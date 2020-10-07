@@ -1,6 +1,6 @@
 [package]
 name          = "nmea-parser"
-version       = "1.1.1"
+version       = "0.1.1"
 publish       = true
 description   = "Rust NMEA sentence parser for AIS and GNSS messages."
 authors       = ["Timo Saarinen <zaari@mailbox.org>"]
