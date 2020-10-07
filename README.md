@@ -16,7 +16,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.1.0"
+nmea-parser = "0.1.1"
 ```
 
 Sample example program:
