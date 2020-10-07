@@ -1,11 +1,10 @@
 [package]
 name          = "nmea-parser"
-version       = "0.1.1"
-publish       = true
+version       = "0.2.0-dev"
+publish       = false
 description   = "Rust NMEA sentence parser for AIS and GNSS messages."
 authors       = ["Timo Saarinen <zaari@mailbox.org>"]
 license       = "Apache-2.0"
-#homepage      = ""
 repository    = "https://github.com/zaari/nmea-parser"
 documentation = "https://docs.rs/nmea-parser"
 keywords      = ["nmea", "ais", "gnss", "gps"]
@@ -16,7 +15,7 @@ edition       = "2018"
 [dependencies]
 bitvec     = "0.19.2"
 regex      = "1.3.9"
-chrono     = { version = "0.4.19", features = ["serde"] }
+chrono     = "0.4.19"
 log        = "0.4.11"
 env_logger = "0.7.1"
 assert     = "0.7.4"

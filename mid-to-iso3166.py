@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 
+#
+# This script is used to generate code for VesselStaticData::country method in types.rs.
+#
+
+
 import re
 import sys
 
@@ -610,7 +615,7 @@ for iso3166_line in ISO_3166.split('\n'):
   elif iso3166_line != "":
     print("Failed to parse: %s" % iso3166_line)
 
-# Parse MMSI MID mapping
+# Parse MMSI MID mapping and generate Rust code
 prev_mid = None
 for mid_line in MID.split('\n'):
   mo = re.compile(r"^(\d\d\d)\s+(.*)$").match(mid_line)

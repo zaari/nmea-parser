@@ -19,7 +19,7 @@ Include the following fragment in your `Cargo.toml` file:
 nmea-parser = "0.1.1"
 ```
 
-Sample example program:
+Sample program:
 
 ```rust
 use nmea_parser::*;

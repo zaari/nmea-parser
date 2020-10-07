@@ -16,7 +16,7 @@ limitations under the License.
 use super::*;
 
 // -------------------------------------------------------------------------------------------------
-/// Result from function `decode_sentence`.
+/// Result from function `decode_sentence`
 #[derive(Clone, Debug, PartialEq)]
 pub enum ParsedSentence {
     /// The given sentence is only part of multi-sentence message and we need more data to
@@ -50,7 +50,7 @@ pub enum ParsedSentence {
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS station based on talker id.
+/// AIS station based on talker id
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Station {
     BaseAisStation, // !AB
@@ -72,7 +72,7 @@ impl Default for Station {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Navigation system, deptected from NMEA GNSS sentence prefix (e.g. $BDGGA).
+/// Navigation system, deptected from NMEA GNSS sentence prefix (e.g. $BDGGA)
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationSystem {
     /// Combination of several satellite systems
@@ -217,7 +217,7 @@ pub struct VesselDynamicData {
 
 }
 
-/// AIS type, either Class A or Class B.
+/// AIS type, either Class A or Class B
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AisClass {
     /// AIS class not known.
@@ -246,6 +246,17 @@ impl std::fmt::Display for AisClass {
         
     }
 }
+
+impl LatLon for VesselDynamicData {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
 
 /// Navigation status for VesselDynamicData
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -373,7 +384,7 @@ pub struct VesselStaticData {
     pub mothership_mmsi: Option<u32>,
 }
 
-/// Ship type derived from ship and cargo type field.
+/// Ship type derived from ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ShipType {
     NotAvailable, // 0
@@ -507,7 +518,7 @@ impl std::fmt::Display for ShipType {
     }
 }
 
-/// Cargo type derived from ship and cargo type field.
+/// Cargo type derived from ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CargoType {
     Undefined, // x0
@@ -523,7 +534,7 @@ pub enum CargoType {
 }
 
 impl CargoType {
-    /// Construct a CargoType based on 8-bit NMEA identifier.
+    /// Construct a CargoType based on 8-bit NMEA identifier
     pub fn new(raw: u8) -> CargoType {
         match raw {
             10 | 20 | 40 | 60 | 70 | 80 | 90 => {
@@ -964,7 +975,17 @@ pub struct PositionTimeSatelites {
     pub ref_station_id: Option<u16>,
 }
 
-/// Part of GGA.
+impl LatLon for PositionTimeSatelites {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
+/// Part of GGA
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum GpsQualityIndicator {
     Invalid, // 0
@@ -1024,8 +1045,18 @@ pub struct PositionVelocityTime {
     pub variation: Option<f64>
 }
 
+impl LatLon for PositionVelocityTime {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
-/// GSA - GPS DOP and active satellites
+/// GSA - GPS dilution of position (DOP) and active satellites
 #[derive(Clone, Debug, PartialEq)]
 pub struct PositionPrecision {
     /// Navigation system
@@ -1050,7 +1081,7 @@ pub struct PositionPrecision {
     pub vdop: Option<f64>,
 }
 
-/// Position fix type.
+/// Position fix type
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FixMode {
     /// No fix.
@@ -1064,7 +1095,7 @@ pub enum FixMode {
 }
 
 // -------------------------------------------------------------------------------------------------
-/// GSV - Satellite information (for GSV).
+/// GSV - Satellite information
 #[derive(Clone, Debug, PartialEq)]
 pub struct SatelliteInformation {
     /// Navigation system
@@ -1107,7 +1138,7 @@ pub struct VelocityMadeGood {
     pub faa_mode: Option<FaaMode>,
 }
 
-/// NMEA 2.3 standard has this information.
+/// NMEA 2.3 standard has this information
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum FaaMode {
     /// Autonomous mode (automatic 2D/3D)
@@ -1173,9 +1204,19 @@ pub struct Position {
     pub faa_mode: Option<FaaMode>,
 }
 
+impl LatLon for Position {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
-/// Used to store partial sentences between function calls.
+/// Used to store partial sentences between function calls
 pub struct NmeaStore {
     saved_fragments: HashMap<String, String>,
     saved_vsds: HashMap<u32, VesselStaticData>,
@@ -1224,6 +1265,19 @@ impl NmeaStore {
     pub fn vsds_count(&self) -> usize {
         self.saved_vsds.len()
     }
+}
+
+// -------------------------------------------------------------------------------------------------
+
+/// Provides access to geographical position in the object.
+pub trait LatLon {
+    /// Returns the latitude of the position contained by the object. If the position is not
+    /// available returns None.
+    fn latitude(&self) -> Option<f64>;
+
+    /// Returns the longitude of the position contained by the object. If the position is not
+    /// available returns None.
+    fn longitude(&self) -> Option<f64>;
 }
 
 // -------------------------------------------------------------------------------------------------

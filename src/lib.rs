@@ -14,13 +14,24 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+//! # NMEA Parser: NMEA parser for Rust
+//!
+//! This Rust crate aims to cover the most important AIS and GNSS sentences. 
+//! Supports AIS class A and B types. Identifies GPS, GLONASS, Galileo, BeiDou, 
+//! Navic and QZSS satellite systems. 
+//!
+
 #![allow(dead_code)]
 
 #[macro_use] extern crate log;
 extern crate env_logger;
 
-
 extern crate chrono;
+
+use std::collections::{HashMap};
+use bitvec::prelude::*;
+use chrono::{DateTime};
+use chrono::prelude::*;
 
 mod ais_vdm_t1t2t3;
 mod ais_vdm_t5;
@@ -38,11 +49,6 @@ mod util;
 
 pub use types::*;
 use util::*;
-
-use std::collections::{HashMap};
-use bitvec::prelude::*;
-use chrono::{DateTime};
-use chrono::prelude::*;
 
 /// Decode NMEA sentence into ParsedSentence string. If the given sentence is part of 
 /// multipart message, the state is saved into `store` object and `ParsedSentence::Incomplete` 
