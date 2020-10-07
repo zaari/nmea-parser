@@ -5,7 +5,7 @@
 [docsrs-image]: https://docs.rs/nmea-parser/badge.svg
 [docsrs]: https://docs.rs/nmea-parser
 
-This Rust crate aims to cover the most important AIS and GNSS sentences. 
+This Rust crate aims to cover the most important AIS and GNSS sentences. Supports AIS class A and B types. Identifies GPS, GLONASS, Galileo, BeiDou, Navic and QZSS satellite systems. 
 
 ## Usage
 
