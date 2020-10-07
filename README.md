@@ -1,4 +1,7 @@
-# NMEA Parsin for Rust
+# NMEA Parser for Rust
+
+[![NMEA Parser on crates.io][cratesio-image]][cratesio]
+[![NMEA Parser on docs.rs][docsrs-image]][docsrs]
 
 [cratesio-image]: https://img.shields.io/crates/v/nmea-parser.svg
 [cratesio]: https://crates.io/crates/nmea-parser
