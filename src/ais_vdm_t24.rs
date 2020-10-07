@@ -33,7 +33,7 @@ pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaStore, own_vessel:
     // Pick the fields 
     let vsd = VesselStaticData{
         own_vessel:              own_vessel,
-        ais_type:                AisType::ClassB,
+        ais_type:                AisClass::ClassB,
         mmsi:                    pick_u64(&bv, 8, 30) as u32,
         ais_version_indicator:   0,
         imo_number:              None,

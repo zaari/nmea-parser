@@ -32,9 +32,9 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
         mode2_3d: {
             let s = split.get(2).unwrap_or(&"");
             match s {
-                &"1" => Some(FixType::NotAvailable),
-                &"2" => Some(FixType::Fix2D),
-                &"3" => Some(FixType::Fix3D),
+                &"1" => Some(FixMode::NotAvailable),
+                &"2" => Some(FixMode::Fix2D),
+                &"3" => Some(FixMode::Fix3D),
                 &"" => None,
                 _ => { return Err(format!("Invalid GPGSA fix type: {}", s)); }
             }
@@ -69,7 +69,7 @@ mod test {
                     // The expected result
                     ParsedSentence::Gsa(gsa) => {
                         assert_eq!(gsa.mode1_automatic, Some(true));
-                        assert_eq!(gsa.mode2_3d, Some(FixType::Fix3D));
+                        assert_eq!(gsa.mode2_3d, Some(FixMode::Fix3D));
                         assert_eq!(gsa.prn_numbers, vec![19,28,14,18,27,22,31,39]);
                         assert_eq!(gsa.pdop, Some(1.7));
                         assert_eq!(gsa.hdop, Some(1.0));

@@ -20,7 +20,7 @@ use super::*;
 pub fn handle(bv: &BitVec, _station: Station, own_vessel: bool) -> Result<ParsedSentence, String> {
     return Ok(ParsedSentence::VesselStaticData(VesselStaticData{
         own_vessel:              own_vessel,
-        ais_type:                AisType::ClassB,
+        ais_type:                AisClass::ClassB,
         mmsi:                    pick_u64(&bv, 8, 30) as u32,
         ais_version_indicator:   pick_u64(&bv, 38, 2) as u8,
         imo_number: {

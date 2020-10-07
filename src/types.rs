@@ -129,7 +129,7 @@ pub struct VesselDynamicData {
     pub station: Station,
 
     /// Class A or Class B
-    pub ais_type: AisType,
+    pub ais_type: AisClass,
 
     /// User ID (30 bits)
     pub mmsi: u32,
@@ -217,32 +217,37 @@ pub struct VesselDynamicData {
 
 }
 
-// AIS type.
+/// AIS type, either Class A or Class B.
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum AisType {
+pub enum AisClass {
+    /// AIS class not known.
     Unknown,
+    
+    /// AIS class A.
     ClassA, // Message types 1, 2, 3, 5
+
+    /// AIS class B.
     ClassB, // Message types 14, 18, 19, 24
 }
 
-impl Default for AisType {
-    fn default() -> AisType {
-        AisType::Unknown
+impl Default for AisClass {
+    fn default() -> AisClass {
+        AisClass::Unknown
     }
 }
 
-impl std::fmt::Display for AisType {
+impl std::fmt::Display for AisClass {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AisType::Unknown => { write!(f, "?") }
-            AisType::ClassA => { write!(f, "A") }
-            AisType::ClassB => { write!(f, "B") }
+            AisClass::Unknown => { write!(f, "?") }
+            AisClass::ClassA => { write!(f, "A") }
+            AisClass::ClassB => { write!(f, "B") }
         }
         
     }
 }
 
-// Navigation status for VesselDynamicData
+/// Navigation status for VesselDynamicData
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationStatus {
     UnderWayUsingEngine, // 0
@@ -293,7 +298,7 @@ impl Default for NavigationStatus {
     }
 }
 
-// Location metadata about positioning system
+/// Location metadata about positioning system
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositioningSystemMeta {
     Operative, // When timestamp second is 0-59
@@ -311,7 +316,7 @@ pub struct VesselStaticData {
     pub own_vessel: bool,
 
     /// Class A or Class B
-    pub ais_type: AisType,
+    pub ais_type: AisClass,
 
     /// User ID (30 bits)
     pub mmsi: u32,
@@ -922,7 +927,7 @@ impl VesselStaticData {
 }
 
 // -------------------------------------------------------------------------------------------------
-/// GGA: Time, position, and fix related data
+/// GGA - Time, position, and fix related data
 #[derive(Clone, Debug, PartialEq)]
 pub struct PositionTimeSatelites {
     /// Navigation system
@@ -991,7 +996,7 @@ impl GpsQualityIndicator {
 }
 
 // -------------------------------------------------------------------------------------------------
-/// RMC: Position, velocity, and time (Recommended Minimum sentence C)
+/// RMC - Position, velocity, and time (Recommended Minimum sentence C)
 #[derive(Clone, Debug, PartialEq)]
 pub struct PositionVelocityTime {
     /// Navigation system
@@ -1020,7 +1025,7 @@ pub struct PositionVelocityTime {
 }
 
 // -------------------------------------------------------------------------------------------------
-/// GSA: GPS DOP and active satellites
+/// GSA - GPS DOP and active satellites
 #[derive(Clone, Debug, PartialEq)]
 pub struct PositionPrecision {
     /// Navigation system
@@ -1030,7 +1035,7 @@ pub struct PositionPrecision {
     pub mode1_automatic: Option<bool>,
     
     /// Mode 2, fix type: 
-    pub mode2_3d: Option<FixType>,
+    pub mode2_3d: Option<FixMode>,
     
     /// PRN numbers used (space for 12)
     pub prn_numbers: Vec<u8>,
@@ -1045,8 +1050,9 @@ pub struct PositionPrecision {
     pub vdop: Option<f64>,
 }
 
+/// Position fix type.
 #[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FixType {
+pub enum FixMode {
     /// No fix.
     NotAvailable,
     
@@ -1058,7 +1064,7 @@ pub enum FixType {
 }
 
 // -------------------------------------------------------------------------------------------------
-/// GSV: Satellite information (for GSV).
+/// GSV - Satellite information (for GSV).
 #[derive(Clone, Debug, PartialEq)]
 pub struct SatelliteInformation {
     /// Navigation system
@@ -1079,7 +1085,7 @@ pub struct SatelliteInformation {
 
 // -------------------------------------------------------------------------------------------------
 
-/// VTG: Track made good and speed over ground
+/// VTG - Track made good and speed over ground
 #[derive(Clone, Debug, PartialEq)]
 pub struct VelocityMadeGood {
     /// Navigation system

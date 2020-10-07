@@ -44,10 +44,9 @@ use bitvec::prelude::*;
 use chrono::{DateTime};
 use chrono::prelude::*;
 
-/// Decode NMEA sentence into ParsedSentence string. In case of multi-fragment sentences up to
-/// two two fragments are supported. Notice that in case of class B AIVDM VesselStaticData 
-/// results you have to merge them with a possible existing VesselStaticData of the same same MMSI.
-/// See `VesselStaticData::merge` for more information.
+/// Decode NMEA sentence into ParsedSentence string. If the given sentence is part of 
+/// multipart message, the state is saved into `store` object and `ParsedSentence::Incomplete` 
+/// returned. The actual result is returned when all the parts have been given to this function.
 pub fn decode_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<ParsedSentence, String> {
     // https://gpsd.gitlab.io/gpsd/AIVDM.html#_aivdmaivdo_sentence_layer
     // http://www.allaboutais.com/jdownloads/AIS%20standards%20documentation/itu-m.1371-4-201004.pdf

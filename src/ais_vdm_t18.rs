@@ -26,7 +26,7 @@ pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedS
             station
         },
         ais_type: {
-            AisType::ClassB
+            AisClass::ClassB
         },
         mmsi: {
             pick_u64(&bv, 8, 30) as u32
