@@ -50,10 +50,10 @@ mod util;
 pub use types::*;
 use util::*;
 
-/// Decode NMEA sentence into ParsedSentence string. If the given sentence is part of 
+/// Parses NMEA sentence into `ParsedSentence` enum. If the given sentence is part of 
 /// multipart message, the state is saved into `store` object and `ParsedSentence::Incomplete` 
-/// returned. The actual result is returned when all the parts have been given to this function.
-pub fn decode_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<ParsedSentence, String> {
+/// returned. The actual result is returned when all the parts have been provided for the function.
+pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<ParsedSentence, String> {
     // https://gpsd.gitlab.io/gpsd/AIVDM.html#_aivdmaivdo_sentence_layer
     // http://www.allaboutais.com/jdownloads/AIS%20standards%20documentation/itu-m.1371-4-201004.pdf
 
@@ -431,14 +431,14 @@ mod test {
     #[test]
     fn test_parse_corrupted() {
         // Try a sentence with mismatching checksum
-        assert!(decode_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*41", 
+        assert!(parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*41", 
                                 &mut NmeaStore::new()).ok().is_none());
     }
 
     #[test]
     fn test_parse_missing_checksum() {
         // Try a sentence without checksum
-        assert!(decode_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0", 
+        assert!(parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0", 
                                 &mut NmeaStore::new()).ok().is_some());
     }
 }

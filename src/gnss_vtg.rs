@@ -38,7 +38,7 @@ mod test {
     #[test]
     fn test_parse_bdvtg() {
         let mut store = NmeaStore::new();
-        match decode_sentence("$BDVTG,054.7,T,034.4,M,005.5,N,010.2,K,D*31", &mut store) 
+        match parse_sentence("$BDVTG,054.7,T,034.4,M,005.5,N,010.2,K,D*31", &mut store) 
         {
             Ok(ps) => {
                 match ps {

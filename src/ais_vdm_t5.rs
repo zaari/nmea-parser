@@ -94,7 +94,7 @@ mod test {
         let s2 = "!AIVDM,2,2,1,A,88888888880,2*25";
         
         // Process fragment 1
-        match decode_sentence(s1, &mut store) {
+        match parse_sentence(s1, &mut store) {
             Ok(_) => {
             },
             Err(e) => {
@@ -104,7 +104,7 @@ mod test {
         assert_eq!(store.strings_count(), 1);
         
         // Process fragment 2
-        match decode_sentence(s2, &mut store) {
+        match parse_sentence(s2, &mut store) {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -149,7 +149,7 @@ mod test {
         }
         
         // Process fragment 2 (reversed order)
-        match decode_sentence(s2, &mut store) {
+        match parse_sentence(s2, &mut store) {
             Ok(_) => {
             },
             Err(e) => {
@@ -159,7 +159,7 @@ mod test {
         assert_eq!(store.strings_count(), 1);
         
         // Process fragment 1 (reversed order)
-        match decode_sentence(s1, &mut store) {
+        match parse_sentence(s1, &mut store) {
             Ok(ps) => {
                 match ps {
                     // The expected result

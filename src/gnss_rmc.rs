@@ -61,7 +61,7 @@ mod test {
 
     #[test]
     fn test_parse_cprmc() {
-        match decode_sentence("$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191120,020.3,E*67", 
+        match parse_sentence("$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191120,020.3,E*67", 
             &mut NmeaStore::new()) 
         {
             Ok(ps) => {
@@ -92,7 +92,7 @@ mod test {
 
     #[test]
     fn test_parse_cprmc_empty_fields() {
-        match decode_sentence("$GPRMC,225446,A,,,,,,,070809,,*23", &mut NmeaStore::new()) {
+        match parse_sentence("$GPRMC,225446,A,,,,,,,070809,,*23", &mut NmeaStore::new()) {
             Ok(ps) => {
                 match ps {
                     // The expected result

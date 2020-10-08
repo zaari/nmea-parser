@@ -53,7 +53,7 @@ mod test {
     #[test]
     fn test_parse_gagll() {
         let mut store = NmeaStore::new();
-        match decode_sentence("$GAGLL,4916.45,N,12311.12,W,225444,A,D*48", &mut store) 
+        match parse_sentence("$GAGLL,4916.45,N,12311.12,W,225444,A,D*48", &mut store) 
         {
             Ok(ps) => {
                 match ps {

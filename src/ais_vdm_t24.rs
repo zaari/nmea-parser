@@ -222,7 +222,7 @@ mod test {
     
         // https://fossies.org/linux/gpsd/test/sample.aivdm
         let s1 = "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D";
-        match decode_sentence(s1, &mut store) {
+        match parse_sentence(s1, &mut store) {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -242,7 +242,7 @@ mod test {
             }
         }
         let s2 = "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40";
-        match decode_sentence(s2, &mut store) {
+        match parse_sentence(s2, &mut store) {
             Ok(ps) => {
                 match ps {
                     // The expected result

@@ -144,7 +144,7 @@ mod test {
 
     #[test]
     fn test_parse_avidm_type1() {
-        match decode_sentence("!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A", 
+        match parse_sentence("!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {
                 match ps {
@@ -181,7 +181,7 @@ mod test {
 
     #[test]
     fn test_parse_avidm_type2() {
-        match decode_sentence("!AIVDM,1,1,,A,16SteH0P00Jt63hHaa6SagvJ087r,0*42", 
+        match parse_sentence("!AIVDM,1,1,,A,16SteH0P00Jt63hHaa6SagvJ087r,0*42", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {
                 match ps {
@@ -218,7 +218,7 @@ mod test {
 
     #[test]
     fn test_parse_avidm_type3() {
-        match decode_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*40", 
+        match parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*40", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {
                 match ps {

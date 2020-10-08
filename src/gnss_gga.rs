@@ -44,7 +44,7 @@ mod test {
 
     #[test]
     fn test_parse_cpgga() {
-        match decode_sentence("$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47", 
+        match parse_sentence("$GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47", 
             &mut NmeaStore::new()) 
         {
             Ok(ps) => {
@@ -81,7 +81,7 @@ mod test {
 
     #[test]
     fn test_parse_cpgga_southwest() {
-        match decode_sentence("$GPGGA,123519,4807.0,S,01131.0,W,1,08,0.9,545.4,M,46.9,M,,", 
+        match parse_sentence("$GPGGA,123519,4807.0,S,01131.0,W,1,08,0.9,545.4,M,46.9,M,,", 
             &mut NmeaStore::new()) 
         {
             Ok(ps) => {
@@ -107,7 +107,7 @@ mod test {
 
     #[test]
     fn test_parse_cpgga_empty_fields() {
-        match decode_sentence("$GPGGA,123519,,,,,,,,,,,,,*5B", &mut NmeaStore::new()) 
+        match parse_sentence("$GPGGA,123519,,,,,,,,,,,,,*5B", &mut NmeaStore::new()) 
         {
             Ok(ps) => {
                 match ps {

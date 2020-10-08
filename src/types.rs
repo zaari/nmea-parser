@@ -16,7 +16,7 @@ limitations under the License.
 use super::*;
 
 // -------------------------------------------------------------------------------------------------
-/// Result from function `decode_sentence`
+/// Result from function `parse_sentence`
 #[derive(Clone, Debug, PartialEq)]
 pub enum ParsedSentence {
     /// The given sentence is only part of multi-sentence message and we need more data to

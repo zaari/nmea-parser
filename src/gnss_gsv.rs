@@ -75,7 +75,7 @@ mod test {
     fn test_parse_cpgsv() {
         let mut store = NmeaStore::new();
         
-        match decode_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74", 
+        match parse_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74", 
             &mut store) 
         {
             Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
@@ -83,7 +83,7 @@ mod test {
         }
         assert_eq!(store.strings_count(), 1);
 
-        match decode_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74", 
+        match parse_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74", 
             &mut store) 
         {
             Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
@@ -91,7 +91,7 @@ mod test {
         }
         assert_eq!(store.strings_count(), 2);
 
-        match decode_sentence("$GPGSV,3,3,11,22,42,067,42,24,14,311,43,27,05,244,00,,,,*4D", 
+        match parse_sentence("$GPGSV,3,3,11,22,42,067,42,24,14,311,43,27,05,244,00,,,,*4D", 
             &mut store) 
         {
             Ok(ps) => {

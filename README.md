@@ -16,7 +16,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.1.1"
+nmea-parser = "0.2.0"
 ```
 
 Sample program:
@@ -28,7 +28,7 @@ pub fn main() -> Result<(), String> {
     let mut store = NmeaStore::new();
     let sentence = "$GAGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*56";
     
-    match nmea_parser::decode_sentence(sentence, &mut store)? {
+    match nmea_parser::parse_sentence(sentence, &mut store)? {
         ParsedSentence::VesselDynamicData(vdd) => {
             println!("MMSI:  {}",        vdd.mmsi);
             println!("Speed: {:.1} kts", vdd.sog_knots.unwrap());
@@ -61,8 +61,9 @@ pub fn main() -> Result<(), String> {
 
 |Version |Category    |Goal                                                                 |
 |--------|------------|---------------------------------------------------------------------|
-|**0.1** |AIS, GNSS   |AIS VDM/VDO t1-3, t5, t18-19, t24, GGA, RMC, GSA, GSV, VTG, GLL      |
-|0.2     |AIS         |AIS VDM/VDO t4, t6-t17, t20-t23, t25-27                              |
+|0.1     |AIS, GNSS   |AIS VDM/VDO t1-3, t5, t18-19, t24, GGA, RMC, GSA, GSV, VTG, GLL      |
+|**0.2** |refactoring |code refactoring                                                     |
+|0.3     |AIS         |AIS VDM/VDO t4, t6-t17, t20-t23, t25-27                              |
 |1.0     |meta        |API freeze, enhanced documentation                                   |
 |1.1     |GNSS        |ALM, TRF, STN, VBW, XTC, XTE, ZDA                                    |
 |1.2     |GNSS, route |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                               |
