@@ -20,7 +20,7 @@ use super::*;
 pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, String> {
     let split: Vec<&str> = sentence.split(',').collect();
     
-    return Ok(ParsedSentence::Rmc(PositionVelocityTime{
+    return Ok(ParsedSentence::Rmc(RmcData{
         system:             nav_system,
         timestamp:          parse_yymmdd_hhmmss(split.get(9).unwrap_or(&""), 
                                                 split.get(1).unwrap_or(&"")).ok(),

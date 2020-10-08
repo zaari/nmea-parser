@@ -13,54 +13,35 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
+//! AIS-related data structures
+
+#[doc(hidden)]
+pub mod vdm_t1t2t3;
+#[doc(hidden)]
+pub mod vdm_t5;
+#[doc(hidden)]
+pub mod vdm_t18;
+#[doc(hidden)]
+pub mod vdm_t19;
+#[doc(hidden)]
+pub mod vdm_t24;
+
 use super::*;
-
-// -------------------------------------------------------------------------------------------------
-/// Result from function `parse_sentence`
-#[derive(Clone, Debug, PartialEq)]
-pub enum ParsedSentence {
-    /// The given sentence is only part of multi-sentence message and we need more data to
-    /// create the actual result. State is stored in `NmeaStore` object.
-    Incomplete,
-
-    /// AIS VDM/VDO t1, t2, t3 and t18
-    VesselDynamicData(VesselDynamicData),
-    
-    /// AIS VDM/VDO t5 and t24
-    VesselStaticData(VesselStaticData),
-    
-    /// GGA
-    Gga(PositionTimeSatelites),
-    
-    /// RMC
-    Rmc(PositionVelocityTime),   
-    
-    /// GSA
-    Gsa(PositionPrecision),         
-    
-    /// GSV
-    Gsv(Vec<SatelliteInformation>),   
-    
-    /// VTG
-    Vtg(VelocityMadeGood),
-    
-    /// GLL
-    Gll(Position),
-}
 
 // -------------------------------------------------------------------------------------------------
 
 /// AIS station based on talker id
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Station {
-    BaseAisStation, // !AB
+    BaseStation, // !AB
     DependentAisBaseStation, // !AD
-    MobileAisStation, // !AI (the most common one)
-    AidToNavigationAisStation, // !AN
+    MobileStation, // !AI (the most common one)
+    AidToNavigationStation, // !AN
     AisReceivingStation, // !AR
     LimitedBaseStation, // !AS
     AisTransmittingStation, // !AT
-    RepeaterAisStation, // !AX
+    RepeaterStation, // !AX
     Other, // !BS, !SA, etc.
 }
 
@@ -70,47 +51,18 @@ impl Default for Station {
     }
 }
 
-// -------------------------------------------------------------------------------------------------
-
-/// Navigation system, deptected from NMEA GNSS sentence prefix (e.g. $BDGGA)
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum NavigationSystem {
-    /// Combination of several satellite systems
-    Combination, // GNxxx
-    
-    /// American GPS
-    Gps, // GPxxx
-    
-    /// Russian GLONASS
-    Glonass, // GLxxx
-    
-    /// European Galileo
-    Galileo, // GAxxx
-    
-    // Chinese BeiDou
-    Beidou,  // BDxxx
-    
-    // Indian NavIC
-    Navic,  // GIxxx
-    
-    // Japanese Qzss
-    Qzss,  // QZxxx
-    
-    // Some other
-    Other,
-}
-
-impl std::fmt::Display for NavigationSystem {
+impl std::fmt::Display for Station {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            NavigationSystem::Combination => { write!(f, "combination") }
-            NavigationSystem::Gps => { write!(f, "GPS") }
-            NavigationSystem::Glonass => { write!(f, "GLONASS") }
-            NavigationSystem::Galileo => { write!(f, "Galileo") }
-            NavigationSystem::Beidou => { write!(f, "BeiDou") }
-            NavigationSystem::Navic => { write!(f, "Navic") }
-            NavigationSystem::Qzss => { write!(f, "QZSS") }
-            NavigationSystem::Other => { write!(f, "other") }
+            Station::BaseStation => { write!(f, "base station") }
+            Station::DependentAisBaseStation => { write!(f, "dependent AIS base station") }
+            Station::MobileStation => { write!(f, "mobile station") }
+            Station::AidToNavigationStation => { write!(f, "aid to navigation station") }
+            Station::AisReceivingStation => { write!(f, "ais receiving station") }
+            Station::LimitedBaseStation => { write!(f, "limited base station") }
+            Station::AisTransmittingStation => { write!(f, "AIS transmitting station") }
+            Station::RepeaterStation => { write!(f, "repeater station") }
+            Station::Other => { write!(f, "other") }
         }
         
     }
@@ -119,7 +71,7 @@ impl std::fmt::Display for NavigationSystem {
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIVDM types 1, 2, 3 and 18
+/// AIS VDM/VDO types 1, 2, 3 and 18
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselDynamicData { 
     /// True if the data is about own vessel, false if about other.
@@ -217,7 +169,7 @@ pub struct VesselDynamicData {
 
 }
 
-/// AIS type, either Class A or Class B
+/// AIS class which is either Class A or Class B
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum AisClass {
     /// AIS class not known.
@@ -239,9 +191,9 @@ impl Default for AisClass {
 impl std::fmt::Display for AisClass {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AisClass::Unknown => { write!(f, "?") }
-            AisClass::ClassA => { write!(f, "A") }
-            AisClass::ClassB => { write!(f, "B") }
+            AisClass::Unknown => { write!(f, "unknown") }
+            AisClass::ClassA => { write!(f, "Class A") }
+            AisClass::ClassB => { write!(f, "Class B") }
         }
         
     }
@@ -258,7 +210,7 @@ impl LatLon for VesselDynamicData {
 }
 
 
-/// Navigation status for VesselDynamicData
+/// AIS navigation status for VesselDynamicData
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationStatus {
     UnderWayUsingEngine, // 0
@@ -309,7 +261,7 @@ impl Default for NavigationStatus {
     }
 }
 
-/// Location metadata about positioning system
+/// AIS location metadata about positioning system
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositioningSystemMeta {
     Operative, // When timestamp second is 0-59
@@ -318,9 +270,22 @@ pub enum PositioningSystemMeta {
     Inoperative,
 }
 
+impl std::fmt::Display for PositioningSystemMeta {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PositioningSystemMeta::Operative => { write!(f, "operative") }
+            PositioningSystemMeta::ManualInputMode => { write!(f, "manual input mode") }
+            PositioningSystemMeta::DeadReckoningMode => { write!(f, "dead reckoning mode") }
+            PositioningSystemMeta::Inoperative => { write!(f, "inoperative") }
+        }
+        
+    }
+}
+
+
 // -------------------------------------------------------------------------------------------------
 
-/// AIVDM type 5 and 24
+/// AIS VDM/VDO type 5 and 24
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselStaticData { 
     /// True if the data is about own vessel, false if about other vessel.
@@ -384,7 +349,7 @@ pub struct VesselStaticData {
     pub mothership_mmsi: Option<u32>,
 }
 
-/// Ship type derived from ship and cargo type field
+/// AIS ship type derived from ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ShipType {
     NotAvailable, // 0
@@ -518,7 +483,7 @@ impl std::fmt::Display for ShipType {
     }
 }
 
-/// Cargo type derived from ship and cargo type field
+/// AIS cargo type derived from ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CargoType {
     Undefined, // x0
@@ -599,7 +564,7 @@ impl Default for CargoType {
 }
 
 
-/// EPFD position fix types
+/// AIS EPFD position fix types
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositionFixType {
     Undefined, // 0
@@ -630,6 +595,23 @@ impl PositionFixType {
                 PositionFixType::Undefined
             },
         }
+    }
+}
+
+impl std::fmt::Display for PositionFixType {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            PositionFixType::Undefined => { write!(f, "undefined") }
+            PositionFixType::GPS => { write!(f, "GPS") }
+            PositionFixType::GLONASS => { write!(f, "GLONASS") }
+            PositionFixType::GPSGLONASS => { write!(f, "GPS/GLONASS") }
+            PositionFixType::LoranC => { write!(f, "Loran-C") }
+            PositionFixType::Chayka => { write!(f, "Chayka") }
+            PositionFixType::IntegratedNavigationSystem => { write!(f, "integrated navigation system") }
+            PositionFixType::Surveyed => { write!(f, "surveyed") }
+            PositionFixType::Galileo => { write!(f, "Galileo") }
+        }
+        
     }
 }
 
@@ -937,397 +919,4 @@ impl VesselStaticData {
     }
 }
 
-// -------------------------------------------------------------------------------------------------
-/// GGA - Time, position, and fix related data
-#[derive(Clone, Debug, PartialEq)]
-pub struct PositionTimeSatelites {
-    /// Navigation system
-    pub system: NavigationSystem,
 
-    /// UTC of position fix
-    pub timestamp: Option<DateTime<Utc>>,
-    
-    /// Latitude in degrees
-    pub latitude: Option<f64>,
-
-    /// Longitude in degrees
-    pub longitude: Option<f64>,
-    
-    /// GPS QUality indicator
-    pub quality: GpsQualityIndicator,
-    
-    /// Number of satellites in use
-    pub satellite_count: Option<u8>,
-    
-    /// Horizontal dilution of position
-    pub hdop: Option<f64>,
-    
-    /// Altitude above mean sea level (metres)
-    pub altitude: Option<f64>,
-    
-    /// Height of geoid (mean sea level) above WGS84 ellipsoid
-    pub geoid_separation: Option<f64>,
-    
-    /// Age of differential GPS data record, Type 1 or Type 9.
-    pub age_of_dgps: Option<f64>,
-    
-    /// Reference station ID, range 0000-4095
-    pub ref_station_id: Option<u16>,
-}
-
-impl LatLon for PositionTimeSatelites {
-    fn latitude(&self) -> Option<f64> {
-        self.latitude
-    }
-
-    fn longitude(&self) -> Option<f64> {
-        self.longitude
-    }
-}
-
-/// Part of GGA
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum GpsQualityIndicator {
-    Invalid, // 0
-    GpsFix, // 1
-    DGpsFix, // 2
-    PpsFix, // 3
-    RealTimeKinematic, // 4
-    RealTimeKinematicFloat, // 5
-    DeadReckoning, // 6
-    ManualInputMode, // 7
-    SimulationMode, // 8
-}
-
-impl GpsQualityIndicator {
-    pub fn new(a: u8) -> GpsQualityIndicator {
-        match a {
-            0 => GpsQualityIndicator::Invalid,
-            1 => GpsQualityIndicator::GpsFix,
-            2 => GpsQualityIndicator::DGpsFix,
-            3 => GpsQualityIndicator::PpsFix,
-            4 => GpsQualityIndicator::RealTimeKinematic,
-            5 => GpsQualityIndicator::RealTimeKinematicFloat,
-            6 => GpsQualityIndicator::DeadReckoning,
-            7 => GpsQualityIndicator::ManualInputMode,
-            8 => GpsQualityIndicator::SimulationMode,
-            _ => GpsQualityIndicator::Invalid,
-        }
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-/// RMC - Position, velocity, and time (Recommended Minimum sentence C)
-#[derive(Clone, Debug, PartialEq)]
-pub struct PositionVelocityTime {
-    /// Navigation system
-    pub system: NavigationSystem,
-
-    /// Fix datetime based on HHMMSS and DDMMYY
-    pub timestamp: Option<DateTime<Utc>>,
-    
-    /// Status: true = active, false = void.
-    pub status_active: Option<bool>,
-    
-    /// Latitude in degrees    
-    pub latitude: Option<f64>,
-
-    /// Longitude in degrees    
-    pub longitude: Option<f64>,
-    
-    /// Speed over ground in knots
-    pub speed_knots: Option<f64>,
-    
-    /// Track angle in degrees (True)
-    pub bearing: Option<f64>,
-    
-    /// Magnetic variation in degrees
-    pub variation: Option<f64>
-}
-
-impl LatLon for PositionVelocityTime {
-    fn latitude(&self) -> Option<f64> {
-        self.latitude
-    }
-
-    fn longitude(&self) -> Option<f64> {
-        self.longitude
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-/// GSA - GPS dilution of position (DOP) and active satellites
-#[derive(Clone, Debug, PartialEq)]
-pub struct PositionPrecision {
-    /// Navigation system
-    pub system: NavigationSystem,
-
-    /// Mode 1: true = automatic, false = manual
-    pub mode1_automatic: Option<bool>,
-    
-    /// Mode 2, fix type: 
-    pub mode2_3d: Option<FixMode>,
-    
-    /// PRN numbers used (space for 12)
-    pub prn_numbers: Vec<u8>,
-    
-    /// Position (3D) dilution of precision
-    pub pdop: Option<f64>,
-    
-    /// Horizontal dilution of precision
-    pub hdop: Option<f64>,
-    
-    /// Vertical dilution of precision
-    pub vdop: Option<f64>,
-}
-
-/// Position fix type
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FixMode {
-    /// No fix.
-    NotAvailable,
-    
-    /// 2D fix.
-    Fix2D,
-    
-    /// 3d fix.
-    Fix3D,
-}
-
-// -------------------------------------------------------------------------------------------------
-/// GSV - Satellite information
-#[derive(Clone, Debug, PartialEq)]
-pub struct SatelliteInformation {
-    /// Navigation system
-    pub system: NavigationSystem,
-
-    /// Satellite PRN number
-    pub prn_number: u8,
-    
-    /// Elevation in degrees (max 90°)
-    pub elevation: Option<u8>,
-    
-    /// Azimuth in degrees from True north (0°-359°)
-    pub azimuth: Option<u16>,
-    
-    /// SNR, 0-99 dB, None when not tracking
-    pub snr: Option<u8>,
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// VTG - Track made good and speed over ground
-#[derive(Clone, Debug, PartialEq)]
-pub struct VelocityMadeGood {
-    /// Navigation system
-    pub system: NavigationSystem,
-
-    /// Course over ground (CoG), degrees True
-    pub cog_true: Option<f64>,
-    
-    /// Course over ground (CoG), degrees Magnetic
-    pub cog_magnetic: Option<f64>,
-    
-    /// Speed over ground (SoG), knots
-    pub sog_knots: Option<f64>,
-    
-    /// Speed over ground (SoG), km/h
-    pub sog_kph: Option<f64>,
-    
-    /// FAA mode indicator
-    pub faa_mode: Option<FaaMode>,
-}
-
-/// NMEA 2.3 standard has this information
-#[derive(Clone, Copy, Debug, PartialEq)]
-pub enum FaaMode {
-    /// Autonomous mode (automatic 2D/3D)
-    Autonomous,
-    
-    /// Differential GPS mode (DGPS).
-    Differential,
-    
-    /// Estimated (dead-reckoning) data.
-    Estimated,
-    
-    /// No valid data available.
-    NotValid,
-    
-    /// Simulated data.
-    Simulator,
-}
-
-impl FaaMode {
-    pub fn new(val: &str) -> Result<FaaMode, String> {
-        match val {
-            "A" => Ok(FaaMode::Autonomous),
-            "D" => Ok(FaaMode::Differential),
-            "E" => Ok(FaaMode::Estimated),
-            "N" => Ok(FaaMode::NotValid),
-            _ => { Err(format!("Unrecognized FAA information value: {}", val)) }
-        }
-    }
-
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            FaaMode::Autonomous => { write!(f, "A") }
-            FaaMode::Differential => { write!(f, "D") }
-            FaaMode::Estimated => { write!(f, "E") }
-            FaaMode::NotValid => { write!(f, "N") }
-            _ => { write!(f, "?") }
-        }
-        
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// GLL - Geographic Position - Latitude/Longitude
-#[derive(Clone, Debug, PartialEq)]
-pub struct Position {
-    /// Navigation system
-    pub system: NavigationSystem,
-
-    /// Latitude in degrees.
-    pub latitude: Option<f64>,
-
-    /// Longitude in degrees.
-    pub longitude: Option<f64>,
-
-    /// UTC of position fix
-    pub timestamp: Option<DateTime<Utc>>,
-
-    /// True = data valid, false = data invalid.
-    pub data_valid: Option<bool>,
-    
-    /// FAA mode indicator (NMEA 2.3 and later).
-    pub faa_mode: Option<FaaMode>,
-}
-
-impl LatLon for Position {
-    fn latitude(&self) -> Option<f64> {
-        self.latitude
-    }
-
-    fn longitude(&self) -> Option<f64> {
-        self.longitude
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// Used to store partial sentences between function calls
-pub struct NmeaStore {
-    saved_fragments: HashMap<String, String>,
-    saved_vsds: HashMap<u32, VesselStaticData>,
-}
-
-impl NmeaStore {
-    /// Default constructor.
-    pub fn new() -> NmeaStore {
-        NmeaStore {
-            saved_fragments: HashMap::new(),
-            saved_vsds:      HashMap::new(),
-        }
-    }
-    
-    /// Push string-to-string mapping to store.
-    pub fn push_string(&mut self, key: String, value: String) {
-        self.saved_fragments.insert(key, value);
-    }
-
-    /// Pull string-to-string mapping by key from store.
-    pub fn pull_string(&mut self, key: String) -> Option<String> {
-        self.saved_fragments.remove(&key)
-    }
-
-    /// Tests whether the given string-to-string mapping exists in the store.
-    pub fn contains_key(&mut self, key: String) -> bool {
-        self.saved_fragments.contains_key(&key)
-    }
-
-    /// Return number of string-to-string mappings stored.
-    pub fn strings_count(&self) -> usize {
-        self.saved_fragments.len()
-    }
-
-    /// Push MMSI-to-VesselStaticData mapping to store.
-    pub fn push_vsd(&mut self, mmsi: u32, vsd: VesselStaticData) {
-        self.saved_vsds.insert(mmsi, vsd);
-    }
-    
-    /// Pull MMSI-to-VesselStaticData mapping from store.
-    pub fn pull_vsd(&mut self, mmsi: u32) -> Option<VesselStaticData> {
-        self.saved_vsds.remove(&mmsi)
-    }
-
-    /// Return number of MMSI-to-VesselStaticData mappings in store.    
-    pub fn vsds_count(&self) -> usize {
-        self.saved_vsds.len()
-    }
-}
-
-// -------------------------------------------------------------------------------------------------
-
-/// Provides access to geographical position in the object.
-pub trait LatLon {
-    /// Returns the latitude of the position contained by the object. If the position is not
-    /// available returns None.
-    fn latitude(&self) -> Option<f64>;
-
-    /// Returns the longitude of the position contained by the object. If the position is not
-    /// available returns None.
-    fn longitude(&self) -> Option<f64>;
-}
-
-// -------------------------------------------------------------------------------------------------
-
-#[cfg(test)]
-mod test {
-    use super::*;
-
-    #[test]
-    fn test_nmea_store() {
-        let mut store = NmeaStore::new();
-        
-        // String test
-        store.push_string("a".into(), "b".into());
-        assert_eq!(store.strings_count(), 1);
-        store.push_string("c".into(), "d".into());
-        assert_eq!(store.strings_count(), 2);
-        store.pull_string("a".into());
-        assert_eq!(store.strings_count(), 1);
-        store.pull_string("c".into());
-        assert_eq!(store.strings_count(), 0);
-        
-        // VesselStaticData test
-        store.push_vsd(1, Default::default());
-        assert_eq!(store.vsds_count(), 1);
-        store.push_vsd(2, Default::default());
-        assert_eq!(store.vsds_count(), 2);
-        store.pull_vsd(1);
-        assert_eq!(store.vsds_count(), 1);
-        store.pull_vsd(2);
-        assert_eq!(store.vsds_count(), 0);
-    }
-
-    #[test]
-    fn test_mmsi_to_country_code_conversion() {
-        let mut vsd = VesselStaticData::default();
-        
-        vsd.mmsi = 230992580; assert_eq!(vsd.country().unwrap(), "FI");
-        vsd.mmsi = 276009860; assert_eq!(vsd.country().unwrap(), "EE");
-        vsd.mmsi = 265803690; assert_eq!(vsd.country().unwrap(), "SE");
-        vsd.mmsi = 273353180; assert_eq!(vsd.country().unwrap(), "RU");
-        vsd.mmsi = 211805060; assert_eq!(vsd.country().unwrap(), "DE");
-        vsd.mmsi = 257037270; assert_eq!(vsd.country().unwrap(), "NO");
-        vsd.mmsi = 227232370; assert_eq!(vsd.country().unwrap(), "FR");
-        vsd.mmsi = 248221000; assert_eq!(vsd.country().unwrap(), "MT");
-        vsd.mmsi = 374190000; assert_eq!(vsd.country().unwrap(), "PA");
-        vsd.mmsi = 412511368; assert_eq!(vsd.country().unwrap(), "CN");
-        vsd.mmsi = 512003200; assert_eq!(vsd.country().unwrap(), "NZ");
-        vsd.mmsi = 995126020; assert_eq!(vsd.country(), None);
-        vsd.mmsi = 2300049; assert_eq!(vsd.country(), None);
-    }
-
-}

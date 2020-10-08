@@ -220,7 +220,6 @@ mod test {
     fn test_parse_avidm_type24() {
         let mut store = NmeaStore::new();
     
-        // https://fossies.org/linux/gpsd/test/sample.aivdm
         let s1 = "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D";
         match parse_sentence(s1, &mut store) {
             Ok(ps) => {

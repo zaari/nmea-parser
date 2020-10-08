@@ -15,8 +15,6 @@ limitations under the License.
 */
 use super::*;
 
-use chrono::prelude::*;
-
 use regex::Regex;
 
 #[doc(hidden)]
@@ -28,7 +26,6 @@ pub fn make_fragment_key(sentence_type: &String, message_id: u64, fragment_count
 /// Converts AIVDM playload armored string into bit vector.
 #[doc(hidden)]
 pub fn parse_payload(payload: &String) -> Result<BitVec, String> {   
-    // As described on page https://gpsd.gitlab.io/gpsd/AIVDM.html#_aivdmaivdo_payload_armoring
     let mut bv = BitVec::<LocalBits, usize>::with_capacity(payload.len() * 6); // or Lsb0 or Msb0 ?
     for c in payload.chars() {
         let mut ci = (c as u8) - 48;
@@ -213,6 +210,8 @@ pub fn parse_longitude_dddmm_mmm(lon_string: &str, eastwest: &str) -> Result<Opt
         Ok(None)
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

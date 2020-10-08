@@ -103,7 +103,6 @@ mod test {
 
     #[test]
     fn test_parse_avidm_type18() {
-        // https://fossies.org/linux/gpsd/test/sample.aivdm
         let s = "!AIVDM,1,1,,A,B52K>;h00Fc>jpUlNV@ikwpUoP06,0*4C";
         match parse_sentence(s, &mut NmeaStore::new()) {
             Ok(ps) => {

@@ -13,7 +13,10 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 use super::*;
+
+// -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
 /// xxGGA: Global Positioning System Fix Data
@@ -21,14 +24,14 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
     
-    return Ok(ParsedSentence::Gga(PositionTimeSatelites{
+    return Ok(ParsedSentence::Gga(GgaData{
         system:             nav_system,
         timestamp:          parse_hhmmss(split.get(1).unwrap_or(&""), now).ok(),
         latitude:           parse_latitude_ddmm_mmm(split.get(2).unwrap_or(&""), 
                                                     split.get(3).unwrap_or(&""))?,
         longitude:          parse_longitude_dddmm_mmm(split.get(4).unwrap_or(&""), 
                                                       split.get(5).unwrap_or(&""))?,
-        quality:            GpsQualityIndicator::new(pick_number_field(&split, 6)?.unwrap_or(0)),
+        quality:            GgaQualityIndicator::new(pick_number_field(&split, 6)?.unwrap_or(0)),
         satellite_count:    pick_number_field(&split, 7)?,
         hdop:               pick_number_field(&split, 8)?,
         altitude:           pick_number_field(&split, 9)?,
@@ -57,7 +60,7 @@ mod test {
                         });
                         assert::close(gga.latitude.unwrap_or(0.0), 48.117, 0.001);
                         assert::close(gga.longitude.unwrap_or(0.0), 11.517, 0.001);
-                        assert_eq!(gga.quality, GpsQualityIndicator::GpsFix);
+                        assert_eq!(gga.quality, GgaQualityIndicator::GpsFix);
                         assert_eq!(gga.satellite_count.unwrap_or(0), 8);
                         assert::close(gga.hdop.unwrap_or(0.0), 0.9, 0.1);
                         assert::close(gga.altitude.unwrap_or(0.0), 545.4, 0.1);
@@ -119,7 +122,7 @@ mod test {
                         });
                         assert_eq!(gga.latitude, None);
                         assert_eq!(gga.longitude, None);
-                        assert_eq!(gga.quality, GpsQualityIndicator::Invalid);
+                        assert_eq!(gga.quality, GgaQualityIndicator::Invalid);
                         assert_eq!(gga.satellite_count, None);
                         assert_eq!(gga.hdop, None);
                         assert_eq!(gga.altitude, None);
