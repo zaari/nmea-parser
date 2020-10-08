@@ -22,7 +22,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaSto
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Gll(Position{
+    return Ok(ParsedSentence::Gll(GllData{
         system:             nav_system,
         latitude:           parse_latitude_ddmm_mmm(split.get(1).unwrap_or(&""), 
                                                     split.get(2).unwrap_or(&""))?,

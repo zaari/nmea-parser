@@ -40,7 +40,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaStor
                 let split: Vec<&str> = sentence.split(',').collect();
                 for j in 0..4 {
                     if let Some(prn) = pick_number_field(&split, 4 + 4 * j as usize + 0).ok().unwrap_or(None) {
-                        v.push(SatelliteInformation{
+                        v.push(GsvData{
                             system: nav_system,
                             prn_number: prn,
                             elevation:  pick_number_field(&split, 4 + 4 * j as usize + 1).ok().unwrap_or(None),

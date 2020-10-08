@@ -89,7 +89,6 @@ mod test {
     fn test_parse_avidm_type5() {
         let mut store = NmeaStore::new();
     
-        // https://fossies.org/linux/gpsd/test/sample.aivdm
         let s1 = "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C";
         let s2 = "!AIVDM,2,2,1,A,88888888880,2*25";
         

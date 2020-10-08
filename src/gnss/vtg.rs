@@ -21,7 +21,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaSto
               -> Result<ParsedSentence, String> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Vtg(VelocityMadeGood{
+    return Ok(ParsedSentence::Vtg(VtgData{
         system: nav_system,
         cog_true:          pick_number_field(&split, 1).ok().unwrap_or(None),
         cog_magnetic:      pick_number_field(&split, 3).ok().unwrap_or(None),
