@@ -42,7 +42,7 @@ pub struct VtgData {
 #[doc(hidden)]
 /// xxVTG: Track Made Good and Ground Speed
 pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaStore) 
-              -> Result<ParsedSentence, String> {
+              -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
     return Ok(ParsedSentence::Vtg(VtgData{
@@ -83,7 +83,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }

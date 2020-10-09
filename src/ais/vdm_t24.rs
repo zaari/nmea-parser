@@ -18,7 +18,7 @@ use super::*;
 #[doc(hidden)]
 /// AIVDM types 24: Static data report
 pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaStore, own_vessel: bool) 
--> Result<ParsedSentence, String> {
+-> Result<ParsedSentence, ParseError> {
     // Check whether the message bit layout follows part A or part B format
     // We use two complementary booleans to make the code more readable.
     let (part_a, part_b) = match pick_u64(&bv, 38, 2) {
@@ -26,7 +26,7 @@ pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaStore, own_vessel:
         1 => { (false, true) },
         _ => {
             return Err(format!("AIVDM type 24 part number has unexpected value: {}", 
-                               pick_u64(&bv, 38, 2)));
+                               pick_u64(&bv, 38, 2)).into());
         }
     };
     
@@ -217,7 +217,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_avidm_type24() {
+    fn test_parse_vdm_type24() {
         let mut store = NmeaStore::new();
     
         let s1 = "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D";
@@ -237,7 +237,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK"); return;
+                assert_eq!(e.to_string(), "OK"); return;
             }
         }
         let s2 = "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40";
@@ -279,10 +279,9 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-
 

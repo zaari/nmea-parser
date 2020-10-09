@@ -18,7 +18,7 @@ use super::*;
 
 #[doc(hidden)]
 /// AIVDM types 1-3: Position Report with SOTDMA/ITDMA
-pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, String> {
+pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
         own_vessel: {
             own_vessel
@@ -143,7 +143,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_avidm_type1() {
+    fn test_parse_vdm_type1() {
         match parse_sentence("!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {
@@ -174,13 +174,13 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }
 
     #[test]
-    fn test_parse_avidm_type2() {
+    fn test_parse_vdm_type2() {
         match parse_sentence("!AIVDM,1,1,,A,16SteH0P00Jt63hHaa6SagvJ087r,0*42", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {
@@ -211,13 +211,13 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }
 
     #[test]
-    fn test_parse_avidm_type3() {
+    fn test_parse_vdm_type3() {
         match parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*40", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {
@@ -248,10 +248,11 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }
 
 
 }
+

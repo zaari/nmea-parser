@@ -35,9 +35,11 @@ use chrono::prelude::*;
 
 pub mod ais;
 pub mod gnss;
+mod error;
 mod util;
 
 use util::*;
+pub use error::{ParseError};
 
 // -------------------------------------------------------------------------------------------------
 /// Result from function `parse_sentence`
@@ -143,7 +145,7 @@ pub trait LatLon {
 /// Parses NMEA sentence into `ParsedSentence` enum. If the given sentence is part of 
 /// multipart message, the state is saved into `store` object and `ParsedSentence::Incomplete` 
 /// returned. The actual result is returned when all the parts have been provided for the function.
-pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<ParsedSentence, String> {
+pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<ParsedSentence, ParseError> {
     // Calculace NMEA checksum and compare it to the given one. Also, remove the checksum part
     // from the sentence to simplify next processing steps.
     let mut checksum = 0;
@@ -160,8 +162,9 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
     }
     let checksum_hex_calculated = format!("{:02X?}", checksum);
     if checksum_hex_calculated != checksum_hex_given && checksum_hex_given != "" {
-        return Err(format!("Corrupted NMEA sentence: {:02X?} != {:02X?}", 
-                           checksum_hex_calculated, checksum_hex_given));
+        return Err(ParseError::CorruptedSentence(
+                   format!("Corrupted NMEA sentence: {:02X?} != {:02X?}", 
+                           checksum_hex_calculated, checksum_hex_given)));
     }
     
     // Pick sentence type
@@ -169,7 +172,7 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
         if let Some(i) = sentence.find(',') {
             sentence[0..i].into()
         } else {
-            return Err(format!("Invalid NMEA sentence: {}", sentence));
+            return Err(ParseError::InvalidSentence(format!("Invalid NMEA sentence: {}", sentence)));
         }
     };
 
@@ -255,46 +258,56 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
 
         // $xxALM - Almanac Data
         "$ALM" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxHDT - Heading, True
         "$HDT" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxTRF - Transit Fix Data
         "$TRF" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxSTN - Multiple Data ID
         "$STN" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxVBW - Dual Ground / Water Speed
         "$VBW" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxXTC - Cross track error
         "$XTC" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxXTE - Cross-track error, Measured
         "$XTE" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxZDA - Date & Time
         "$ZDA" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
 
 
 
         // $xxBOD Bearing Origin to Destination 
         "$BOD" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
         // $xxRMA - Recommended minimum specific Loran-C data
         "$RMA" => {
-            return Err(format!("Unimplemented NMEA sentence: {}", sentence_type)); // TODO
+            return Err(ParseError::UnsupportedSentenceType(
+                       format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
         },
 
 
@@ -312,13 +325,19 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     1 => {
                         match s.parse::<u8>() {
                             Ok(i) => { fragment_count = i; },
-                            Err(_) => { return Err(format!("Failed to parse fragment count: {}", s)); }
+                            Err(_) => { 
+                                return Err(ParseError::InvalidSentence(
+                                           format!("Failed to parse fragment count: {}", s))); 
+                            }
                         };
                     },
                     2 => {
                         match s.parse::<u8>() {
                             Ok(i) => { fragment_number = i; },
-                            Err(_) => { return Err(format!("Failed to parse fragment count: {}", s)); }
+                            Err(_) => { 
+                                return Err(ParseError::InvalidSentence(
+                                           format!("Failed to parse fragment count: {}", s))); 
+                            }
                         };
                     },
                     3 => {
@@ -387,8 +406,9 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     // Base Station Report
                     4 => {
                         // TODO: implementation
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Ship static voyage related data
                     5 => {
@@ -397,65 +417,87 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     },
                     // Addressed Binary Message 
                     6 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Binary Acknowledge
                     7 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Binary Broadcast Message 
                     8 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Standard SAR Aircraft position report 
                     9 => {
                         // TODO: implementation
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // UTC and Date inquiry 
                     10 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // UTC and Date response 
                     11 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Addressed safety related message 
                     12 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Safety related Acknowledge 
                     13 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Safety related Broadcast Message 
                     14 => {
                         // TODO: implementation (Class B)
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Interrogation 
                     15 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Assigned Mode Command 
                     16 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // GNSS Binary Broadcast Message  
                     17 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Standard Class B CS Position Report 
                     18 => {
@@ -469,24 +511,31 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     },
                     // Data Link Management 
                     20 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Aids-to-navigation Report 
                     21 => {
                         // TODO: implementation
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Channel Management 
                     22 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Group Assignment Command 
                     23 => {
-                        return Err(format!("Unsupported {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     },
                     // Class B CS Static Data Report
                     24 => {
@@ -494,8 +543,10 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                                                    nmea_store, own_vessel);
                     },
                     _ => {
-                        return Err(format!("Unrecognized {} message type: {}", 
-                                            sentence_type, message_type));
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
                     }
                 }
             } else {
@@ -503,7 +554,8 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
             }
         },
         _ => {
-            return Err(format!("Unsupported sentence: {}", sentence_type));
+            Err(ParseError::UnsupportedSentenceType(
+                format!("Unsupported sentence type: {}", sentence_type)))
         }
     }
 }
@@ -571,5 +623,4 @@ mod test {
     }
 
 }
-
 

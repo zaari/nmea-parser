@@ -67,7 +67,7 @@ impl std::fmt::Display for GsaFixMode {
 
 #[doc(hidden)]
 /// xxGSA: GPS DOP and active satellites 
-pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, String> {
+pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Gsa(GsaData{
@@ -76,7 +76,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
             let s = split.get(1).unwrap_or(&"");
             match s {
                 &"M" => Some(false), &"A" => Some(true), &"" => None,
-                _ => { return Err(format!("Invalid GPGSA mode: {}", s)); }
+                _ => { return Err(format!("Invalid GPGSA mode: {}", s).into()); }
             }
         },
         mode2_3d: {
@@ -86,7 +86,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
                 &"2" => Some(GsaFixMode::Fix2D),
                 &"3" => Some(GsaFixMode::Fix3D),
                 &"" => None,
-                _ => { return Err(format!("Invalid GPGSA fix type: {}", s)); }
+                _ => { return Err(format!("Invalid GPGSA fix type: {}", s).into()); }
             }
         },
         prn_numbers: {
@@ -136,8 +136,9 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
+

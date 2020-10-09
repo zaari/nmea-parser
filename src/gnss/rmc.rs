@@ -34,7 +34,7 @@ pub struct RmcData {
     pub longitude: Option<f64>,
     
     /// Speed over ground in knots
-    pub speed_knots: Option<f64>,
+    pub sog_knots: Option<f64>,
     
     /// Track angle in degrees (True)
     pub bearing: Option<f64>,
@@ -57,7 +57,7 @@ impl LatLon for RmcData {
 
 #[doc(hidden)]
 /// xxRMC: Recommended minimum specific GPS/Transit data
-pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, String> {
+pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Rmc(RmcData{
@@ -70,14 +70,14 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
                 &"A" => Some(true),
                 &"V" => Some(false),
                 &"" => None,
-                _ => { return Err(format!("Invalid RMC navigation receiver status: {}", s)); }
+                _ => { return Err(format!("Invalid RMC navigation receiver status: {}", s).into()); }
             }
         },
         latitude:           parse_latitude_ddmm_mmm(split.get(3).unwrap_or(&""), 
                                                     split.get(4).unwrap_or(&""))?,
         longitude:          parse_longitude_dddmm_mmm(split.get(5).unwrap_or(&""), 
                                                       split.get(6).unwrap_or(&""))?,
-        speed_knots:        pick_number_field(&split, 7)?,
+        sog_knots:        pick_number_field(&split, 7)?,
         bearing:            pick_number_field(&split, 8)?,
         variation: {
             if let Some(val) = pick_number_field::<f64>(&split, 10)? {
@@ -85,7 +85,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
                 match side {
                     &"E" => { Some(val) },
                     &"W" => { Some(-val) },
-                    _ => { return Err(format!("Invalid RMC variation side: {}", side)); },
+                    _ => { return Err(format!("Invalid RMC variation side: {}", side).into()); },
                 }
             } else {
                 None
@@ -114,7 +114,7 @@ mod test {
                         assert_eq!(rmc.timestamp, {
                             Some(Utc.ymd(2020, 11, 19).and_hms(22, 54, 46))
                         });
-                        assert_eq!(rmc.speed_knots.unwrap(), 0.5);
+                        assert_eq!(rmc.sog_knots.unwrap(), 0.5);
                         assert::close(rmc.bearing.unwrap_or(0.0), 54.7, 0.1);
                         assert_eq!(rmc.variation.unwrap(), 20.3);
                     },
@@ -127,7 +127,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }
@@ -143,7 +143,7 @@ mod test {
                         assert_eq!(rmc.timestamp, {
                             Some(Utc.ymd(2009, 8, 7).and_hms(22, 54, 46))
                         });
-                        assert_eq!(rmc.speed_knots, None);
+                        assert_eq!(rmc.sog_knots, None);
                         assert_eq!(rmc.bearing, None);
                         assert_eq!(rmc.variation, None);
                     },
@@ -156,7 +156,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }

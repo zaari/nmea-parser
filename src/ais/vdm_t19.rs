@@ -16,10 +16,10 @@ limitations under the License.
 use super::*;
 
 #[doc(hidden)]
-/// AIVDM type 19: Extended Class B Equipment Position Report
-pub fn handle(_bv: &BitVec, _station: Station, _own_vessel: bool) -> Result<ParsedSentence, String> {
+/// AIS VDM/VDO type 19: Extended Class B Equipment Position Report
+pub fn handle(_bv: &BitVec, _station: Station, _own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     // TODO: implementation (Class B)
-    return Err("Unsupported AIVDM message type: 19".into());
+    return Err(ParseError::UnsupportedSentenceType("Unsupported AIVDM message type: 19".into()));
 }
 
 #[cfg(test)]
@@ -27,7 +27,8 @@ mod test {
 //    use super::*;
 
 //    #[test]
-//    fn test_parse_avidm_type19() {
+//    fn test_parse_vdm_type19() {
 //        assert!(false);
 //    }
 }
+

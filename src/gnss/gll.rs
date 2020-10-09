@@ -52,7 +52,7 @@ impl LatLon for GllData {
 #[doc(hidden)]
 /// xxGLL: Geographic Position, Latitude / Longitude and time.
 pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaStore) 
-              -> Result<ParsedSentence, String> {
+              -> Result<ParsedSentence, ParseError> {
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
@@ -111,7 +111,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
     }

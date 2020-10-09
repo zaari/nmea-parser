@@ -17,7 +17,7 @@ use super::*;
 
 #[doc(hidden)]
 /// AIVDM type 5: Ship static voyage related data
-pub fn handle(bv: &BitVec, _station: Station, own_vessel: bool) -> Result<ParsedSentence, String> {
+pub fn handle(bv: &BitVec, _station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselStaticData(VesselStaticData{
         own_vessel:              own_vessel,
         ais_type:                AisClass::ClassB,
@@ -86,7 +86,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_avidm_type5() {
+    fn test_parse_vdm_type5() {
         let mut store = NmeaStore::new();
     
         let s1 = "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C";
@@ -97,7 +97,7 @@ mod test {
             Ok(_) => {
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
         assert_eq!(store.strings_count(), 1);
@@ -143,7 +143,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
         
@@ -152,7 +152,7 @@ mod test {
             Ok(_) => {
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
         assert_eq!(store.strings_count(), 1);
@@ -200,7 +200,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
         

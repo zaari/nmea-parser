@@ -17,7 +17,7 @@ use super::*;
 
 #[doc(hidden)]
 /// AIVDM type 18: Standard Class B CS Position Report 
-pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, String> {
+pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
         own_vessel: {
             own_vessel
@@ -102,7 +102,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_avidm_type18() {
+    fn test_parse_vdm_type18() {
         let s = "!AIVDM,1,1,,A,B52K>;h00Fc>jpUlNV@ikwpUoP06,0*4C";
         match parse_sentence(s, &mut NmeaStore::new()) {
             Ok(ps) => {
@@ -133,8 +133,9 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }       
     }
 }
+

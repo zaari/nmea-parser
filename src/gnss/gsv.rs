@@ -39,7 +39,7 @@ pub struct GsvData {
 #[doc(hidden)]
 /// xxGSV: GPS Satellites in view
 pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaStore) 
-              -> Result<ParsedSentence, String> {
+              -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
     let msg_type = split.get(0).unwrap_or(&"");
@@ -102,7 +102,7 @@ mod test {
             &mut store) 
         {
             Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
-            Err(e) => { assert_eq!(e, "OK"); }
+            Err(e) => { assert_eq!(e.to_string(), "OK"); }
         }
         assert_eq!(store.strings_count(), 1);
 
@@ -110,7 +110,7 @@ mod test {
             &mut store) 
         {
             Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
-            Err(e) => { assert_eq!(e, "OK"); }
+            Err(e) => { assert_eq!(e.to_string(), "OK"); }
         }
         assert_eq!(store.strings_count(), 2);
 
@@ -148,7 +148,7 @@ mod test {
                 }
             },
             Err(e) => {
-                assert_eq!(e, "OK");
+                assert_eq!(e.to_string(), "OK");
             }
         }
         assert_eq!(store.strings_count(), 0);

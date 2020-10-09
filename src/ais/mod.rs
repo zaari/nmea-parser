@@ -919,4 +919,3 @@ impl VesselStaticData {
     }
 }
 
-
