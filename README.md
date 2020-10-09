@@ -50,7 +50,7 @@ pub fn main() -> Result<(), ParseError> {
                 println!("");
             },
             ParsedSentence::Gga(gga) => {
-                println!("System:    {}",     gga.system);
+                println!("Source:    {}",     gga.source);
                 println!("Latitude:  {:.3}°", gga.latitude.unwrap());
                 println!("Longitude: {:.3}°", gga.longitude.unwrap());
                 println!("");

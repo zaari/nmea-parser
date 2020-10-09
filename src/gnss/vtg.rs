@@ -19,7 +19,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct VtgData {
     /// Navigation system
-    pub system: NavigationSystem,
+    pub source: NavigationSystem,
 
     /// Course over ground (CoG), degrees True
     pub cog_true: Option<f64>,
@@ -46,12 +46,12 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaSto
     let split: Vec<&str> = sentence.split(',').collect();
 
     return Ok(ParsedSentence::Vtg(VtgData{
-        system: nav_system,
+        source:            nav_system,
         cog_true:          pick_number_field(&split, 1).ok().unwrap_or(None),
         cog_magnetic:      pick_number_field(&split, 3).ok().unwrap_or(None),
-        sog_knots: pick_number_field(&split, 5).ok().unwrap_or(None),
-        sog_kph:   pick_number_field(&split, 7).ok().unwrap_or(None),
-        faa_mode:               FaaMode::new(split.get(9).unwrap_or(&"")).ok(),
+        sog_knots:         pick_number_field(&split, 5).ok().unwrap_or(None),
+        sog_kph:           pick_number_field(&split, 7).ok().unwrap_or(None),
+        faa_mode:          FaaMode::new(split.get(9).unwrap_or(&"")).ok(),
     }));
 }    
 
@@ -70,7 +70,7 @@ mod test {
                 match ps {
                     // The expected result
                     ParsedSentence::Vtg(vtg) => {
-                        assert_eq!(vtg.system, NavigationSystem::Beidou);
+                        assert_eq!(vtg.source, NavigationSystem::Beidou);
                         assert::close(vtg.cog_true.unwrap_or(0.0), 54.7, 0.1);
                         assert::close(vtg.cog_magnetic.unwrap_or(0.0), 34.4, 0.1);
                         assert::close(vtg.sog_knots.unwrap_or(0.0), 5.5, 0.1);

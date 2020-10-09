@@ -19,7 +19,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct GllData {
     /// Navigation system
-    pub system: NavigationSystem,
+    pub source: NavigationSystem,
 
     /// Latitude in degrees.
     pub latitude: Option<f64>,
@@ -57,7 +57,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaSto
     let split: Vec<&str> = sentence.split(',').collect();
 
     return Ok(ParsedSentence::Gll(GllData{
-        system:             nav_system,
+        source:             nav_system,
         latitude:           parse_latitude_ddmm_mmm(split.get(1).unwrap_or(&""), 
                                                     split.get(2).unwrap_or(&""))?,
         longitude:          parse_longitude_dddmm_mmm(split.get(3).unwrap_or(&""), 
@@ -95,7 +95,7 @@ mod test {
                 match ps {
                     // The expected result
                     ParsedSentence::Gll(gll) => {
-                        assert_eq!(gll.system, NavigationSystem::Galileo);
+                        assert_eq!(gll.source, NavigationSystem::Galileo);
                         assert::close(gll.latitude.unwrap_or(0.0), 49.3, 0.1);
                         assert::close(gll.longitude.unwrap_or(0.0), -123.2, 0.1);
                         assert_eq!(gll.timestamp, {

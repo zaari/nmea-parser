@@ -20,7 +20,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct GgaData {
     /// Navigation system
-    pub system: NavigationSystem,
+    pub source: NavigationSystem,
 
     /// UTC of position fix
     pub timestamp: Option<DateTime<Utc>>,
@@ -120,7 +120,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Gga(GgaData{
-        system:             nav_system,
+        source:             nav_system,
         timestamp:          parse_hhmmss(split.get(1).unwrap_or(&""), now).ok(),
         latitude:           parse_latitude_ddmm_mmm(split.get(2).unwrap_or(&""), 
                                                     split.get(3).unwrap_or(&""))?,

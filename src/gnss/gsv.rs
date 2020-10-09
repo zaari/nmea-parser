@@ -19,7 +19,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct GsvData {
     /// Navigation system
-    pub system: NavigationSystem,
+    pub source: NavigationSystem,
 
     /// Satellite PRN number
     pub prn_number: u8,
@@ -62,7 +62,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaStor
                 for j in 0..4 {
                     if let Some(prn) = pick_number_field(&split, 4 + 4 * j as usize + 0).ok().unwrap_or(None) {
                         v.push(GsvData{
-                            system: nav_system,
+                            source: nav_system,
                             prn_number: prn,
                             elevation:  pick_number_field(&split, 4 + 4 * j as usize + 1).ok().unwrap_or(None),
                             azimuth:    pick_number_field(&split, 4 + 4 * j as usize + 2).ok().unwrap_or(None),

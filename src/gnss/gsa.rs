@@ -18,7 +18,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct GsaData {
     /// Navigation system
-    pub system: NavigationSystem,
+    pub source: NavigationSystem,
 
     /// Mode 1: true = automatic, false = manual
     pub mode1_automatic: Option<bool>,
@@ -71,7 +71,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Gsa(GsaData{
-        system:             nav_system,
+        source:             nav_system,
         mode1_automatic: {
             let s = split.get(1).unwrap_or(&"");
             match s {

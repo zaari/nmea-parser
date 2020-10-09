@@ -19,7 +19,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct RmcData {
     /// Navigation system
-    pub system: NavigationSystem,
+    pub source: NavigationSystem,
 
     /// Fix datetime based on HHMMSS and DDMMYY
     pub timestamp: Option<DateTime<Utc>>,
@@ -61,7 +61,7 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Rmc(RmcData{
-        system:             nav_system,
+        source:             nav_system,
         timestamp:          parse_yymmdd_hhmmss(split.get(9).unwrap_or(&""), 
                                                 split.get(1).unwrap_or(&"")).ok(),
         status_active:      {

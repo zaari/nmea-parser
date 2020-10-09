@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Added `ParseError` type
 
 ### Changed
+- Renamed `gnss::*::system` field to `gnss::*::source`
 - Changed `parse_sentence` to return `ParseError` instead of `String`
 - Renamed `RmcData::speed_knots` to `RmcData::sog_knots`
 - Renamed `gnss` module's structs and enums to make them more consistent
