@@ -87,7 +87,7 @@ The following features are included in the current version of the crate.
 |GNSS sentences   |GGA, RMC, GSA, GSV, VTG, GLL                                                       |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS                                      | 
 
-## Feature Roadmap
+## Roadmap
 
 Before version 1.0 refactoring and renaming of crate's code elements is likely to happen.
 

@@ -15,6 +15,40 @@ limitations under the License.
 */
 use super::*;
 
+/// GLL - geographic Position - Latitude/Longitude
+#[derive(Clone, Debug, PartialEq)]
+pub struct GllData {
+    /// Navigation system
+    pub system: NavigationSystem,
+
+    /// Latitude in degrees.
+    pub latitude: Option<f64>,
+
+    /// Longitude in degrees.
+    pub longitude: Option<f64>,
+
+    /// UTC of position fix
+    pub timestamp: Option<DateTime<Utc>>,
+
+    /// True = data valid, false = data invalid.
+    pub data_valid: Option<bool>,
+    
+    /// FAA mode indicator (NMEA 2.3 and later).
+    pub faa_mode: Option<FaaMode>,
+}
+
+impl LatLon for GllData {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 #[doc(hidden)]
 /// xxGLL: Geographic Position, Latitude / Longitude and time.
 pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaStore) 
@@ -45,6 +79,8 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaSto
         faa_mode:           FaaMode::new(split.get(7).unwrap_or(&"")).ok(),
     }));
 }    
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

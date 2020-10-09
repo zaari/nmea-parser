@@ -15,6 +15,27 @@ limitations under the License.
 */
 use super::*;
 
+/// GSV - satellite information
+#[derive(Clone, Debug, PartialEq)]
+pub struct GsvData {
+    /// Navigation system
+    pub system: NavigationSystem,
+
+    /// Satellite PRN number
+    pub prn_number: u8,
+    
+    /// Elevation in degrees (max 90°)
+    pub elevation: Option<u8>,
+    
+    /// Azimuth in degrees from True north (0°-359°)
+    pub azimuth: Option<u16>,
+    
+    /// SNR, 0-99 dB, None when not tracking
+    pub snr: Option<u8>,
+}
+
+// -------------------------------------------------------------------------------------------------
+
 #[doc(hidden)]
 /// xxGSV: GPS Satellites in view
 pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaStore) 
@@ -62,6 +83,8 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaStor
 fn make_gsv_key(sentence_type: &str, msg_count: u32, msg_num: u32) -> String {
     format!("{},{},{}", sentence_type, msg_count, msg_num)
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

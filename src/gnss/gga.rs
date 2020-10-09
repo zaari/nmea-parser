@@ -16,6 +16,101 @@ limitations under the License.
 
 use super::*;
 
+/// GGA - time, position, and fix related data
+#[derive(Clone, Debug, PartialEq)]
+pub struct GgaData {
+    /// Navigation system
+    pub system: NavigationSystem,
+
+    /// UTC of position fix
+    pub timestamp: Option<DateTime<Utc>>,
+    
+    /// Latitude in degrees
+    pub latitude: Option<f64>,
+
+    /// Longitude in degrees
+    pub longitude: Option<f64>,
+    
+    /// GNSS Quality indicator
+    pub quality: GgaQualityIndicator,
+    
+    /// Number of satellites in use
+    pub satellite_count: Option<u8>,
+    
+    /// Horizontal dilution of position
+    pub hdop: Option<f64>,
+    
+    /// Altitude above mean sea level (metres)
+    pub altitude: Option<f64>,
+    
+    /// Height of geoid (mean sea level) above WGS84 ellipsoid
+    pub geoid_separation: Option<f64>,
+    
+    /// Age of differential GPS data record, Type 1 or Type 9.
+    pub age_of_dgps: Option<f64>,
+    
+    /// Reference station ID, range 0000-4095
+    pub ref_station_id: Option<u16>,
+}
+
+impl LatLon for GgaData {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
+/// GGA GPS quality indicator
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum GgaQualityIndicator {
+    Invalid, // 0
+    GpsFix, // 1
+    DGpsFix, // 2
+    PpsFix, // 3
+    RealTimeKinematic, // 4
+    RealTimeKinematicFloat, // 5
+    DeadReckoning, // 6
+    ManualInputMode, // 7
+    SimulationMode, // 8
+}
+
+impl GgaQualityIndicator {
+    pub fn new(a: u8) -> GgaQualityIndicator {
+        match a {
+            0 => GgaQualityIndicator::Invalid,
+            1 => GgaQualityIndicator::GpsFix,
+            2 => GgaQualityIndicator::DGpsFix,
+            3 => GgaQualityIndicator::PpsFix,
+            4 => GgaQualityIndicator::RealTimeKinematic,
+            5 => GgaQualityIndicator::RealTimeKinematicFloat,
+            6 => GgaQualityIndicator::DeadReckoning,
+            7 => GgaQualityIndicator::ManualInputMode,
+            8 => GgaQualityIndicator::SimulationMode,
+            _ => GgaQualityIndicator::Invalid,
+        }
+    }
+}
+
+impl std::fmt::Display for GgaQualityIndicator {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GgaQualityIndicator::Invalid => { write!(f, "invalid") }
+            GgaQualityIndicator::GpsFix => { write!(f, "GPS fix") }
+            GgaQualityIndicator::DGpsFix => { write!(f, "DGPS fix") }
+            GgaQualityIndicator::PpsFix => { write!(f, "PPS fix") }
+            GgaQualityIndicator::RealTimeKinematic => { write!(f, "Real-Time Kinematic") }
+            GgaQualityIndicator::RealTimeKinematicFloat => { write!(f, "Real-Time Kinematic (floating point)") }
+            GgaQualityIndicator::DeadReckoning => { write!(f, "dead reckoning") }
+            GgaQualityIndicator::ManualInputMode => { write!(f, "manual input mode") }
+            GgaQualityIndicator::SimulationMode => { write!(f, "simulation mode") }
+        }
+        
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
@@ -40,6 +135,8 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
         ref_station_id:     pick_number_field(&split, 14)?,
     }));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

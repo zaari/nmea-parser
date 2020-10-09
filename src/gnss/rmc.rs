@@ -15,6 +15,46 @@ limitations under the License.
 */
 use super::*;
 
+/// RMC - position, velocity, and time (Recommended Minimum sentence C)
+#[derive(Clone, Debug, PartialEq)]
+pub struct RmcData {
+    /// Navigation system
+    pub system: NavigationSystem,
+
+    /// Fix datetime based on HHMMSS and DDMMYY
+    pub timestamp: Option<DateTime<Utc>>,
+    
+    /// Status: true = active, false = void.
+    pub status_active: Option<bool>,
+    
+    /// Latitude in degrees    
+    pub latitude: Option<f64>,
+
+    /// Longitude in degrees    
+    pub longitude: Option<f64>,
+    
+    /// Speed over ground in knots
+    pub speed_knots: Option<f64>,
+    
+    /// Track angle in degrees (True)
+    pub bearing: Option<f64>,
+    
+    /// Magnetic variation in degrees
+    pub variation: Option<f64>
+}
+
+impl LatLon for RmcData {
+    fn latitude(&self) -> Option<f64> {
+        self.latitude
+    }
+
+    fn longitude(&self) -> Option<f64> {
+        self.longitude
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
+
 #[doc(hidden)]
 /// xxRMC: Recommended minimum specific GPS/Transit data
 pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, String> {
@@ -54,6 +94,8 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
     }));
 
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

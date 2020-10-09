@@ -14,6 +14,56 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 use super::*;
+/// GSA - GNSS dilution of position (DOP) and active satellites
+#[derive(Clone, Debug, PartialEq)]
+pub struct GsaData {
+    /// Navigation system
+    pub system: NavigationSystem,
+
+    /// Mode 1: true = automatic, false = manual
+    pub mode1_automatic: Option<bool>,
+    
+    /// Mode 2, fix type: 
+    pub mode2_3d: Option<GsaFixMode>,
+    
+    /// PRN numbers used (space for 12)
+    pub prn_numbers: Vec<u8>,
+    
+    /// Position (3D) dilution of precision
+    pub pdop: Option<f64>,
+    
+    /// Horizontal dilution of precision
+    pub hdop: Option<f64>,
+    
+    /// Vertical dilution of precision
+    pub vdop: Option<f64>,
+}
+
+/// GSA position fix type
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum GsaFixMode {
+    /// No fix.
+    NotAvailable,
+    
+    /// 2D fix.
+    Fix2D,
+    
+    /// 3d fix.
+    Fix3D,
+}
+
+impl std::fmt::Display for GsaFixMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            GsaFixMode::NotAvailable => { write!(f, "no available") }
+            GsaFixMode::Fix2D => { write!(f, "2D fix") }
+            GsaFixMode::Fix3D => { write!(f, "3D fix") }
+        }
+        
+    }
+}
+
+// -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
 /// xxGSA: GPS DOP and active satellites 
@@ -55,6 +105,8 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSent
         vdop: pick_number_field(&split, 17)?,
     }));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

@@ -15,6 +15,30 @@ limitations under the License.
 */
 use super::*;
 
+/// VTG - track made good and speed over ground
+#[derive(Clone, Debug, PartialEq)]
+pub struct VtgData {
+    /// Navigation system
+    pub system: NavigationSystem,
+
+    /// Course over ground (CoG), degrees True
+    pub cog_true: Option<f64>,
+    
+    /// Course over ground (CoG), degrees Magnetic
+    pub cog_magnetic: Option<f64>,
+    
+    /// Speed over ground (SoG), knots
+    pub sog_knots: Option<f64>,
+    
+    /// Speed over ground (SoG), km/h
+    pub sog_kph: Option<f64>,
+    
+    /// FAA mode indicator
+    pub faa_mode: Option<FaaMode>,
+}
+
+// -------------------------------------------------------------------------------------------------
+
 #[doc(hidden)]
 /// xxVTG: Track Made Good and Ground Speed
 pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaStore) 
@@ -30,6 +54,8 @@ pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaSto
         faa_mode:               FaaMode::new(split.get(9).unwrap_or(&"")).ok(),
     }));
 }    
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {

@@ -285,7 +285,7 @@ impl std::fmt::Display for PositioningSystemMeta {
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO type 5 and 24
+/// AIS VDM/VDO types 5 and 24
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselStaticData { 
     /// True if the data is about own vessel, false if about other vessel.
