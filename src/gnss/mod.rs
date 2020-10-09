@@ -39,7 +39,7 @@ pub use vtg::VtgData;
 
 // -------------------------------------------------------------------------------------------------
 
-/// Navigation system, deptected from NMEA GNSS sentence prefix (e.g. $BDGGA)
+/// Navigation system, identified with NMEA GNSS sentence prefix (e.g. $BDGGA)
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationSystem {
     /// Combination of several satellite systems

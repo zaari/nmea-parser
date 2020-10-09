@@ -17,7 +17,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.3.0"
+nmea-parser = "0.3.1"
 ```
 
 The following sample program uses the crate to parse the given NMEA sentence 
@@ -26,47 +26,43 @@ and to print some  fields of the resulting data object:
 ```rust
 use nmea_parser::*;
 
-pub fn main() -> Result<(), ParseError> {
-    let mut store = NmeaStore::new();
-    
-    let sentences = vec![
-      "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D",
-      "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40",
-      "$GAGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*56",
-    ];
+let mut store = NmeaStore::new();
+let sentences = vec![
+  "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D",
+  "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40",
+  "$GAGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*56",
+];
 
-    for sentence in sentences {    
-        match nmea_parser::parse_sentence(sentence, &mut store)? {
-            ParsedSentence::VesselDynamicData(vdd) => {
-                println!("MMSI:  {}",        vdd.mmsi);
-                println!("Speed: {:.1} kts", vdd.sog_knots.unwrap());
-                println!("");
-            },
-            ParsedSentence::VesselStaticData(vds) => {
-                println!("MMSI:  {}", vds.mmsi);
-                println!("Flag:  {}", vds.country().unwrap());
-                println!("Name:  {}", vds.name.unwrap());
-                println!("Type:  {}", vds.ship_type);
-                println!("");
-            },
-            ParsedSentence::Gga(gga) => {
-                println!("Source:    {}",     gga.source);
-                println!("Latitude:  {:.3}°", gga.latitude.unwrap());
-                println!("Longitude: {:.3}°", gga.longitude.unwrap());
-                println!("");
-            },
-            ParsedSentence::Rmc(rmc) => {
-                println!("System:  {}",        rmc.system);
-                println!("Speed:   {:.1} kts", rmc.sog_knots.unwrap());
-                println!("Bearing: {}°",       rmc.bearing.unwrap());
-                println!("Time:    {}",        rmc.timestamp.unwrap());
-                println!("");
-            },
-            _ => {
-            }
+for sentence in sentences {    
+    match nmea_parser::parse_sentence(sentence, &mut store)? {
+        ParsedSentence::VesselDynamicData(vdd) => {
+            println!("MMSI:  {}",        vdd.mmsi);
+            println!("Speed: {:.1} kts", vdd.sog_knots.unwrap());
+            println!("");
+        },
+        ParsedSentence::VesselStaticData(vds) => {
+            println!("MMSI:  {}", vds.mmsi);
+            println!("Flag:  {}", vds.country().unwrap());
+            println!("Name:  {}", vds.name.unwrap());
+            println!("Type:  {}", vds.ship_type);
+            println!("");
+        },
+        ParsedSentence::Gga(gga) => {
+            println!("Source:    {}",     gga.source);
+            println!("Latitude:  {:.3}°", gga.latitude.unwrap());
+            println!("Longitude: {:.3}°", gga.longitude.unwrap());
+            println!("");
+        },
+        ParsedSentence::Rmc(rmc) => {
+            println!("Source:  {}",        rmc.source);
+            println!("Speed:   {:.1} kts", rmc.sog_knots.unwrap());
+            println!("Bearing: {}°",       rmc.bearing.unwrap());
+            println!("Time:    {}",        rmc.timestamp.unwrap());
+            println!("");
+        },
+        _ => {
         }
     }
-    Ok(())
 }
 ```
 
