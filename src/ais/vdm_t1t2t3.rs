@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 #[doc(hidden)]
-/// AIVDM types 1-3: Position Report with SOTDMA/ITDMA
+/// AIS VDM/VDO types 1-3: Position Report with SOTDMA/ITDMA
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
         own_vessel: {
@@ -252,7 +252,5 @@ mod test {
             }
         }
     }
-
-
 }
 

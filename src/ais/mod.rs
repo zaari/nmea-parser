@@ -19,6 +19,8 @@ limitations under the License.
 #[doc(hidden)]
 pub mod vdm_t1t2t3;
 #[doc(hidden)]
+pub mod vdm_t4;
+#[doc(hidden)]
 pub mod vdm_t5;
 #[doc(hidden)]
 pub mod vdm_t18;
@@ -28,6 +30,7 @@ pub mod vdm_t19;
 pub mod vdm_t24;
 
 use super::*;
+pub use vdm_t4::*;
 
 // -------------------------------------------------------------------------------------------------
 
@@ -85,6 +88,8 @@ pub struct VesselDynamicData {
 
     /// User ID (30 bits)
     pub mmsi: u32,
+    
+    // TODO: timestamp
     
     /// Navigation status
     pub nav_status: NavigationStatus,

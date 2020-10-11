@@ -5,7 +5,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation of AIS VDM/VDO type 4 message
 ### Changed
+
+## [0.3.1] - 0202-10-09
+### Changed
+- Fixed the example program in README.md
 
 ## [0.3.0] - 0202-10-09
 ### Added
@@ -13,7 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Renamed `gnss::*::system` field to `gnss::*::source`
-- Changed `parse_sentence` to return `ParseError` instead of `String`
+- Changed `parse_sentence` to return `ParseError` instead of plain `String` in case of errors
 - Renamed `RmcData::speed_knots` to `RmcData::sog_knots`
 - Renamed `gnss` module's structs and enums to make them more consistent
 - Refactored the whole module hierarchy to improve modularity and clarity

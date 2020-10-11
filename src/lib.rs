@@ -55,6 +55,9 @@ pub enum ParsedSentence {
     /// AIS VDM/VDO t5 and t24
     VesselStaticData(ais::VesselStaticData),
     
+    /// AIS VDM/VDO type 4
+    BaseStationReport(ais::BaseStationReport),
+    
     /// GGA
     Gga(gnss::GgaData),
     
@@ -405,10 +408,8 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     },
                     // Base Station Report
                     4 => {
-                        // TODO: implementation
-                        return Err(ParseError::UnsupportedSentenceType(
-                                   format!("Unsupported {} message type: {}", 
-                                           sentence_type, message_type)));
+                        return ais::vdm_t4::handle(&bv, station.unwrap_or(ais::Station::Other), 
+                                                   own_vessel);
                     },
                     // Ship static voyage related data
                     5 => {

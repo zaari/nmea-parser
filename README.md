@@ -38,6 +38,7 @@ for sentence in sentences {
         ParsedSentence::VesselDynamicData(vdd) => {
             println!("MMSI:  {}",        vdd.mmsi);
             println!("Speed: {:.1} kts", vdd.sog_knots.unwrap());
+            println!("Heading: {}°",     vdd.heading_true.unwrap());
             println!("");
         },
         ParsedSentence::VesselStaticData(vds) => {
@@ -74,7 +75,7 @@ Flag:  TR
 Name:  PROGUY
 Type:  passenger
 
-System:    Galileo
+Source:    Galileo
 Latitude:  48.117°
 Longitude: 11.517°
 
