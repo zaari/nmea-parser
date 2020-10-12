@@ -113,6 +113,7 @@ implementation effort of each of them.
 
 ## License
 
-The crate is licensed under [Apache 2.0 license][LICENSE] which also includes liability and warranty
+The crate is licensed under [Apache 2.0 license] which also includes liability and warranty
 statements.
 
+[Apache 2.0 license]: LICENSE
