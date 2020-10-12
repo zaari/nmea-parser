@@ -23,6 +23,8 @@ pub mod vdm_t4;
 #[doc(hidden)]
 pub mod vdm_t5;
 #[doc(hidden)]
+pub mod vdm_t6;
+#[doc(hidden)]
 pub mod vdm_t18;
 #[doc(hidden)]
 pub mod vdm_t19;
@@ -31,6 +33,7 @@ pub mod vdm_t24;
 
 use super::*;
 pub use vdm_t4::*;
+pub use vdm_t6::*;
 
 // -------------------------------------------------------------------------------------------------
 

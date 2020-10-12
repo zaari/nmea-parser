@@ -97,12 +97,17 @@ Until version 1.0 refactoring and renaming of crate's code elements is likely to
 
 |Version |Category    |Goal                                                                 |
 |--------|------------|---------------------------------------------------------------------|
-|0.4     |AIS         |AIS VDM/VDO t4, t6-t17, t20-t23, t25-27                              |
+|0.4     |AIS         |AIS VDM/VDO t4, t9-t17, t20-t23, t25-27                              |
+|0.5     |GNSS        |ALM, TRF, STN, VBW, XTC, XTE, ZDA                                    |
 |1.0     |meta        |Stable API, optimizations, enhanced documentation                    |
-|1.1     |GNSS        |ALM, TRF, STN, VBW, XTC, XTE, ZDA                                    |
+|1.1     |AIS         |AIS VDM/VDO t6-8                                                     |
 |1.2     |GNSS, route |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                               |
 |1.3     |GNSS, misc  |APB, DTM, RMA, GRS, GST, MSK, MSS, STN, VBW                          |
 
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [GNSS]: https://en.wikipedia.org/wiki/Satellite_navigation
+
+## License
+
+The crate is licensed under [Apache 2.0 license][LICENSE.md] which also includes liability and warranty statements.
 

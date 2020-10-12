@@ -58,6 +58,15 @@ pub enum ParsedSentence {
     /// AIS VDM/VDO type 4
     BaseStationReport(ais::BaseStationReport),
     
+    /// AIS VDM/VDO type 6
+    BinaryAddressedMessage(ais::BinaryAddressedMessage),
+//    
+//    /// AIS VDM/VDO type 7
+//    BinaryAcknowledge(ais::BinaryAcknowledge),
+//    
+//    /// AIS VDM/VDO type 8
+//    BinaryBroadcastMessage(ais::BinaryBroadcastMessage),
+    
     /// GGA
     Gga(gnss::GgaData),
     
@@ -418,10 +427,8 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     },
                     // Addressed Binary Message 
                     6 => {
-                        // TODO: implementation
-                        return Err(ParseError::UnsupportedSentenceType(
-                                   format!("Unsupported {} message type: {}", 
-                                           sentence_type, message_type)));
+                        return ais::vdm_t6::handle(&bv, station.unwrap_or(ais::Station::Other), 
+                                                  own_vessel);
                     },
                     // Binary Acknowledge
                     7 => {
