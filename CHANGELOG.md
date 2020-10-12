@@ -5,16 +5,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Implementation of AIS VDM/VDO type 4 message
+- Implementation for AIS VDM/VDO type 4 message
+- Partial implementation for AIS VDM/VDO type 6 message
 ### Changed
 
-## [0.3.1] - 0202-10-09
+## [0.3.1] - 2020-10-09
 ### Changed
 - Fixed the example program in README.md
 
-## [0.3.0] - 0202-10-09
+## [0.3.0] - 2020-10-09
 ### Added
-- Added `ParseError` type
+- `ParseError` type added
 
 ### Changed
 - Renamed `gnss::*::system` field to `gnss::*::source`
@@ -30,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.1] - 2020-10-07
 ### Added
-- Missing code gneration script `mid-to-iso3166.py` added
+- Missing code generation script `mid-to-iso3166.py` added
 ### Changed
 - Minor refactoring and documentation corrections
 

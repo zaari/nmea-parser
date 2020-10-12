@@ -212,6 +212,8 @@ fn choose_some_string(a: &Option<String>, b: &Option<String>) -> Option<String> 
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[cfg(test)]
 mod test {
     use super::*;

@@ -30,6 +30,8 @@ pub mod vdm_t18;
 pub mod vdm_t19;
 #[doc(hidden)]
 pub mod vdm_t24;
+#[doc(hidden)]
+pub mod vdm_t27;
 
 use super::*;
 pub use vdm_t4::*;
@@ -126,6 +128,11 @@ pub struct VesselDynamicData {
 
     /// Positioning system metadata (included in seconds in UTC timestamp)
     pub positioning_system_meta: Option<PositioningSystemMeta>,
+    
+    /// GNSS position status (Type 27):
+    ///  true = current GNSS position
+    ///  false = not GNSS position
+    pub current_gnss_position: Option<bool>,
 
     /// Special manoeuvre indicator. false = not engaged in special manoeuvre, 
     /// true = engaged in special manouvre.
@@ -173,7 +180,7 @@ pub struct VesselDynamicData {
     /// Communication state
     /// Diagnostic information for the radio system. 
     /// https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1371-1-200108-S!!PDF-E.pdf
-    pub radio_status: u32,
+    pub radio_status: Option<u32>,
 
 }
 

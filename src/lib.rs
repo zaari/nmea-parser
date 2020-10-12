@@ -548,7 +548,26 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     // Class B CS Static Data Report
                     24 => {
                         return ais::vdm_t24::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                   nmea_store, own_vessel);
+                                                    nmea_store, own_vessel);
+                    },
+                    // Single Slot Binary Message
+                    25 => {
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
+                    },
+                    // Multiple Slot Binary Message
+                    26 => {
+                        // TODO: implementation
+                        return Err(ParseError::UnsupportedSentenceType(
+                                   format!("Unsupported {} message type: {}", 
+                                           sentence_type, message_type)));
+                    },
+                    // Long Range AIS Broadcast message
+                    27 => {
+                        return ais::vdm_t27::handle(&bv, station.unwrap_or(ais::Station::Other), 
+                                                    own_vessel);
                     },
                     _ => {
                         // TODO: implementation

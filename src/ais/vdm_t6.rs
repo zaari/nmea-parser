@@ -61,7 +61,8 @@ impl LatLon for BinaryAddressedMessage {
 // -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
-/// AIS VDM/VDO types 6: Binary Addressed Message
+/// AIS VDM/VDO types 6: Binary Addressed Message. Implementation of the 920-bit data field is
+/// unimplemented currently.
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::BinaryAddressedMessage(BinaryAddressedMessage{
         own_vessel: {
@@ -93,6 +94,8 @@ pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedS
     }));
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -111,6 +114,7 @@ mod test {
                         assert_eq!(bam.retransmit_flag, false);
                         assert_eq!(bam.dac, 669);
                         assert_eq!(bam.fid, 11);
+                        // TODO: check data
                     },
                     ParsedSentence::Incomplete => {
                         assert!(false);

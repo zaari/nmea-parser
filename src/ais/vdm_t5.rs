@@ -81,6 +81,8 @@ pub fn handle(bv: &BitVec, _station: Station, own_vessel: bool) -> Result<Parsed
     }));
 }
 
+// -------------------------------------------------------------------------------------------------
+
 #[cfg(test)]
 mod test {
     use super::*;

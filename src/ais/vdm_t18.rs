@@ -85,13 +85,12 @@ pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedS
         class_b_css_flag: {
             None
         },
-        radio_status: {
-                pick_u64(&bv, 149, 19) as u32
-            },
+        radio_status:            Some(pick_u64(&bv, 149, 19) as u32),
         nav_status:              NavigationStatus::NotDefined,
         rot:                     None,
         rot_direction:           None,
         positioning_system_meta: None,
+        current_gnss_position:   None,
         special_manoeuvre:       None,
 
     }));

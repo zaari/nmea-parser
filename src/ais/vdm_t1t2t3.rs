@@ -33,97 +33,100 @@ pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedS
             pick_u64(&bv, 8, 30) as u32
         },
         nav_status: {
-                NavigationStatus::new(pick_u64(&bv, 38, 4) as u8)
-            },
+            NavigationStatus::new(pick_u64(&bv, 38, 4) as u8)
+        },
         rot: {
-                let raw = pick_i64(&bv, 42, 8);
-                if -126 <= raw && raw < 0 {
-                    Some(-((-raw as f64 * 708.0/126.0) / 4.733).powi(2))
-                } else if 0 <= raw && raw <= 126 {
-                    Some(((raw as f64 * 708.0/126.0) / 4.733).powi(2))
-                } else {
-                    None
-                }
-            },
+            let raw = pick_i64(&bv, 42, 8);
+            if -126 <= raw && raw < 0 {
+                Some(-((-raw as f64 * 708.0/126.0) / 4.733).powi(2))
+            } else if 0 <= raw && raw <= 126 {
+                Some(((raw as f64 * 708.0/126.0) / 4.733).powi(2))
+            } else {
+                None
+            }
+        },
         rot_direction: {
-                let raw = pick_i64(&bv, 42, 8);
-                if raw == -128 {
-                    None
-                } else if raw <= -2 {
-                    Some(-1)
-                } else if raw < 2 {
-                    Some(0)
-                } else if raw < 128 {
-                    Some(1)
-                } else {
-                    None
-                }
-            },
+            let raw = pick_i64(&bv, 42, 8);
+            if raw == -128 {
+                None
+            } else if raw <= -2 {
+                Some(-1)
+            } else if raw < 2 {
+                Some(0)
+            } else if raw < 128 {
+                Some(1)
+            } else {
+                None
+            }
+        },
         sog_knots: {
-                let raw = pick_u64(&bv, 50, 10);
-                if raw < 1023 {
-                    Some((raw as f64) * 0.1)
-                } else {
-                    None
-                }
-            },
+            let raw = pick_u64(&bv, 50, 10);
+            if raw < 1023 {
+                Some((raw as f64) * 0.1)
+            } else {
+                None
+            }
+        },
         high_position_accuracy: pick_u64(&bv, 60, 1) != 0,
         latitude: {
-                let lat_raw = pick_i64(&bv, 89, 27) as i32;
-                if lat_raw != 0x3412140 {
-                    Some((lat_raw as f64) / 600000.0) 
-                } else {
-                    None
-                }
-            },
+            let lat_raw = pick_i64(&bv, 89, 27) as i32;
+            if lat_raw != 0x3412140 {
+                Some((lat_raw as f64) / 600000.0) 
+            } else {
+                None
+            }
+        },
         longitude: {
-                let lon_raw = pick_i64(&bv, 61, 28) as i32;
-                if lon_raw != 0x6791AC0 {
-                    Some((lon_raw as f64) / 600000.0)
-                } else {
-                    None
-                }
-            },
+            let lon_raw = pick_i64(&bv, 61, 28) as i32;
+            if lon_raw != 0x6791AC0 {
+                Some((lon_raw as f64) / 600000.0)
+            } else {
+                None
+            }
+        },
         cog: {
-                let cog_raw = pick_u64(&bv, 116, 12);
-                if cog_raw != 0xE10 {
-                    Some(cog_raw as f64 * 0.1)
-                } else {
-                    None
-                }
-            },
+            let cog_raw = pick_u64(&bv, 116, 12);
+            if cog_raw != 0xE10 {
+                Some(cog_raw as f64 * 0.1)
+            } else {
+                None
+            }
+        },
         heading_true: {
-                let th_raw = pick_u64(&bv, 128, 9);
-                if th_raw != 511 {
-                    Some(th_raw as f64)
-                } else {
-                    None
-                }
-            },
+            let th_raw = pick_u64(&bv, 128, 9);
+            if th_raw != 511 {
+                Some(th_raw as f64)
+            } else {
+                None
+            }
+        },
         timestamp_seconds: pick_u64(&bv, 137, 6) as u8,
         positioning_system_meta: {
-                // second of UTC timestamp has some hidden information
-                let sec_raw = pick_u64(&bv, 137, 6) as u16;
-                match sec_raw {
-                    60 => { None },
-                    61 => { Some(PositioningSystemMeta::ManualInputMode) },
-                    62 => { Some(PositioningSystemMeta::DeadReckoningMode) },
-                    63 => { Some(PositioningSystemMeta::Inoperative) },
-                    _  => { Some(PositioningSystemMeta::Operative) },
-                }
-            },
+            // second of UTC timestamp has some hidden information
+            let sec_raw = pick_u64(&bv, 137, 6) as u16;
+            match sec_raw {
+                60 => { None },
+                61 => { Some(PositioningSystemMeta::ManualInputMode) },
+                62 => { Some(PositioningSystemMeta::DeadReckoningMode) },
+                63 => { Some(PositioningSystemMeta::Inoperative) },
+                _  => { Some(PositioningSystemMeta::Operative) },
+            }
+        },
+        current_gnss_position: {
+            None
+        },
         special_manoeuvre: {
-                let raw = pick_u64(&bv, 143, 2);
-                match raw {
-                    0 => { None },
-                    1 => { Some(true) },
-                    2 => { Some(true) },
-                    _ => {
-                        warn!("Unrecognized Maneuver Indicator value: {}", raw);
-                        None
-                    }
+            let raw = pick_u64(&bv, 143, 2);
+            match raw {
+                0 => { None },
+                1 => { Some(true) },
+                2 => { Some(true) },
+                _ => {
+                    warn!("Unrecognized Maneuver Indicator value: {}", raw);
+                    None
                 }
-            },
+            }
+        },
         raim_flag:          pick_u64(&bv, 148, 1) != 0,
         class_b_unit_flag:  None,
         class_b_display:    None,
@@ -133,10 +136,12 @@ pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedS
         class_b_mode_flag:  None,
         class_b_css_flag:   None,
         radio_status: {
-                pick_u64(&bv, 149, 19) as u32
-            },
+            Some(pick_u64(&bv, 149, 19) as u32)
+        },
     }));
 }
+
+// -------------------------------------------------------------------------------------------------
 
 #[cfg(test)]
 mod test {
