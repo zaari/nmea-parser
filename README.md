@@ -8,7 +8,7 @@
 [docsrs-image]: https://docs.rs/nmea-parser/badge.svg
 [docsrs]: https://docs.rs/nmea-parser
 
-This Rust crate aims to cover the most important [AIS] and [GNSS] sentences. It supports both 
+This [Rust] crate aims to cover the most important [AIS] and [GNSS] sentences. It supports both 
 class A and B types of AIS.
 
 ## Usage
@@ -83,7 +83,8 @@ Longitude: 11.517°
 
 ## Features
 
-The following features are included in the published version of the crate.
+The following features are included in the published version of the crate. Details about
+version history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
@@ -93,10 +94,9 @@ The following features are included in the published version of the crate.
 
 ## Roadmap
 
-Until version 1.0 refactoring and renaming of crate's code elements is likely to happen but the goal
-is to the make breaking changes as early as possible. The following table shows the plan to include
-different sentences in the crate. Prioritisation is based on estimated significance and 
-implementation effort of each of them.
+Until version 1.0 refactoring and renaming of crate's code elements is likely to happen.
+The following table shows the plan to include different sentences in the crate. Prioritisation is 
+based on estimated significance and implementation effort of each of them.
 
 |Version |Category    |Goal                                                   |
 |--------|------------|-------------------------------------------------------|
@@ -104,16 +104,18 @@ implementation effort of each of them.
 |0.5     |GNSS        |ALM, TRF, STN, VBW, XTC, XTE, ZDA                      |
 |0.6     |AIS         |VDM/VDO types 20, 22, 23, 25, 26                       |
 |0.7     |AIS         |VDM/VDO types 6-8                                      |
-|1.0     |meta        |Stable API, optimizations, enhanced documentation      |
+|1.0     |general     |Stable API, optimizations, enhanced documentation      |
 |1.2     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
 |1.3     |GNSS        |APB, DTM, RMA, GRS, GST, MSK, MSS, STN, VBW            |
 
+## License
+
+This crate is licensed under [Apache 2.0 license] which also includes liability and warranty
+statements.
+
+[changelog]: CHANGELOG.md
+[Apache 2.0 license]: LICENSE
+[Rust]: https://en.wikipedia.org/wiki/Rust_(programming_language)
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [GNSS]: https://en.wikipedia.org/wiki/Satellite_navigation
 
-## License
-
-The crate is licensed under [Apache 2.0 license] which also includes liability and warranty
-statements.
-
-[Apache 2.0 license]: LICENSE

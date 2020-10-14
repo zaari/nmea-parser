@@ -5,12 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for AIS VDM/VDO type 21 message
 - Implementation for AIS VDM/VDO type 27 message
 - Implementation for AIS VDM/VDO type 4 message
 - Partial implementation for AIS VDM/VDO type 6 message
 - New field `current_gnss_position` added to `VesselDynamicData` struct
 ### Changed
-- Type of `VesselDynamicData::radio_status` changed from `u32` to `Option<u32>`
+- Type of `VesselDynamicData::radio_status` changed from `u32` to `Option<u32>` because of type 27 
+  messages don't have the field
+- Dependency `regex` upgraded to version 1.4
 
 ## [0.3.1] - 2020-10-09
 ### Changed

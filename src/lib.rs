@@ -49,7 +49,7 @@ pub enum ParsedSentence {
     /// create the actual result. State is stored in `NmeaStore` object.
     Incomplete,
 
-    /// AIS VDM/VDO t1, t2, t3 and t18
+    /// AIS VDM/VDO t1, t2, t3, t18 and t27
     VesselDynamicData(ais::VesselDynamicData),
     
     /// AIS VDM/VDO t5 and t24
@@ -66,6 +66,9 @@ pub enum ParsedSentence {
 //    
 //    /// AIS VDM/VDO type 8
 //    BinaryBroadcastMessage(ais::BinaryBroadcastMessage),
+
+    // AIS VDM/VDO type 21
+    AidToNavigationReport(ais::AidToNavigationReport),
     
     /// GGA
     Gga(gnss::GgaData),
@@ -526,10 +529,8 @@ pub fn parse_sentence(sentence: &str, nmea_store: &mut NmeaStore) -> Result<Pars
                     },
                     // Aids-to-navigation Report 
                     21 => {
-                        // TODO: implementation
-                        return Err(ParseError::UnsupportedSentenceType(
-                                   format!("Unsupported {} message type: {}", 
-                                           sentence_type, message_type)));
+                        return ais::vdm_t21::handle(&bv, station.unwrap_or(ais::Station::Other), 
+                                                   own_vessel);
                     },
                     // Channel Management 
                     22 => {

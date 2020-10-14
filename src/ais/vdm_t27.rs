@@ -100,7 +100,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_vdm_type1() {
+    fn test_parse_vdm_type27() {
         match parse_sentence("!AIVDM,1,1,,B,KC5E2b@U19PFdLbMuc5=ROv62<7m,0*16", 
                               &mut NmeaStore::new()) {
             Ok(ps) => {

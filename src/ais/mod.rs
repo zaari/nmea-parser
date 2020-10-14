@@ -31,11 +31,14 @@ pub mod vdm_t19;
 #[doc(hidden)]
 pub mod vdm_t24;
 #[doc(hidden)]
+pub mod vdm_t21;
+#[doc(hidden)]
 pub mod vdm_t27;
 
 use super::*;
 pub use vdm_t4::*;
 pub use vdm_t6::*;
+pub use vdm_t21::*;
 
 // -------------------------------------------------------------------------------------------------
 
