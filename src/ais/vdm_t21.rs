@@ -289,8 +289,7 @@ impl std::fmt::Display for NavAidType {
 // -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
-/// AIS VDM/VDO types 6: Binary Addressed Message. Implementation of the 920-bit data field is
-/// unimplemented currently.
+/// AIS VDM/VDO types 21: Aid-to-Navigation Report
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::AidToNavigationReport(AidToNavigationReport{
         own_vessel: {

@@ -18,7 +18,7 @@ use super::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO type 4: Base Station Report
+/// AIS VDM/VDO type 6: Binary Addressed Message
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct BinaryAddressedMessage { 
     /// True if the data is about own vessel, false if about other.
