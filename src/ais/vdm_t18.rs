@@ -16,7 +16,7 @@ limitations under the License.
 use super::*;
 
 #[doc(hidden)]
-/// AIVDM type 18: Standard Class B CS Position Report 
+/// AIS VDM/VDO type 18: Standard Class B CS Position Report 
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
         own_vessel: {

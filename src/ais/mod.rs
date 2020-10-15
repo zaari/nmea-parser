@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//! AIS-related data structures
+//! AIS VDM/VDO data structures
 
 #[doc(hidden)]
 pub mod vdm_t1t2t3;
@@ -82,7 +82,7 @@ impl std::fmt::Display for Station {
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO types 1, 2, 3 and 18
+/// Types 1, 2, 3 and 18
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselDynamicData { 
     /// True if the data is about own vessel, false if about other.
@@ -303,7 +303,7 @@ impl std::fmt::Display for PositioningSystemMeta {
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO types 5 and 24
+/// Types 5 and 24
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselStaticData { 
     /// True if the data is about own vessel, false if about other vessel.

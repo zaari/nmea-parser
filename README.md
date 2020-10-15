@@ -17,7 +17,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.4.0"
+nmea-parser = "0.4.1"
 ```
 
 The following sample program uses the crate to parse the given NMEA sentence and to print some 
@@ -88,7 +88,7 @@ version history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
-|AIS sentences    |VDM/VDO types 1-3, 5, 18-19 and 24                         |
+|AIS sentences    |VDM/VDO types 1-3, 5, 18-19, 21, 24 and 27                 |
 |GNSS sentences   |GGA, RMC, GSA, GSV, VTG, GLL                               |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS              | 
 
@@ -100,7 +100,7 @@ based on estimated significance and implementation effort of each of them.
 
 |Version |Category    |Goal                                                   |
 |--------|------------|-------------------------------------------------------|
-|0.5     |AIS         |VDM/VDO types 4, 9-17, 21, 27                          |
+|0.5     |AIS         |VDM/VDO types 4, 9-17                                  |
 |0.6     |GNSS        |ALM, DTM, GBS, HDT, ROT, STN, TRF, VBW, ZDA, XTC, XTE  |
 |0.7     |AIS         |VDM/VDO types 20, 22, 23, 25, 26                       |
 |0.8     |AIS         |VDM/VDO types 6-8                                      |

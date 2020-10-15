@@ -18,7 +18,7 @@ use super::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO type 4: Base Station Report
+/// Type 4: Base Station Report
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct BaseStationReport { 
     /// True if the data is about own vessel, false if about other.
@@ -69,7 +69,7 @@ impl LatLon for BaseStationReport {
 // -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
-/// AIS VDM/VDO types 4: Base Station Report
+/// AIS VDM/VDO type 4: Base Station Report
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::BaseStationReport(BaseStationReport{
         own_vessel: {

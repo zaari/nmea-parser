@@ -18,7 +18,7 @@ use super::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO type 6: Binary Addressed Message
+/// Type 6: Binary Addressed Message
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct BinaryAddressedMessage { 
     /// True if the data is about own vessel, false if about other.
@@ -61,7 +61,7 @@ impl LatLon for BinaryAddressedMessage {
 // -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
-/// AIS VDM/VDO types 6: Binary Addressed Message. Implementation of the 920-bit data field is
+/// AIS VDM/VDO type 6: Binary Addressed Message. Implementation of the 920-bit data field is
 /// unimplemented currently.
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::BinaryAddressedMessage(BinaryAddressedMessage{

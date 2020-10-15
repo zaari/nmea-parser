@@ -16,7 +16,7 @@ limitations under the License.
 use super::*;
 
 #[doc(hidden)]
-/// AIVDM types 24: Static data report
+/// AIS VDM/VDO type 24: Static data report
 pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own_vessel: bool) 
 -> Result<ParsedSentence, ParseError> {
     // Check whether the message bit layout follows part A or part B format

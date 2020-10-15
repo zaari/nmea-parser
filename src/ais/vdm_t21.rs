@@ -18,7 +18,7 @@ use super::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO type 21: Aid-to-Navigation Report
+/// Type 21: Aid-to-Navigation Report
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct AidToNavigationReport { 
     /// True if the data is about own vessel, false if about other.
@@ -289,7 +289,7 @@ impl std::fmt::Display for NavAidType {
 // -------------------------------------------------------------------------------------------------
 
 #[doc(hidden)]
-/// AIS VDM/VDO types 21: Aid-to-Navigation Report
+/// AIS VDM/VDO type 21: Aid-to-Navigation Report
 pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::AidToNavigationReport(AidToNavigationReport{
         own_vessel: {
