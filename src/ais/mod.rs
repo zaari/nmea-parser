@@ -36,9 +36,9 @@ pub mod vdm_t21;
 pub mod vdm_t27;
 
 use super::*;
-pub use vdm_t4::*;
-pub use vdm_t6::*;
-pub use vdm_t21::*;
+pub use vdm_t4::{BaseStationReport};
+pub use vdm_t6::{BinaryAddressedMessage};
+pub use vdm_t21::{AidToNavigationReport, NavAidType};
 
 // -------------------------------------------------------------------------------------------------
 

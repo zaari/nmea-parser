@@ -114,8 +114,8 @@ mod test {
 
     #[test]
     fn test_parse_gpgsa() {
-        match parse_sentence("$GPGSA,A,3,19,28,14,18,27,22,31,39,,,,,1.7,1.0,1.3*34", 
-                              &mut NmeaStore::new()) {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("$GPGSA,A,3,19,28,14,18,27,22,31,39,,,,,1.7,1.0,1.3*34") {
             Ok(ps) => {
                 match ps {
                     // The expected result

@@ -8,8 +8,8 @@
 [docsrs-image]: https://docs.rs/nmea-parser/badge.svg
 [docsrs]: https://docs.rs/nmea-parser
 
-This [Rust] crate aims to cover the most important [AIS] and [GNSS] sentences. It supports both 
-class A and B types of AIS.
+This [Rust] crate aims to cover the most important [AIS] and [GNSS] NMEA 0183 sentences. It supports 
+both class A and B types of AIS.
 
 ## Usage
 
@@ -17,7 +17,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.3.1"
+nmea-parser = "0.4.0"
 ```
 
 The following sample program uses the crate to parse the given NMEA sentence and to print some 
@@ -26,7 +26,7 @@ fields of the resulting data object:
 ```rust
 use nmea_parser::*;
 
-let mut store = NmeaStore::new();
+let mut p = NmeaParser::new();
 let sentences = vec![
   "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D",
   "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40",
@@ -34,11 +34,11 @@ let sentences = vec![
 ];
 
 for sentence in sentences {    
-    match nmea_parser::parse_sentence(sentence, &mut store)? {
+    match p.parse_sentence(sentence)? {
         ParsedSentence::VesselDynamicData(vdd) => {
-            println!("MMSI:  {}",        vdd.mmsi);
-            println!("Speed: {:.1} kts", vdd.sog_knots.unwrap());
-            println!("Heading: {}°",     vdd.heading_true.unwrap());
+            println!("MMSI:    {}",        vdd.mmsi);
+            println!("Speed:   {:.1} kts", vdd.sog_knots.unwrap());
+            println!("Heading: {}°",       vdd.heading_true.unwrap());
             println!("");
         },
         ParsedSentence::VesselStaticData(vds) => {
@@ -100,13 +100,13 @@ based on estimated significance and implementation effort of each of them.
 
 |Version |Category    |Goal                                                   |
 |--------|------------|-------------------------------------------------------|
-|0.4     |AIS         |VDM/VDO types 4, 9-17, 21, 27                          |
-|0.5     |GNSS        |ALM, TRF, STN, VBW, XTC, XTE, ZDA                      |
-|0.6     |AIS         |VDM/VDO types 20, 22, 23, 25, 26                       |
-|0.7     |AIS         |VDM/VDO types 6-8                                      |
+|0.5     |AIS         |VDM/VDO types 4, 9-17, 21, 27                          |
+|0.6     |GNSS        |ALM, DTM, GBS, HDT, ROT, STN, TRF, VBW, ZDA, XTC, XTE  |
+|0.7     |AIS         |VDM/VDO types 20, 22, 23, 25, 26                       |
+|0.8     |AIS         |VDM/VDO types 6-8                                      |
 |1.0     |general     |Stable API, optimizations, enhanced documentation      |
 |1.2     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
-|1.3     |GNSS        |APB, DTM, RMA, GRS, GST, MSK, MSS, STN, VBW            |
+|1.3     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW            |
 
 ## License
 

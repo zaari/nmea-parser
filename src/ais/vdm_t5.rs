@@ -89,23 +89,23 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type5() {
-        let mut store = NmeaStore::new();
+        let mut p = NmeaParser::new();
     
         let s1 = "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C";
         let s2 = "!AIVDM,2,2,1,A,88888888880,2*25";
         
         // Process fragment 1
-        match parse_sentence(s1, &mut store) {
+        match p.parse_sentence(s1) {
             Ok(_) => {
             },
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
-        assert_eq!(store.strings_count(), 1);
+        assert_eq!(p.strings_count(), 1);
         
         // Process fragment 2
-        match parse_sentence(s2, &mut store) {
+        match p.parse_sentence(s2) {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -150,17 +150,17 @@ mod test {
         }
         
         // Process fragment 2 (reversed order)
-        match parse_sentence(s2, &mut store) {
+        match p.parse_sentence(s2) {
             Ok(_) => {
             },
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
-        assert_eq!(store.strings_count(), 1);
+        assert_eq!(p.strings_count(), 1);
         
         // Process fragment 1 (reversed order)
-        match parse_sentence(s1, &mut store) {
+        match p.parse_sentence(s1) {
             Ok(ps) => {
                 match ps {
                     // The expected result

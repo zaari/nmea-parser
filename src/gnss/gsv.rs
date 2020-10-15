@@ -38,7 +38,7 @@ pub struct GsvData {
 
 #[doc(hidden)]
 /// xxGSV: GPS Satellites in view
-pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaStore) 
+pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaParser) 
               -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
@@ -96,27 +96,23 @@ mod test {
     
     #[test]
     fn test_parse_cpgsv() {
-        let mut store = NmeaStore::new();
+        let mut p = NmeaParser::new();
         
-        match parse_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74", 
-            &mut store) 
+        match p.parse_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74") 
         {
             Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
             Err(e) => { assert_eq!(e.to_string(), "OK"); }
         }
-        assert_eq!(store.strings_count(), 1);
+        assert_eq!(p.strings_count(), 1);
 
-        match parse_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74", 
-            &mut store) 
+        match p.parse_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74") 
         {
             Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
             Err(e) => { assert_eq!(e.to_string(), "OK"); }
         }
-        assert_eq!(store.strings_count(), 2);
+        assert_eq!(p.strings_count(), 2);
 
-        match parse_sentence("$GPGSV,3,3,11,22,42,067,42,24,14,311,43,27,05,244,00,,,,*4D", 
-            &mut store) 
-        {
+        match p.parse_sentence("$GPGSV,3,3,11,22,42,067,42,24,14,311,43,27,05,244,00,,,,*4D") {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -142,7 +138,7 @@ mod test {
                         assert_eq!(s11.snr, Some(0));
                     },
                     _ => {
-                        assert_eq!(store.strings_count(), 3);
+                        assert_eq!(p.strings_count(), 3);
                         assert!(false);
                     }
                 }
@@ -151,7 +147,7 @@ mod test {
                 assert_eq!(e.to_string(), "OK");
             }
         }
-        assert_eq!(store.strings_count(), 0);
+        assert_eq!(p.strings_count(), 0);
     }
 }
 

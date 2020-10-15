@@ -51,7 +51,7 @@ impl LatLon for GllData {
 
 #[doc(hidden)]
 /// xxGLL: Geographic Position, Latitude / Longitude and time.
-pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaStore) 
+pub fn handle(sentence: &str, nav_system: NavigationSystem) 
               -> Result<ParsedSentence, ParseError> {
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
@@ -88,9 +88,8 @@ mod test {
 
     #[test]
     fn test_parse_gagll() {
-        let mut store = NmeaStore::new();
-        match parse_sentence("$GAGLL,4916.45,N,12311.12,W,225444,A,D*48", &mut store) 
-        {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("$GAGLL,4916.45,N,12311.12,W,225444,A,D*48") {
             Ok(ps) => {
                 match ps {
                     // The expected result

@@ -41,7 +41,7 @@ pub struct VtgData {
 
 #[doc(hidden)]
 /// xxVTG: Track Made Good and Ground Speed
-pub fn handle(sentence: &str, nav_system: NavigationSystem, _store: &mut NmeaStore) 
+pub fn handle(sentence: &str, nav_system: NavigationSystem) 
               -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
@@ -63,9 +63,8 @@ mod test {
 
     #[test]
     fn test_parse_bdvtg() {
-        let mut store = NmeaStore::new();
-        match parse_sentence("$BDVTG,054.7,T,034.4,M,005.5,N,010.2,K,D*31", &mut store) 
-        {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("$BDVTG,054.7,T,034.4,M,005.5,N,010.2,K,D*31") {
             Ok(ps) => {
                 match ps {
                     // The expected result

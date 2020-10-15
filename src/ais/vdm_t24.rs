@@ -17,7 +17,7 @@ use super::*;
 
 #[doc(hidden)]
 /// AIVDM types 24: Static data report
-pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaStore, own_vessel: bool) 
+pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own_vessel: bool) 
 -> Result<ParsedSentence, ParseError> {
     // Check whether the message bit layout follows part A or part B format
     // We use two complementary booleans to make the code more readable.
@@ -220,10 +220,10 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type24() {
-        let mut store = NmeaStore::new();
+        let mut p = NmeaParser::new();
     
         let s1 = "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D";
-        match parse_sentence(s1, &mut store) {
+        match p.parse_sentence(s1) {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -243,7 +243,7 @@ mod test {
             }
         }
         let s2 = "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40";
-        match parse_sentence(s2, &mut store) {
+        match p.parse_sentence(s2) {
             Ok(ps) => {
                 match ps {
                     // The expected result

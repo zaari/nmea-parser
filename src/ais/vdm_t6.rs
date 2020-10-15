@@ -102,8 +102,8 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type5() {
-        match parse_sentence("!AIVDM,1,1,,B,6B?n;be:cbapalgc;i6?Ow4,2*4A", 
-                              &mut NmeaStore::new()) {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("!AIVDM,1,1,,B,6B?n;be:cbapalgc;i6?Ow4,2*4A") {
             Ok(ps) => {
                 match ps {
                     // The expected result

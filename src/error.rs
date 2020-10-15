@@ -21,7 +21,7 @@ pub enum ParseError {
     /// Unsupported (or unimplemented) sentence type
     UnsupportedSentenceType(String),
 
-    /// Checksum doesn't match
+    /// NMEA checksum doesn't match
     CorruptedSentence(String),
 
     /// The sentence format isn't what expected

@@ -149,8 +149,8 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type1() {
-        match parse_sentence("!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A", 
-                              &mut NmeaStore::new()) {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("!AIVDM,1,1,,A,15RTgt0PAso;90TKcjM8h6g208CQ,0*4A") {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -186,8 +186,8 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type2() {
-        match parse_sentence("!AIVDM,1,1,,A,16SteH0P00Jt63hHaa6SagvJ087r,0*42", 
-                              &mut NmeaStore::new()) {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("!AIVDM,1,1,,A,16SteH0P00Jt63hHaa6SagvJ087r,0*42") {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -223,8 +223,8 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type3() {
-        match parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*40", 
-                              &mut NmeaStore::new()) {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*40") {
             Ok(ps) => {
                 match ps {
                     // The expected result

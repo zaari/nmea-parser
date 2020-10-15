@@ -31,9 +31,9 @@ pub mod gll;
 
 use super::*;
 pub use rmc::RmcData;
-pub use gga::GgaData;
+pub use gga::{GgaData, GgaQualityIndicator};
 pub use gll::GllData;
-pub use gsa::GsaData;
+pub use gsa::{GsaData,GsaFixMode};
 pub use gsv::GsvData;
 pub use vtg::VtgData;
 

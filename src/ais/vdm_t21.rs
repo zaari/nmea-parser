@@ -372,9 +372,8 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type21() {
-        let mut store = NmeaStore::new();
-        match parse_sentence("!AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46", 
-                              &mut store) {
+        let mut p = NmeaParser::new();
+        match p.parse_sentence("!AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46") {
             Ok(ps) => {
                 match ps {
                     ParsedSentence::Incomplete => {
@@ -390,8 +389,7 @@ mod test {
             }
         }
         
-        match parse_sentence("!AIVDM,2,2,5,B,:D44QDlp0C1DU00,2*36", 
-                              &mut store) {
+        match p.parse_sentence("!AIVDM,2,2,5,B,:D44QDlp0C1DU00,2*36") {
             Ok(ps) => {
                 match ps {
                     // The expected result
