@@ -9,7 +9,7 @@
 [docsrs]: https://docs.rs/nmea-parser
 
 This [Rust] crate aims to cover the most important [AIS] and [GNSS] NMEA 0183 sentences. It supports 
-both class A and B types of AIS.
+both AIS class A and class B.
 
 ## Usage
 
@@ -26,15 +26,17 @@ fields of the resulting data object:
 ```rust
 use nmea_parser::*;
 
-let mut p = NmeaParser::new();
+// Create parser and define sample sentences
+let mut parser = NmeaParser::new();
 let sentences = vec![
   "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D",
   "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40",
   "$GAGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*56",
 ];
 
+// Parse the sentences and print the parsed data 
 for sentence in sentences {    
-    match p.parse_sentence(sentence)? {
+    match parser.parse_sentence(sentence)? {
         ParsedSentence::VesselDynamicData(vdd) => {
             println!("MMSI:    {}",        vdd.mmsi);
             println!("Speed:   {:.1} kts", vdd.sog_knots.unwrap());
@@ -78,7 +80,6 @@ Type:  passenger
 Source:    Galileo
 Latitude:  48.117°
 Longitude: 11.517°
-
 ```
 
 ## Features
@@ -88,7 +89,7 @@ version history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
-|AIS sentences    |VDM/VDO types 1-3, 5, 18-19, 21, 24 and 27                 |
+|AIS sentences    |VDM/VDO types 1-5, 18-19, 21, 24 and 27                 |
 |GNSS sentences   |GGA, RMC, GSA, GSV, VTG, GLL                               |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS              | 
 
@@ -96,17 +97,17 @@ version history can be found from the [changelog].
 
 Until version 1.0 refactoring and renaming of crate's code elements is likely to happen.
 The following table shows the plan to include different sentences in the crate. Prioritisation is 
-based on estimated significance and implementation effort of each of them.
+based on estimated significance and implementation effort of each item.
 
 |Version |Category    |Goal                                                   |
 |--------|------------|-------------------------------------------------------|
-|0.5     |AIS         |VDM/VDO types 4, 9-17                                  |
+|0.5     |AIS         |VDM/VDO types 9-17                                     |
 |0.6     |GNSS        |ALM, DTM, GBS, HDT, ROT, STN, TRF, VBW, ZDA, XTC, XTE  |
-|0.7     |AIS         |VDM/VDO types 20, 22, 23, 25, 26                       |
+|0.7     |AIS         |VDM/VDO types 20, 22, 23, 25 and 26                    |
 |0.8     |AIS         |VDM/VDO types 6-8                                      |
 |1.0     |general     |Stable API, optimizations, enhanced documentation      |
 |1.2     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
-|1.3     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW            |
+|1.3     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW                 |
 
 ## License
 

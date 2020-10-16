@@ -82,7 +82,7 @@ impl std::fmt::Display for Station {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Types 1, 2, 3 and 18
+/// Types 1, 2, 3 and 18: Position Report Class A and Long Range AIS Broadcast message
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselDynamicData { 
     /// True if the data is about own vessel, false if about other.

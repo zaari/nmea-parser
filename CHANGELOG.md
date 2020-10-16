@@ -3,22 +3,26 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+### Changed
+
 ## [0.4.1] - 2020-10-15
 ### Changed
 - Documentation corrections and changes
 
 ## [0.4.0] - 2020-10-15
 ### Added
-- Implementation for AIS VDM/VDO type 21 message
-- Implementation for AIS VDM/VDO type 27 message
-- Implementation for AIS VDM/VDO type 4 message
-- Partial implementation for AIS VDM/VDO type 6 message
+- Implementation for AIS VDM/VDO sentence type 21 parsing
+- Implementation for AIS VDM/VDO sentence type 27 parsing
+- Implementation for AIS VDM/VDO sentence type 4 parsing
+- Partial implementation for AIS VDM/VDO sentence type 6 parsing
 - New field `current_gnss_position` added to `VesselDynamicData` struct
 ### Changed
 - Renamed `NmeaStore` to `NmeaParser` and made `parse_sentence` its member function
 - Submodule documentation visibility fixes
 - Type of `VesselDynamicData::radio_status` changed from `u32` to `Option<u32>` because type 27 
-  messages don't have the field
+  sentences don't have the field
 - Dependency `regex` upgraded to version 1.4
 
 ## [0.3.1] - 2020-10-09
