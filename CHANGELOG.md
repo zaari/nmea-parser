@@ -5,7 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for AIS VDM/VDO sentence type 9 parsing
 ### Changed
+- Dependency `env_logger` upgraded to version 0.8
 
 ## [0.4.1] - 2020-10-15
 ### Changed

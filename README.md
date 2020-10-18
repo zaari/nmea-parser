@@ -89,7 +89,7 @@ version history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
-|AIS sentences    |VDM/VDO types 1-5, 18-19, 21, 24 and 27                 |
+|AIS sentences    |VDM/VDO types 1-5, 18-19, 21, 24 and 27                    |
 |GNSS sentences   |GGA, RMC, GSA, GSV, VTG, GLL                               |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS              | 
 
