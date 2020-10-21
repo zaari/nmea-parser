@@ -70,6 +70,9 @@ pub enum ParsedSentence {
     // AIS VDM/VDO type 9
     StandardSarAircraftPositionReport(ais::StandardSarAircraftPositionReport),
 
+    // AIS VDM/VDO type 10
+    UtcDateInquiry(ais::UtcDateInquiry),
+
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
     
@@ -458,10 +461,8 @@ impl NmeaParser {
                         },
                         // UTC and Date inquiry 
                         10 => {
-                            // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
+                            return ais::vdm_t10::handle(&bv, station.unwrap_or(ais::Station::Other), 
+                                                       own_vessel);
                         },
                         // UTC and Date response 
                         11 => {
@@ -651,6 +652,7 @@ mod test {
         vsd.mmsi = 512003200; assert_eq!(vsd.country().unwrap(), "NZ");
         vsd.mmsi = 995126020; assert_eq!(vsd.country(), None);
         vsd.mmsi =   2300049; assert_eq!(vsd.country(), None);
+        vsd.mmsi =         0; assert_eq!(vsd.country(), None);
     }
 
 }

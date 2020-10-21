@@ -20,8 +20,10 @@ Include the following fragment in your `Cargo.toml` file:
 nmea-parser = "0.4.1"
 ```
 
-The following sample program uses the crate to parse the given NMEA sentence and to print some 
-fields of the resulting data object:
+The following sample program uses the crate to parse the given NMEA sentence and 
+to print some fields of the resulting data object. The program relies on plain `unwrap()`
+functions to simplify the example. In real-life applications proper handling of
+`None` cases is needed.
 
 ```rust
 use nmea_parser::*;
@@ -99,7 +101,7 @@ Until version 1.0 refactoring and renaming of crate's code elements is likely to
 The following table shows the plan to include different sentences in the crate. Prioritisation is 
 based on estimated significance and implementation effort of each item.
 
-|Version |Category    |Goal                                                   |
+|Version |Category    |Content                                                |
 |--------|------------|-------------------------------------------------------|
 |0.5     |AIS         |VDM/VDO types 9-17                                     |
 |0.6     |GNSS        |ALM, DTM, GBS, HDT, ROT, STN, TRF, VBW, ZDA, XTC, XTE  |
@@ -108,6 +110,10 @@ based on estimated significance and implementation effort of each item.
 |1.0     |general     |Stable API, optimizations, enhanced documentation      |
 |1.2     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
 |1.3     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW                 |
+
+## Minimum Rust version
+
+The crate's minimum supported Rust toolchain version is 1.44.
 
 ## License
 

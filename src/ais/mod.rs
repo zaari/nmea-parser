@@ -27,6 +27,8 @@ pub mod vdm_t6;
 #[doc(hidden)]
 pub mod vdm_t9;
 #[doc(hidden)]
+pub mod vdm_t10;
+#[doc(hidden)]
 pub mod vdm_t18;
 #[doc(hidden)]
 pub mod vdm_t19;
@@ -41,6 +43,7 @@ use super::*;
 pub use vdm_t4::{BaseStationReport};
 pub use vdm_t6::{BinaryAddressedMessage};
 pub use vdm_t9::{StandardSarAircraftPositionReport};
+pub use vdm_t10::{UtcDateInquiry};
 pub use vdm_t21::{AidToNavigationReport, NavAidType};
 
 // -------------------------------------------------------------------------------------------------

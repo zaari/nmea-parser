@@ -11,6 +11,7 @@ keywords      = ["nmea", "ais", "gnss", "gps"]
 categories    = ["parsing"]
 readme        = "README.md"
 edition       = "2018"
+#rust-version  = "1.44"
 
 [dependencies]
 bitvec     = "0.19.3"
