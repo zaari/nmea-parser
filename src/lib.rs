@@ -26,10 +26,9 @@ limitations under the License.
 #[macro_use] extern crate log;
 extern crate env_logger;
 
-extern crate chrono;
-
 use std::collections::{HashMap};
 use bitvec::prelude::*;
+pub use chrono;
 use chrono::{DateTime};
 use chrono::prelude::*;
 
