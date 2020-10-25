@@ -15,6 +15,8 @@ limitations under the License.
 */
 use super::*;
 
+use std::num::ParseIntError;
+
 #[doc(hidden)]
 /// Make a key for storing NMEA sentence fragments
 pub fn make_fragment_key(sentence_type: &String, message_id: u64, fragment_count: u8, fragment_number: u8, radio_channel_code: &str) -> String {
@@ -133,40 +135,39 @@ pub fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: usize) ->
 
 /// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
 pub fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
-    if let Some(hour) = hhmmss[0..2].parse::<u32>().ok() {
-        if let Some(minute) = hhmmss[2..4].parse::<u32>().ok() {
-            if let Some(second) = hhmmss[4..6].parse::<u32>().ok() {
-                return Ok(Utc.ymd(now.year(), now.month(), now.day()).and_hms(hour, minute, second))
-            }
-        }
-    }
-    return Err(format!("Invalid time format: {}", hhmmss));
+    let (hour, minute, second) =  parse_time(hhmmss)
+        .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
+    Ok(Utc.ymd(now.year(), now.month(), now.day()).and_hms(hour, minute, second))
 }
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to DateTime<Utc>.
 pub fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, String> {
     let century = (Utc::now().year() / 100) * 100;
-    if let Some(day) = pick_s2(yymmdd, 0).parse::<u32>().ok() {
-        if let Some(month) = pick_s2(yymmdd, 2).parse::<u32>().ok() {
-            if let Some(year) = pick_s2(yymmdd, 4).parse::<i32>().ok() {
-                if let Some(hour) = pick_s2(hhmmss, 0).parse::<u32>().ok() {
-                    if let Some(minute) = pick_s2(hhmmss, 2).parse::<u32>().ok() {
-                        if let Some(second) = pick_s2(hhmmss, 4).parse::<u32>().ok() {
-                            return Ok(Utc.ymd(century + year, month, day)
-                                         .and_hms(hour, minute, second))
-                        }
-                    }
-                }
-                return Err(format!("Invalid time format: {}", hhmmss));
-            }
-        }
-    }
-    return Err(format!("Invalid date format: {}", yymmdd));
+    let (day, month, year) = parse_date(yymmdd)
+        .map_err(|_| format!("Invalid date format: {}", yymmdd))?;
+    let (hour, minute, second) =  parse_time(hhmmss)
+        .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
+    Ok(Utc.ymd(century + year, month, day).and_hms(hour, minute, second))
+}
+
+fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseIntError> {
+    let day = pick_s2(yymmdd, 0).parse::<u32>()?;
+    let month = pick_s2(yymmdd, 2).parse::<u32>()?;
+    let year = pick_s2(yymmdd, 4).parse::<i32>()?;
+    Ok((day, month, year))
+}
+
+fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseIntError> {
+    let hour = pick_s2(hhmmss, 0).parse::<u32>()?;
+    let minute = pick_s2(hhmmss, 2).parse::<u32>()?;
+    let second = pick_s2(hhmmss, 4).parse::<u32>()?;
+    Ok((hour, minute, second))
 }
 
 /// A simple helper to pick a substring of length two from the given string.
-fn pick_s2(s: &str, i: usize) -> String {
-    s.chars().skip(i).take(2).collect()
+fn pick_s2(s: &str, i: usize) -> &str {
+    let end = i + 2;
+    s.get(i..end).unwrap_or("")
 }
 
 /// Parse latitude from two string.
