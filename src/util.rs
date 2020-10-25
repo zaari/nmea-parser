@@ -15,7 +15,7 @@ limitations under the License.
 */
 use super::*;
 
-use regex::Regex;
+use std::num::ParseIntError;
 
 /// Make a key for storing NMEA sentence fragments
 pub(crate) fn make_fragment_key(sentence_type: &str, message_id: u64, fragment_count: u8, fragment_number: u8, radio_channel_code: &str) -> String {
@@ -128,41 +128,40 @@ pub(crate) fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: us
 }
 
 /// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
-pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
-    if let Some(hour) = hhmmss[0..2].parse::<u32>().ok() {
-        if let Some(minute) = hhmmss[2..4].parse::<u32>().ok() {
-            if let Some(second) = hhmmss[4..6].parse::<u32>().ok() {
-                return Ok(Utc.ymd(now.year(), now.month(), now.day()).and_hms(hour, minute, second))
-            }
-        }
-    }
-    return Err(format!("Invalid time format: {}", hhmmss));
+pub fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
+    let (hour, minute, second) =  parse_time(hhmmss)
+        .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
+    Ok(Utc.ymd(now.year(), now.month(), now.day()).and_hms(hour, minute, second))
 }
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to DateTime<Utc>.
 pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, String> {
     let century = (Utc::now().year() / 100) * 100;
-    if let Some(day) = pick_s2(yymmdd, 0).parse::<u32>().ok() {
-        if let Some(month) = pick_s2(yymmdd, 2).parse::<u32>().ok() {
-            if let Some(year) = pick_s2(yymmdd, 4).parse::<i32>().ok() {
-                if let Some(hour) = pick_s2(hhmmss, 0).parse::<u32>().ok() {
-                    if let Some(minute) = pick_s2(hhmmss, 2).parse::<u32>().ok() {
-                        if let Some(second) = pick_s2(hhmmss, 4).parse::<u32>().ok() {
-                            return Ok(Utc.ymd(century + year, month, day)
-                                         .and_hms(hour, minute, second))
-                        }
-                    }
-                }
-                return Err(format!("Invalid time format: {}", hhmmss));
-            }
-        }
-    }
-    return Err(format!("Invalid date format: {}", yymmdd));
+    let (day, month, year) = parse_date(yymmdd)
+        .map_err(|_| format!("Invalid date format: {}", yymmdd))?;
+    let (hour, minute, second) =  parse_time(hhmmss)
+        .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
+    Ok(Utc.ymd(century + year, month, day).and_hms(hour, minute, second))
+}
+
+fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseIntError> {
+    let day = pick_s2(yymmdd, 0).parse::<u32>()?;
+    let month = pick_s2(yymmdd, 2).parse::<u32>()?;
+    let year = pick_s2(yymmdd, 4).parse::<i32>()?;
+    Ok((day, month, year))
+}
+
+fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseIntError> {
+    let hour = pick_s2(hhmmss, 0).parse::<u32>()?;
+    let minute = pick_s2(hhmmss, 2).parse::<u32>()?;
+    let second = pick_s2(hhmmss, 4).parse::<u32>()?;
+    Ok((hour, minute, second))
 }
 
 /// A simple helper to pick a substring of length two from the given string.
-fn pick_s2(s: &str, i: usize) -> String {
-    s.chars().skip(i).take(2).collect()
+fn pick_s2(s: &str, i: usize) -> &str {
+    let end = i + 2;
+    s.get(i..end).unwrap_or("")
 }
 
 /// Parse latitude from two string.
@@ -170,19 +169,26 @@ fn pick_s2(s: &str, i: usize) -> String {
 /// hemisphere = N for north, S for south
 pub(crate) fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Result<Option<f64>, String> {
     // DDMM.MMM
-    if lat_string != "" {
-        let re = Regex::new(r"^([0-9][0-9])([0-9][0-9]\.[0-9]+)").unwrap();
-        if let Some(caps) = re.captures(lat_string) {
-            let d = caps.get(1).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let m = caps.get(2).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let val = d + m / 60.0;
-            Ok(Some(match hemisphere { "N" => val , "S" => -val, _ => val }))
-        } else {
-            return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string));
-        }
-    } else {
-        Ok(None)
+    if lat_string.is_empty() {
+        return Ok(None)
     }
+
+    // Validate: 4 digits, a decimal point, then 1 or more digits
+    let byte_string = lat_string.as_bytes();
+    if !(byte_string.iter().take(4).all(|c| c.is_ascii_digit())
+        && byte_string.get(4) == Some(&b'.')
+        && byte_string.get(5).map(|c| c.is_ascii_digit()).unwrap_or(false)) {
+        return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string));
+    }
+    let end = 5 + byte_string.iter()
+        .skip(5)
+        .take_while(|c| c.is_ascii_digit()).count();
+
+    // Extract
+    let d = lat_string[0..2].parse::<f64>().unwrap_or(0.0);
+    let m = lat_string[2..end].parse::<f64>().unwrap_or(0.0);
+    let val = d + m / 60.0;
+    Ok(Some(match hemisphere { "N" => val , "S" => -val, _ => val }))
 }
 
 /// Parse longitude from two string.
@@ -190,19 +196,26 @@ pub(crate) fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Res
 /// eastwest = E for north, W for south
 pub(crate) fn parse_longitude_dddmm_mmm(lon_string: &str, eastwest: &str) -> Result<Option<f64>, String> {
     // DDDMM.MMM
-    if lon_string != "" {
-        let re = Regex::new(r"^([0-9][0-9][0-9])([0-9][0-9]\.[0-9]+)").unwrap();
-        if let Some(caps) = re.captures(lon_string) {
-            let d = caps.get(1).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let m = caps.get(2).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let val = d + m / 60.0;
-            Ok(Some(match eastwest { "E" => val, "W" => -val, _ => val }))
-        } else {
-            return Err(format!("Failed to parse longitude (DDDMM.MMM) from {}", lon_string));
-        }
-    } else {
-        Ok(None)
+    if lon_string.is_empty() {
+        return Ok(None)
     }
+
+    // Validate: 5 digits, a decimal point, then 1 or more digits
+    let byte_string = lon_string.as_bytes();
+    if !(byte_string.iter().take(5).all(|c| c.is_ascii_digit())
+        && byte_string.get(5) == Some(&b'.')
+        && byte_string.get(6).map(|c| c.is_ascii_digit()).unwrap_or(false)) {
+        return Err(format!("Failed to parse longitude (DDDMM.MMM) from {}", lon_string));
+    }
+    let end = 6 + byte_string.iter()
+        .skip(6)
+        .take_while(|c| c.is_ascii_digit()).count();
+
+    // Extract
+    let d = lon_string[0..3].parse::<f64>().unwrap_or(0.0);
+    let m = lon_string[3..end].parse::<f64>().unwrap_or(0.0);
+    let val = d + m / 60.0;
+    Ok(Some(match eastwest { "E" => val, "W" => -val, _ => val }))
 }
 
 // -------------------------------------------------------------------------------------------------
