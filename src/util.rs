@@ -17,6 +17,8 @@ use super::*;
 
 use std::num::ParseIntError;
 
+const AIS_CHAR_BITS: usize = 6;
+
 /// Make a key for storing NMEA sentence fragments
 pub(crate) fn make_fragment_key(sentence_type: &str, message_id: u64, fragment_count: u8, fragment_number: u8, radio_channel_code: &str) -> String {
     format!("{},{},{},{},{}", sentence_type, fragment_count, fragment_number, message_id, radio_channel_code)
@@ -66,20 +68,21 @@ pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
 
 /// Pick a string from BitVec. Char_count is the length in characters. Character size is 6-bits.
 pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> String {
-    let char_size = 6;
     let mut res = String::with_capacity(char_count);
     for i in 0 .. char_count {
-        let ch = pick_u64(bv, index + i * char_size, char_size) as u32;
-        assert!(ch < 64);
-        if ch == 0 {
-            break;
-        } else if ch < 32 {
-            res.push(std::char::from_u32(64 + ch).unwrap_or(' '))
-        } else {
-            res.push(std::char::from_u32(ch).unwrap_or(' '))
+        // unwraps below won't panic as char_from::u32 will only ever receive values between
+        // 32..=96, all of which are valid.
+        match pick_u64(bv, index + i * AIS_CHAR_BITS, AIS_CHAR_BITS) as u32 {
+            0 => break,
+            ch if ch < 32 => res.push(std::char::from_u32(64 + ch).unwrap()),
+            ch if ch < 64 => res.push(std::char::from_u32(ch).unwrap()),
+            ch => panic!("invalid AIS character {}", ch),
         }
     }
-    res.trim_end().to_string()
+    
+    let trimmed_len = res.trim_end().len();
+    res.truncate(trimmed_len);
+    res
 }
 
 /// Pick ETA based on UTC month, day, hour and minute.
