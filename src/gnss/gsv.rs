@@ -36,9 +36,8 @@ pub struct GsvData {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// xxGSV: GPS Satellites in view
-pub fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaParser) 
+pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaParser)
               -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 

@@ -17,15 +17,13 @@ use super::*;
 
 use regex::Regex;
 
-#[doc(hidden)]
 /// Make a key for storing NMEA sentence fragments
-pub fn make_fragment_key(sentence_type: &String, message_id: u64, fragment_count: u8, fragment_number: u8, radio_channel_code: &str) -> String {
+pub(crate) fn make_fragment_key(sentence_type: &str, message_id: u64, fragment_count: u8, fragment_number: u8, radio_channel_code: &str) -> String {
     format!("{},{},{},{},{}", sentence_type, fragment_count, fragment_number, message_id, radio_channel_code)
 }
 
 /// Converts AIVDM playload armored string into bit vector.
-#[doc(hidden)]
-pub fn parse_payload(payload: &String) -> Result<BitVec, String> {   
+pub(crate) fn parse_payload(payload: &String) -> Result<BitVec, String> {
     let mut bv = BitVec::<LocalBits, usize>::with_capacity(payload.len() * 6); // or Lsb0 or Msb0 ?
     for c in payload.chars() {
         let mut ci = (c as u8) - 48;
@@ -42,9 +40,8 @@ pub fn parse_payload(payload: &String) -> Result<BitVec, String> {
     Ok(bv)
 }
 
-#[doc(hidden)]
 /// Picks a numberic field from BitVec.
-pub fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
+pub(crate) fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
     let mut res = 0;
     for pos in index .. (index + len) {
         res = (res << 1) | (*bv.get(pos).unwrap_or(&false) as u64);
@@ -52,9 +49,8 @@ pub fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
     res
 }
 
-#[doc(hidden)]
 /// Picks a signed numberic field from BitVec.
-pub fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
+pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
     let mut res = 0;
     for pos in index .. (index + len) {
         res = (res << 1) | (*bv.get(pos).unwrap_or(&false) as u64);
@@ -68,9 +64,8 @@ pub fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
     }
 }
 
-#[doc(hidden)]
 /// Pick a string from BitVec. Char_count is the length in characters. Character size is 6-bits.
-pub fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> String {
+pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> String {
     let char_size = 6;
     let mut res = String::with_capacity(char_count);
     for i in 0 .. char_count {
@@ -87,9 +82,8 @@ pub fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> String {
     res.trim_end().to_string()
 }
 
-#[doc(hidden)]
 /// Pick ETA based on UTC month, day, hour and minute.
-pub fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime::<Utc>> {
+pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime::<Utc>> {
     let now = Utc::now().naive_utc();
     
     // Pick ETA
@@ -121,7 +115,7 @@ pub fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime::<Utc>> {
 }
 
 /// Pick field from comma-separated sentence or None if empty field.
-pub fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: usize) -> Result<Option<T>, String> {
+pub(crate) fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: usize) -> Result<Option<T>, String> {
     let s = split.get(num).unwrap_or(&"");
     if *s != "" {
         match s.parse::<T>() {
@@ -134,7 +128,7 @@ pub fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: usize) ->
 }
 
 /// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
-pub fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
+pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
     if let Some(hour) = hhmmss[0..2].parse::<u32>().ok() {
         if let Some(minute) = hhmmss[2..4].parse::<u32>().ok() {
             if let Some(second) = hhmmss[4..6].parse::<u32>().ok() {
@@ -146,7 +140,7 @@ pub fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, S
 }
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to DateTime<Utc>.
-pub fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, String> {
+pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, String> {
     let century = (Utc::now().year() / 100) * 100;
     if let Some(day) = pick_s2(yymmdd, 0).parse::<u32>().ok() {
         if let Some(month) = pick_s2(yymmdd, 2).parse::<u32>().ok() {
@@ -174,7 +168,7 @@ fn pick_s2(s: &str, i: usize) -> String {
 /// Parse latitude from two string.
 /// lat_string = DDMM.MMM representing latitude
 /// hemisphere = N for north, S for south
-pub fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Result<Option<f64>, String> {
+pub(crate) fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Result<Option<f64>, String> {
     // DDMM.MMM
     if lat_string != "" {
         let re = Regex::new(r"^([0-9][0-9])([0-9][0-9]\.[0-9]+)").unwrap();
@@ -194,7 +188,7 @@ pub fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Result<Opt
 /// Parse longitude from two string.
 /// lon_string = DDDMM.MMM representing latitude
 /// eastwest = E for north, W for south
-pub fn parse_longitude_dddmm_mmm(lon_string: &str, eastwest: &str) -> Result<Option<f64>, String> {
+pub(crate) fn parse_longitude_dddmm_mmm(lon_string: &str, eastwest: &str) -> Result<Option<f64>, String> {
     // DDDMM.MMM
     if lon_string != "" {
         let re = Regex::new(r"^([0-9][0-9][0-9])([0-9][0-9]\.[0-9]+)").unwrap();

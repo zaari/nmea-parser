@@ -16,18 +16,12 @@ limitations under the License.
 
 //! GNSS-related data structures
 
-#[doc(hidden)]
-pub mod gga;
-#[doc(hidden)]
-pub mod gsa;
-#[doc(hidden)]
-pub mod gsv;
-#[doc(hidden)]
-pub mod rmc;
-#[doc(hidden)]
-pub mod vtg;
-#[doc(hidden)]
-pub mod gll;
+pub(crate) mod gga;
+pub(crate) mod gsa;
+pub(crate) mod gsv;
+pub(crate) mod rmc;
+pub(crate) mod vtg;
+pub(crate) mod gll;
 
 use super::*;
 pub use rmc::RmcData;

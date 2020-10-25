@@ -39,9 +39,8 @@ pub struct VtgData {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// xxVTG: Track Made Good and Ground Speed
-pub fn handle(sentence: &str, nav_system: NavigationSystem) 
+pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem)
               -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 

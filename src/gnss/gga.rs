@@ -113,9 +113,8 @@ impl std::fmt::Display for GgaQualityIndicator {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// xxGGA: Global Positioning System Fix Data
-pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
     

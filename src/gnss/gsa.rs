@@ -65,9 +65,8 @@ impl std::fmt::Display for GsaFixMode {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
-/// xxGSA: GPS DOP and active satellites 
-pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
+/// xxGSA: GPS DOP and active satellites
+pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Gsa(GsaData{
