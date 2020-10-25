@@ -76,7 +76,7 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
             0 => break,
             ch if ch < 32 => res.push(std::char::from_u32(64 + ch).unwrap()),
             ch if ch < 64 => res.push(std::char::from_u32(ch).unwrap()),
-            ch => panic!("invalid AIS character {}", ch),
+            ch => panic!("6-bit AIS character expected but value {} encountered!", ch),
         }
     }
     
@@ -142,6 +142,7 @@ pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime
     Ok(Utc.ymd(century + year, month, day).and_hms(hour, minute, second))
 }
 
+/// Parse day, month and year from YYMMDD string.
 fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseIntError> {
     let day = pick_s2(yymmdd, 0).parse::<u32>()?;
     let month = pick_s2(yymmdd, 2).parse::<u32>()?;
@@ -149,6 +150,7 @@ fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseIntError> {
     Ok((day, month, year))
 }
 
+/// Parse hour, minute and second from HHMMSS string.
 fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseIntError> {
     let hour = pick_s2(hhmmss, 0).parse::<u32>()?;
     let minute = pick_s2(hhmmss, 2).parse::<u32>()?;
