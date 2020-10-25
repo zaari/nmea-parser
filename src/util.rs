@@ -128,7 +128,7 @@ pub(crate) fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: us
 }
 
 /// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
-pub fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
+pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
     let (hour, minute, second) =  parse_time(hhmmss)
         .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
     Ok(Utc.ymd(now.year(), now.month(), now.day()).and_hms(hour, minute, second))

@@ -62,7 +62,7 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_vdm_type9() {
+    fn test_parse_vdm_type10() {
         let mut p = NmeaParser::new();
         match p.parse_sentence("!AIVDM,1,1,,B,:5MlU41GMK6@,0*6C") {
             Ok(ps) => {

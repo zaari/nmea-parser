@@ -22,6 +22,7 @@ pub(crate) mod vdm_t5;
 pub(crate) mod vdm_t6;
 pub(crate) mod vdm_t9;
 pub(crate) mod vdm_t10;
+pub(crate) mod vdm_t11;
 pub(crate) mod vdm_t18;
 pub(crate) mod vdm_t19;
 pub(crate) mod vdm_t24;

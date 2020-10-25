@@ -71,6 +71,9 @@ pub enum ParsedSentence {
     // AIS VDM/VDO type 10
     UtcDateInquiry(ais::UtcDateInquiry),
 
+    // AIS VDM/VDO type 11
+    UtcDateResponse(ais::BaseStationReport),
+
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
     
@@ -167,7 +170,7 @@ impl NmeaParser {
         let mut checksum = 0;
         let (sentence, checksum_hex_given) = { 
             if let Some(pos) = sentence.rfind('*') {
-                (sentence[0..pos].to_string(), sentence[(pos+1)..sentence.len()].to_string())
+                (sentence[0..pos].to_string(), sentence[(pos+1)..(pos+3)].to_string())
             } else {
                 debug!("No checksum found for sentence: {}", sentence);
                 (sentence.to_string(), "".to_string())
@@ -464,10 +467,8 @@ impl NmeaParser {
                         },
                         // UTC and Date response 
                         11 => {
-                            // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
+                            return ais::vdm_t11::handle(&bv, station.unwrap_or(ais::Station::Other), 
+                                                       own_vessel);
                         },
                         // Addressed safety related message 
                         12 => {
