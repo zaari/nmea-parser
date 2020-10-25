@@ -55,9 +55,8 @@ impl LatLon for RmcData {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// xxRMC: Recommended minimum specific GPS/Transit data
-pub fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
     
     return Ok(ParsedSentence::Rmc(RmcData{

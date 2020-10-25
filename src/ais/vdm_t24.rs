@@ -15,9 +15,8 @@ limitations under the License.
 */
 use super::*;
 
-#[doc(hidden)]
 /// AIS VDM/VDO type 24: Static data report
-pub fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own_vessel: bool) 
+pub(crate) fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own_vessel: bool)
 -> Result<ParsedSentence, ParseError> {
     // Check whether the message bit layout follows part A or part B format
     // We use two complementary booleans to make the code more readable.

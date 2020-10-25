@@ -15,9 +15,8 @@ limitations under the License.
 */
 use super::*;
 
-#[doc(hidden)]
 /// AIS VDM/VDO type 19: Extended Class B Equipment Position Report
-pub fn handle(_bv: &BitVec, _station: Station, _own_vessel: bool) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(_bv: &BitVec, _station: Station, _own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     // TODO: implementation (Class B)
     return Err(ParseError::UnsupportedSentenceType("Unsupported AIVDM message type: 19".into()));
 }

@@ -15,9 +15,8 @@ limitations under the License.
 */
 use super::*;
 
-#[doc(hidden)]
 /// AIVDM type 5: Ship static voyage related data
-pub fn handle(bv: &BitVec, _station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(bv: &BitVec, _station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselStaticData(VesselStaticData{
         own_vessel:              own_vessel,
         ais_type:                AisClass::ClassB,

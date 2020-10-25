@@ -83,9 +83,8 @@ impl LatLon for StandardSarAircraftPositionReport {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// AIS VDM/VDO type 9: Standard SAR Aircraft Position Report
-pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::StandardSarAircraftPositionReport(StandardSarAircraftPositionReport{
         own_vessel: {
             own_vessel

@@ -16,9 +16,8 @@ limitations under the License.
 
 use super::*;
 
-#[doc(hidden)]
 /// AIS VDM/VDO type 27: Long Range AIS Broadcast message
-pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
         own_vessel: {
             own_vessel

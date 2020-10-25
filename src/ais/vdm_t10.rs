@@ -37,9 +37,8 @@ pub struct UtcDateInquiry {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// AIS VDM/VDO type 10: UTC/Date Inquiry
-pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::UtcDateInquiry(UtcDateInquiry{
         own_vessel: {
             own_vessel

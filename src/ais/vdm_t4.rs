@@ -68,9 +68,8 @@ impl LatLon for BaseStationReport {
 
 // -------------------------------------------------------------------------------------------------
 
-#[doc(hidden)]
 /// AIS VDM/VDO type 4: Base Station Report
-pub fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
     return Ok(ParsedSentence::BaseStationReport(BaseStationReport{
         own_vessel: {
             own_vessel

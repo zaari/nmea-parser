@@ -16,28 +16,17 @@ limitations under the License.
 
 //! AIS VDM/VDO data structures
 
-#[doc(hidden)]
-pub mod vdm_t1t2t3;
-#[doc(hidden)]
-pub mod vdm_t4;
-#[doc(hidden)]
-pub mod vdm_t5;
-#[doc(hidden)]
-pub mod vdm_t6;
-#[doc(hidden)]
-pub mod vdm_t9;
-#[doc(hidden)]
-pub mod vdm_t10;
-#[doc(hidden)]
-pub mod vdm_t18;
-#[doc(hidden)]
-pub mod vdm_t19;
-#[doc(hidden)]
-pub mod vdm_t24;
-#[doc(hidden)]
-pub mod vdm_t21;
-#[doc(hidden)]
-pub mod vdm_t27;
+pub(crate) mod vdm_t1t2t3;
+pub(crate) mod vdm_t4;
+pub(crate) mod vdm_t5;
+pub(crate) mod vdm_t6;
+pub(crate) mod vdm_t9;
+pub(crate) mod vdm_t10;
+pub(crate) mod vdm_t18;
+pub(crate) mod vdm_t19;
+pub(crate) mod vdm_t24;
+pub(crate) mod vdm_t21;
+pub(crate) mod vdm_t27;
 
 use super::*;
 pub use vdm_t4::{BaseStationReport};
