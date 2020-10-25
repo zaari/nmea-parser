@@ -15,8 +15,6 @@ limitations under the License.
 */
 use super::*;
 
-use regex::Regex;
-
 #[doc(hidden)]
 /// Make a key for storing NMEA sentence fragments
 pub fn make_fragment_key(sentence_type: &String, message_id: u64, fragment_count: u8, fragment_number: u8, radio_channel_code: &str) -> String {
@@ -176,19 +174,26 @@ fn pick_s2(s: &str, i: usize) -> String {
 /// hemisphere = N for north, S for south
 pub fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Result<Option<f64>, String> {
     // DDMM.MMM
-    if lat_string != "" {
-        let re = Regex::new(r"^([0-9][0-9])([0-9][0-9]\.[0-9]+)").unwrap();
-        if let Some(caps) = re.captures(lat_string) {
-            let d = caps.get(1).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let m = caps.get(2).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let val = d + m / 60.0;
-            Ok(Some(match hemisphere { "N" => val , "S" => -val, _ => val }))
-        } else {
-            return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string));
-        }
-    } else {
-        Ok(None)
+    if lat_string.is_empty() {
+        return Ok(None)
     }
+
+    // Validate: 4 digits, a decimal point, then 1 or more digits
+    let byte_string = lat_string.as_bytes();
+    if !(byte_string.iter().take(4).all(|c| c.is_ascii_digit())
+        && byte_string.get(4) == Some(&b'.')
+        && byte_string.get(5).map(|c| c.is_ascii_digit()).unwrap_or(false)) {
+        return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string));
+    }
+    let end = 5 + byte_string.iter()
+        .skip(5)
+        .take_while(|c| c.is_ascii_digit()).count();
+
+    // Extract
+    let d = lat_string[0..2].parse::<f64>().unwrap_or(0.0);
+    let m = lat_string[2..end].parse::<f64>().unwrap_or(0.0);
+    let val = d + m / 60.0;
+    Ok(Some(match hemisphere { "N" => val , "S" => -val, _ => val }))
 }
 
 /// Parse longitude from two string.
@@ -196,19 +201,26 @@ pub fn parse_latitude_ddmm_mmm(lat_string: &str, hemisphere: &str) -> Result<Opt
 /// eastwest = E for north, W for south
 pub fn parse_longitude_dddmm_mmm(lon_string: &str, eastwest: &str) -> Result<Option<f64>, String> {
     // DDDMM.MMM
-    if lon_string != "" {
-        let re = Regex::new(r"^([0-9][0-9][0-9])([0-9][0-9]\.[0-9]+)").unwrap();
-        if let Some(caps) = re.captures(lon_string) {
-            let d = caps.get(1).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let m = caps.get(2).unwrap().as_str().parse::<f64>().ok().unwrap_or(0.0);
-            let val = d + m / 60.0;
-            Ok(Some(match eastwest { "E" => val, "W" => -val, _ => val }))
-        } else {
-            return Err(format!("Failed to parse longitude (DDDMM.MMM) from {}", lon_string));
-        }
-    } else {
-        Ok(None)
+    if lon_string.is_empty() {
+        return Ok(None)
     }
+
+    // Validate: 5 digits, a decimal point, then 1 or more digits
+    let byte_string = lon_string.as_bytes();
+    if !(byte_string.iter().take(5).all(|c| c.is_ascii_digit())
+        && byte_string.get(5) == Some(&b'.')
+        && byte_string.get(6).map(|c| c.is_ascii_digit()).unwrap_or(false)) {
+        return Err(format!("Failed to parse longitude (DDDMM.MMM) from {}", lon_string));
+    }
+    let end = 6 + byte_string.iter()
+        .skip(6)
+        .take_while(|c| c.is_ascii_digit()).count();
+
+    // Extract
+    let d = lon_string[0..3].parse::<f64>().unwrap_or(0.0);
+    let m = lon_string[3..end].parse::<f64>().unwrap_or(0.0);
+    let val = d + m / 60.0;
+    Ok(Some(match eastwest { "E" => val, "W" => -val, _ => val }))
 }
 
 // -------------------------------------------------------------------------------------------------
