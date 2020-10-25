@@ -278,4 +278,13 @@ mod test {
         assert_eq!(pick_string(&bv, 0, bv.len() / 6), "?AG_4:!");
     }
 
+    #[test]
+    fn test_pick_number_field() {
+          let s = "128,0,8.0,xyz".split(',').collect();
+          assert_eq!(pick_number_field::<u8>(&s, 0).ok().unwrap().unwrap(), 128);
+          assert_eq!(pick_number_field::<u8>(&s, 1).ok().unwrap().unwrap(), 0);
+          assert_eq!(pick_number_field::<f64>(&s, 2).ok().unwrap().unwrap(), 8.0);
+          assert_eq!(pick_number_field::<f64>(&s, 3).is_ok(), false);
+          assert_eq!(pick_number_field::<f64>(&s, 4).ok().unwrap(), None);
+    }
 }

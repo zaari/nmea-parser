@@ -108,8 +108,8 @@ version. Prioritisation is based on estimated significance and implementation ef
 |0.7     |AIS         |VDM/VDO types 20, 22, 23, 25 and 26                    |
 |0.8     |AIS         |VDM/VDO types 6-8                                      |
 |1.0     |general     |Stable API, optimizations, enhanced documentation      |
-|1.2     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
-|1.3     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW                 |
+|1.1     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
+|1.2     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW                 |
 
 ## Minimum Rust version
 

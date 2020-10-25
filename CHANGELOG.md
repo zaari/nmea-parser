@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation for AIS VDM/VDO sentence type 9 parsing
 ### Changed
 - Sentence checksum length limited to two characters (as some messages may have non-standard extensions)
-- Assert is a dev-dependency now
+- Turned crate `assert` into a dev-dependency
 ### Removed
 - Dependency to `env_logger` removed
 
