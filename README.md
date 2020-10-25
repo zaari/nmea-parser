@@ -21,7 +21,7 @@ nmea-parser = "0.4.1"
 ```
 
 The following sample program uses the crate to parse the given NMEA sentence and 
-to print some fields of the resulting data object. The program relies on plain `unwrap()`
+to print some fields of the resulting data object. The program relies on lazy `unwrap()`
 functions to simplify the example. In real-life applications proper handling of
 `None` cases is needed.
 
@@ -45,11 +45,11 @@ for sentence in sentences {
             println!("Heading: {}°",       vdd.heading_true.unwrap());
             println!("");
         },
-        ParsedSentence::VesselStaticData(vds) => {
-            println!("MMSI:  {}", vds.mmsi);
-            println!("Flag:  {}", vds.country().unwrap());
-            println!("Name:  {}", vds.name.unwrap());
-            println!("Type:  {}", vds.ship_type);
+        ParsedSentence::VesselStaticData(vsd) => {
+            println!("MMSI:  {}", vsd.mmsi);
+            println!("Flag:  {}", vsd.country().unwrap());
+            println!("Name:  {}", vsd.name.unwrap());
+            println!("Type:  {}", vsd.ship_type);
             println!("");
         },
         ParsedSentence::Gga(gga) => {
@@ -98,8 +98,8 @@ version history can be found from the [changelog].
 ## Roadmap
 
 Until version 1.0 refactoring and renaming of crate's code elements is likely to happen.
-The following table shows the plan to include different sentences in the crate. Prioritisation is 
-based on estimated significance and implementation effort of each item.
+The following table outlines the high-level changes that are going to be inclided in the future 
+version. Prioritisation is based on estimated significance and implementation effort of each item.
 
 |Version |Category    |Content                                                |
 |--------|------------|-------------------------------------------------------|
@@ -117,7 +117,7 @@ The crate's minimum supported Rust toolchain version is 1.44.
 
 ## License
 
-This crate is licensed under [Apache 2.0 license] which also includes liability and warranty
+This crate is licensed under [Apache 2.0 license] which also includes the liability and warranty
 statements.
 
 [changelog]: CHANGELOG.md
