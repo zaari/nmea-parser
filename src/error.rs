@@ -14,6 +14,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+use std::fmt;
+
 /// Parse error returned by `parse_sentence`. The string is used instead of static str 
 /// because the error messages are expected to contain context-specific details.
 #[derive(Clone, Debug, PartialEq)]
@@ -34,12 +36,18 @@ impl From<String> for ParseError {
     }
 }
 
-impl ToString for ParseError {
-    fn to_string(&self) -> String {
+impl fmt::Display for ParseError {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            ParseError::UnsupportedSentenceType(s) => { s.clone() },
-            ParseError::CorruptedSentence(s) => { s.clone() }, 
-            ParseError::InvalidSentence(s) => { s.clone() }, 
+            ParseError::UnsupportedSentenceType(s) => {
+                write!(f, "Unsupported NMEA sentence type: {}", s)
+            },
+            ParseError::CorruptedSentence(s) => {
+                write!(f, "Corrupted NMEA sentence: {}", s)
+            }, 
+            ParseError::InvalidSentence(s) => {
+                write!(f, "Invalid NMEA sentence: {}", s)
+            }, 
         }
     }
 }
