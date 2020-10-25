@@ -94,21 +94,19 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime::<Utc>> {
     let mut day    = pick_u64(bv, index + 4, 5) as u32;
     let mut hour   = pick_u64(bv, index + 4 + 5, 5) as u32;
     let mut minute = pick_u64(bv, index + 4 + 5 + 5, 6) as u32;
-    let mut second = pick_u64(bv, index + 4 + 5 + 5 + 6, 6) as u32;
     
-    if month == 0 && day == 0 && hour == 24 && minute == 60 && second == 60 {
+    if month == 0 && day == 0 && hour == 24 && minute == 60 {
         return None;
     }
     
     if month == 0  { month = now.month(); }
     if day == 0    { day = now.day(); }
-    if hour == 24  { hour = 23; minute = 59; second = 59; }
-    if minute == 60  { minute = 59; second = 59; }
-    if second == 60  { second = 59; }
+    if hour == 24  { hour = 23; minute = 59; }
+    if minute == 60  { minute = 59; }
     
     // This and next year
-    let this_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, second);
-    let next_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, second);
+    let this_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, 30);
+    let next_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, 30);
 
     if now <= this_year_eta {
         Some(DateTime::<Utc>::from_utc(this_year_eta, Utc))
@@ -280,7 +278,7 @@ mod test {
 
     #[test]
     fn test_pick_number_field() {
-          let s = "128,0,8.0,xyz".split(',').collect();
+          let s: Vec<&str> = "128,0,8.0,xyz".split(',').collect();
           assert_eq!(pick_number_field::<u8>(&s, 0).ok().unwrap().unwrap(), 128);
           assert_eq!(pick_number_field::<u8>(&s, 1).ok().unwrap().unwrap(), 0);
           assert_eq!(pick_number_field::<f64>(&s, 2).ok().unwrap().unwrap(), 8.0);
