@@ -166,8 +166,9 @@ fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseIntError> {
 }
 
 /// A simple helper to pick a substring of length two from the given string.
-fn pick_s2(s: &str, i: usize) -> String {
-    s.chars().skip(i).take(2).collect()
+fn pick_s2(s: &str, i: usize) -> &str {
+    let end = i + 2;
+    s.get(i..end).unwrap_or("")
 }
 
 /// Parse latitude from two string.
