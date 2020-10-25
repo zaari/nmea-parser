@@ -115,16 +115,11 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime::<Utc>> {
 }
 
 /// Pick field from comma-separated sentence or None if empty field.
-pub(crate) fn pick_number_field<T: std::str::FromStr>(split: &Vec<&str>, num: usize) -> Result<Option<T>, String> {
-    let s = split.get(num).unwrap_or(&"");
-    if *s != "" {
-        match s.parse::<T>() {
-            Ok(p)   => { Ok(Some(p)) }, 
-            Err(_e) => { Err(format!("Failed to parse field {}: {}", num, s)) }
-        }
-    } else {
-        Ok(None)
-    }
+pub(crate) fn pick_number_field<T: std::str::FromStr>(split: &[&str], num: usize) -> Result<Option<T>, String> {
+    split.get(num)
+        .filter(|s| !s.is_empty())
+        .map(|s| s.parse().map_err(|_| format!("Failed to parse field {}: {}", num, s)))
+        .transpose()
 }
 
 /// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
