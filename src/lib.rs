@@ -24,7 +24,6 @@ limitations under the License.
 #![allow(dead_code)]
 
 #[macro_use] extern crate log;
-extern crate env_logger;
 
 extern crate chrono;
 
