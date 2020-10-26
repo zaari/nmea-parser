@@ -71,12 +71,13 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
     let mut res = String::with_capacity(char_count);
     for i in 0 .. char_count {
         // unwraps below won't panic as char_from::u32 will only ever receive values between
-        // 32..=96, all of which are valid.
+        // 32..=96, all of which are valid. Catch all branch is unreachable as we only request
+        // 6-bits from the BitVec.
         match pick_u64(bv, index + i * AIS_CHAR_BITS, AIS_CHAR_BITS) as u32 {
             0 => break,
             ch if ch < 32 => res.push(std::char::from_u32(64 + ch).unwrap()),
             ch if ch < 64 => res.push(std::char::from_u32(ch).unwrap()),
-            ch => panic!("6-bit AIS character expected but value {} encountered!", ch),
+            ch => unreachable!("6-bit AIS character expected but value {} encountered!", ch),
         }
     }
     
