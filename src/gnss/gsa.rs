@@ -22,19 +22,19 @@ pub struct GsaData {
 
     /// Mode 1: true = automatic, false = manual
     pub mode1_automatic: Option<bool>,
-    
-    /// Mode 2, fix type: 
+
+    /// Mode 2, fix type:
     pub mode2_3d: Option<GsaFixMode>,
-    
+
     /// PRN numbers used (space for 12)
     pub prn_numbers: Vec<u8>,
-    
+
     /// Position (3D) dilution of precision
     pub pdop: Option<f64>,
-    
+
     /// Horizontal dilution of precision
     pub hdop: Option<f64>,
-    
+
     /// Vertical dilution of precision
     pub vdop: Option<f64>,
 }
@@ -44,10 +44,10 @@ pub struct GsaData {
 pub enum GsaFixMode {
     /// No fix.
     NotAvailable,
-    
+
     /// 2D fix.
     Fix2D,
-    
+
     /// 3d fix.
     Fix3D,
 }
@@ -55,27 +55,33 @@ pub enum GsaFixMode {
 impl std::fmt::Display for GsaFixMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            GsaFixMode::NotAvailable => { write!(f, "no available") }
-            GsaFixMode::Fix2D => { write!(f, "2D fix") }
-            GsaFixMode::Fix3D => { write!(f, "3D fix") }
+            GsaFixMode::NotAvailable => write!(f, "no available"),
+            GsaFixMode::Fix2D => write!(f, "2D fix"),
+            GsaFixMode::Fix3D => write!(f, "3D fix"),
         }
-        
     }
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// xxGSA: GPS DOP and active satellites
-pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(
+    sentence: &str,
+    nav_system: NavigationSystem,
+) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
-    
-    return Ok(ParsedSentence::Gsa(GsaData{
-        source:             nav_system,
+
+    return Ok(ParsedSentence::Gsa(GsaData {
+        source: nav_system,
         mode1_automatic: {
             let s = split.get(1).unwrap_or(&"");
             match s {
-                &"M" => Some(false), &"A" => Some(true), &"" => None,
-                _ => { return Err(format!("Invalid GPGSA mode: {}", s).into()); }
+                &"M" => Some(false),
+                &"A" => Some(true),
+                &"" => None,
+                _ => {
+                    return Err(format!("Invalid GPGSA mode: {}", s).into());
+                }
             }
         },
         mode2_3d: {
@@ -85,7 +91,9 @@ pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<Par
                 &"2" => Some(GsaFixMode::Fix2D),
                 &"3" => Some(GsaFixMode::Fix3D),
                 &"" => None,
-                _ => { return Err(format!("Invalid GPGSA fix type: {}", s).into()); }
+                _ => {
+                    return Err(format!("Invalid GPGSA fix type: {}", s).into());
+                }
             }
         },
         prn_numbers: {
@@ -121,23 +129,22 @@ mod test {
                     ParsedSentence::Gsa(gsa) => {
                         assert_eq!(gsa.mode1_automatic, Some(true));
                         assert_eq!(gsa.mode2_3d, Some(GsaFixMode::Fix3D));
-                        assert_eq!(gsa.prn_numbers, vec![19,28,14,18,27,22,31,39]);
+                        assert_eq!(gsa.prn_numbers, vec![19, 28, 14, 18, 27, 22, 31, 39]);
                         assert_eq!(gsa.pdop, Some(1.7));
                         assert_eq!(gsa.hdop, Some(1.0));
                         assert_eq!(gsa.vdop, Some(1.3));
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

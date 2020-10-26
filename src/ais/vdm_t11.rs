@@ -17,57 +17,55 @@ limitations under the License.
 use super::*;
 
 /// AIS VDM/VDO type 11: UTC/Date Response
-pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::UtcDateResponse(BaseStationReport{
-        own_vessel: {
-            own_vessel
-        },
-        station: {
-            station
-        },
-        mmsi: {
-            pick_u64(&bv, 8, 30) as u32
-        },
+pub(crate) fn handle(
+    bv: &BitVec,
+    station: Station,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
+    return Ok(ParsedSentence::UtcDateResponse(BaseStationReport {
+        own_vessel: { own_vessel },
+        station: { station },
+        mmsi: { pick_u64(&bv, 8, 30) as u32 },
         timestamp: {
-            Some(Utc.ymd(pick_u64(&bv, 38, 14) as i32, 
-                        pick_u64(&bv, 52, 4) as u32, 
-                        pick_u64(&bv, 56, 5) as u32)
-                    .and_hms(pick_u64(&bv, 61, 5) as u32, 
-                             pick_u64(&bv, 66, 6) as u32, 
-                             pick_u64(&bv, 72, 6) as u32))
-        },        
-        high_position_accuracy: {
-            pick_u64(&bv, 78, 1) != 0
+            Some(
+                Utc.ymd(
+                    pick_u64(&bv, 38, 14) as i32,
+                    pick_u64(&bv, 52, 4) as u32,
+                    pick_u64(&bv, 56, 5) as u32,
+                )
+                .and_hms(
+                    pick_u64(&bv, 61, 5) as u32,
+                    pick_u64(&bv, 66, 6) as u32,
+                    pick_u64(&bv, 72, 6) as u32,
+                ),
+            )
         },
+        high_position_accuracy: { pick_u64(&bv, 78, 1) != 0 },
         latitude: {
-                let lat_raw = pick_i64(&bv, 107, 27) as i32;
-                if lat_raw != 0x3412140 {
-                    Some((lat_raw as f64) / 600000.0) 
-                } else {
-                    None
-                }
-            },
+            let lat_raw = pick_i64(&bv, 107, 27) as i32;
+            if lat_raw != 0x3412140 {
+                Some((lat_raw as f64) / 600000.0)
+            } else {
+                None
+            }
+        },
         longitude: {
-                let lon_raw = pick_i64(&bv, 79, 28) as i32;
-                if lon_raw != 0x6791AC0 {
-                    Some((lon_raw as f64) / 600000.0)
-                } else {
-                    None
-                }
-            },
+            let lon_raw = pick_i64(&bv, 79, 28) as i32;
+            if lon_raw != 0x6791AC0 {
+                Some((lon_raw as f64) / 600000.0)
+            } else {
+                None
+            }
+        },
         position_fix_type: {
-                let raw = pick_u64(&bv, 134, 4) as u8;
-                match raw {
-                    0 => { None },
-                    _ => { Some(PositionFixType::new(raw)) },
-                }
-            },
-        raim_flag: {
-                pick_u64(&bv, 148, 1) != 0
-            },
-        radio_status: {
-                pick_u64(&bv, 149, 19) as u32
-            },
+            let raw = pick_u64(&bv, 134, 4) as u8;
+            match raw {
+                0 => None,
+                _ => Some(PositionFixType::new(raw)),
+            }
+        },
+        raim_flag: { pick_u64(&bv, 148, 1) != 0 },
+        radio_status: { pick_u64(&bv, 149, 19) as u32 },
     }));
 }
 
@@ -108,4 +106,3 @@ mod test {
         }
     }
 }
-

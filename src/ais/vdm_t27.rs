@@ -17,29 +17,19 @@ limitations under the License.
 use super::*;
 
 /// AIS VDM/VDO type 27: Long Range AIS Broadcast message
-pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
-        own_vessel: {
-            own_vessel
-        },
-        station: {
-            station
-        },
-        ais_type: {
-            AisClass::ClassA
-        },
-        mmsi: {
-            pick_u64(&bv, 8, 30) as u32
-        },
-        nav_status: {
-            NavigationStatus::new(pick_u64(&bv, 40, 4) as u8)
-        },
-        rot: {
-            None
-        },
-        rot_direction: {
-            None
-        },
+pub(crate) fn handle(
+    bv: &BitVec,
+    station: Station,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
+    return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData {
+        own_vessel: { own_vessel },
+        station: { station },
+        ais_type: { AisClass::ClassA },
+        mmsi: { pick_u64(&bv, 8, 30) as u32 },
+        nav_status: { NavigationStatus::new(pick_u64(&bv, 40, 4) as u8) },
+        rot: { None },
+        rot_direction: { None },
         sog_knots: {
             let sog_raw = pick_u64(&bv, 62, 6);
             if sog_raw != 63 {
@@ -48,13 +38,11 @@ pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<
                 None
             }
         },
-        high_position_accuracy: {
-            pick_u64(&bv, 38, 1) != 0
-        },
+        high_position_accuracy: { pick_u64(&bv, 38, 1) != 0 },
         latitude: {
             let lat_raw = pick_i64(&bv, 44, 18) as i32;
             if lat_raw != 181000 {
-                Some((lat_raw as f64) / 600.0) 
+                Some((lat_raw as f64) / 600.0)
             } else {
                 None
             }
@@ -69,26 +57,26 @@ pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<
         },
         cog: {
             let cog_raw = pick_u64(&bv, 62, 17);
-            if cog_raw !=  91000 {
+            if cog_raw != 91000 {
                 Some(cog_raw as f64 * 0.1)
             } else {
                 None
             }
         },
-        heading_true:               None,
-        timestamp_seconds:          0,
-        positioning_system_meta:    None,
-        current_gnss_position:      Some(pick_u64(&bv, 62, 1) == 0),
-        special_manoeuvre:          None,
-        raim_flag:                  pick_u64(&bv, 39, 1) != 0,
-        class_b_unit_flag:          None,
-        class_b_display:            None,
-        class_b_dsc:                None,
-        class_b_band_flag:          None,
-        class_b_msg22_flag:         None,
-        class_b_mode_flag:          None,
-        class_b_css_flag:           None,
-        radio_status:               None,
+        heading_true: None,
+        timestamp_seconds: 0,
+        positioning_system_meta: None,
+        current_gnss_position: Some(pick_u64(&bv, 62, 1) == 0),
+        special_manoeuvre: None,
+        raim_flag: pick_u64(&bv, 39, 1) != 0,
+        class_b_unit_flag: None,
+        class_b_display: None,
+        class_b_dsc: None,
+        class_b_band_flag: None,
+        class_b_msg22_flag: None,
+        class_b_mode_flag: None,
+        class_b_css_flag: None,
+        radio_status: None,
     }));
 }
 
@@ -113,24 +101,23 @@ mod test {
                         assert_eq!(vdd.sog_knots, Some(1.0));
                         assert_eq!(vdd.high_position_accuracy, false);
                         assert::close(vdd.latitude.unwrap_or(0.0), 137.0, 0.1);
-                        assert::close(vdd.longitude.unwrap_or(0.0),  4.8, 0.1);
+                        assert::close(vdd.longitude.unwrap_or(0.0), 4.8, 0.1);
                         assert::close(vdd.cog.unwrap_or(0.0), 290.0, 1.0);
                         assert_eq!(vdd.timestamp_seconds, 0);
                         assert_eq!(vdd.current_gnss_position, Some(true));
                         assert_eq!(vdd.raim_flag, false);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

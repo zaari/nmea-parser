@@ -23,24 +23,24 @@ pub struct RmcData {
 
     /// Fix datetime based on HHMMSS and DDMMYY
     pub timestamp: Option<DateTime<Utc>>,
-    
+
     /// Status: true = active, false = void.
     pub status_active: Option<bool>,
-    
+
     /// Latitude in degrees    
     pub latitude: Option<f64>,
 
     /// Longitude in degrees    
     pub longitude: Option<f64>,
-    
+
     /// Speed over ground in knots
     pub sog_knots: Option<f64>,
-    
+
     /// Track angle in degrees (True)
     pub bearing: Option<f64>,
-    
+
     /// Magnetic variation in degrees
-    pub variation: Option<f64>
+    pub variation: Option<f64>,
 }
 
 impl LatLon for RmcData {
@@ -56,42 +56,52 @@ impl LatLon for RmcData {
 // -------------------------------------------------------------------------------------------------
 
 /// xxRMC: Recommended minimum specific GPS/Transit data
-pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem) -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(
+    sentence: &str,
+    nav_system: NavigationSystem,
+) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
-    
-    return Ok(ParsedSentence::Rmc(RmcData{
-        source:             nav_system,
-        timestamp:          parse_yymmdd_hhmmss(split.get(9).unwrap_or(&""), 
-                                                split.get(1).unwrap_or(&"")).ok(),
-        status_active:      {
+
+    return Ok(ParsedSentence::Rmc(RmcData {
+        source: nav_system,
+        timestamp: parse_yymmdd_hhmmss(split.get(9).unwrap_or(&""), split.get(1).unwrap_or(&""))
+            .ok(),
+        status_active: {
             let s = split.get(2).unwrap_or(&"");
             match s {
                 &"A" => Some(true),
                 &"V" => Some(false),
                 &"" => None,
-                _ => { return Err(format!("Invalid RMC navigation receiver status: {}", s).into()); }
+                _ => {
+                    return Err(format!("Invalid RMC navigation receiver status: {}", s).into());
+                }
             }
         },
-        latitude:           parse_latitude_ddmm_mmm(split.get(3).unwrap_or(&""), 
-                                                    split.get(4).unwrap_or(&""))?,
-        longitude:          parse_longitude_dddmm_mmm(split.get(5).unwrap_or(&""), 
-                                                      split.get(6).unwrap_or(&""))?,
-        sog_knots:        pick_number_field(&split, 7)?,
-        bearing:            pick_number_field(&split, 8)?,
+        latitude: parse_latitude_ddmm_mmm(
+            split.get(3).unwrap_or(&""),
+            split.get(4).unwrap_or(&""),
+        )?,
+        longitude: parse_longitude_dddmm_mmm(
+            split.get(5).unwrap_or(&""),
+            split.get(6).unwrap_or(&""),
+        )?,
+        sog_knots: pick_number_field(&split, 7)?,
+        bearing: pick_number_field(&split, 8)?,
         variation: {
             if let Some(val) = pick_number_field::<f64>(&split, 10)? {
                 let side = split.get(11).unwrap_or(&"");
                 match side {
-                    &"E" => { Some(val) },
-                    &"W" => { Some(-val) },
-                    _ => { return Err(format!("Invalid RMC variation side: {}", side).into()); },
+                    &"E" => Some(val),
+                    &"W" => Some(-val),
+                    _ => {
+                        return Err(format!("Invalid RMC variation side: {}", side).into());
+                    }
                 }
             } else {
                 None
             }
         },
     }));
-
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -103,7 +113,7 @@ mod test {
     #[test]
     fn test_parse_cprmc() {
         let mut p = NmeaParser::new();
-        match p.parse_sentence("$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191120,020.3,E*67") 
+        match p.parse_sentence("$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191120,020.3,E*67")
         {
             Ok(ps) => {
                 match ps {
@@ -116,15 +126,15 @@ mod test {
                         assert_eq!(rmc.sog_knots.unwrap(), 0.5);
                         assert::close(rmc.bearing.unwrap_or(0.0), 54.7, 0.1);
                         assert_eq!(rmc.variation.unwrap(), 20.3);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
@@ -146,19 +156,18 @@ mod test {
                         assert_eq!(rmc.sog_knots, None);
                         assert_eq!(rmc.bearing, None);
                         assert_eq!(rmc.variation, None);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

@@ -23,13 +23,13 @@ pub struct GsvData {
 
     /// Satellite PRN number
     pub prn_number: u8,
-    
+
     /// Elevation in degrees (max 90°)
     pub elevation: Option<u8>,
-    
+
     /// Azimuth in degrees from True north (0°-359°)
     pub azimuth: Option<u16>,
-    
+
     /// SNR, 0-99 dB, None when not tracking
     pub snr: Option<u8>,
 }
@@ -37,8 +37,11 @@ pub struct GsvData {
 // -------------------------------------------------------------------------------------------------
 
 /// xxGSV: GPS Satellites in view
-pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut NmeaParser)
-              -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(
+    sentence: &str,
+    nav_system: NavigationSystem,
+    store: &mut NmeaParser,
+) -> Result<ParsedSentence, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
     let msg_type = split.get(0).unwrap_or(&"");
@@ -59,24 +62,33 @@ pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem, store: &mut N
             if let Some(sentence) = store.pull_string(make_gsv_key(msg_type, msg_count, i)) {
                 let split: Vec<&str> = sentence.split(',').collect();
                 for j in 0..4 {
-                    if let Some(prn) = pick_number_field(&split, 4 + 4 * j as usize + 0).ok().unwrap_or(None) {
-                        v.push(GsvData{
+                    if let Some(prn) = pick_number_field(&split, 4 + 4 * j as usize + 0)
+                        .ok()
+                        .unwrap_or(None)
+                    {
+                        v.push(GsvData {
                             source: nav_system,
                             prn_number: prn,
-                            elevation:  pick_number_field(&split, 4 + 4 * j as usize + 1).ok().unwrap_or(None),
-                            azimuth:    pick_number_field(&split, 4 + 4 * j as usize + 2).ok().unwrap_or(None),
-                            snr:        pick_number_field(&split, 4 + 4 * j as usize + 3).ok().unwrap_or(None),
+                            elevation: pick_number_field(&split, 4 + 4 * j as usize + 1)
+                                .ok()
+                                .unwrap_or(None),
+                            azimuth: pick_number_field(&split, 4 + 4 * j as usize + 2)
+                                .ok()
+                                .unwrap_or(None),
+                            snr: pick_number_field(&split, 4 + 4 * j as usize + 3)
+                                .ok()
+                                .unwrap_or(None),
                         });
                     }
                 }
             }
         }
-        
+
         return Ok(ParsedSentence::Gsv(v));
     } else {
         return Ok(ParsedSentence::Incomplete);
     }
-}    
+}
 
 /// Make key for store
 fn make_gsv_key(sentence_type: &str, msg_count: u32, msg_num: u32) -> String {
@@ -89,25 +101,41 @@ fn make_gsv_key(sentence_type: &str, msg_count: u32, msg_num: u32) -> String {
 mod test {
     use super::*;
 
-//    fn init() {
-//        let _ = env_logger::builder().is_test(true).try_init();
-//    }
-    
+    //    fn init() {
+    //        let _ = env_logger::builder().is_test(true).try_init();
+    //    }
+
     #[test]
     fn test_parse_cpgsv() {
         let mut p = NmeaParser::new();
-        
-        match p.parse_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74") 
+
+        match p
+            .parse_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74")
         {
-            Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
-            Err(e) => { assert_eq!(e.to_string(), "OK"); }
+            Ok(ps) => match ps {
+                ParsedSentence::Incomplete => {}
+                _ => {
+                    assert!(false);
+                }
+            },
+            Err(e) => {
+                assert_eq!(e.to_string(), "OK");
+            }
         }
         assert_eq!(p.strings_count(), 1);
 
-        match p.parse_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74") 
+        match p
+            .parse_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74")
         {
-            Ok(ps) => { match ps { ParsedSentence::Incomplete => { }, _ => { assert!(false); } } },
-            Err(e) => { assert_eq!(e.to_string(), "OK"); }
+            Ok(ps) => match ps {
+                ParsedSentence::Incomplete => {}
+                _ => {
+                    assert!(false);
+                }
+            },
+            Err(e) => {
+                assert_eq!(e.to_string(), "OK");
+            }
         }
         assert_eq!(p.strings_count(), 2);
 
@@ -117,31 +145,31 @@ mod test {
                     // The expected result
                     ParsedSentence::Gsv(v) => {
                         assert_eq!(v.len(), 11);
-                        
+
                         // 2nd satellite
                         let s2 = v.get(1).unwrap();
                         assert_eq!(s2.elevation, Some(15));
                         assert_eq!(s2.azimuth, Some(270));
                         assert_eq!(s2.snr, Some(0));
-                        
+
                         // 5th satellite
                         let s5 = v.get(4).unwrap();
                         assert_eq!(s5.elevation, Some(25));
                         assert_eq!(s5.azimuth, Some(170));
                         assert_eq!(s5.snr, Some(0));
-                        
+
                         // 11th satellite
                         let s11 = v.get(10).unwrap();
                         assert_eq!(s11.elevation, Some(5));
                         assert_eq!(s11.azimuth, Some(244));
                         assert_eq!(s11.snr, Some(0));
-                    },
+                    }
                     _ => {
                         assert_eq!(p.strings_count(), 3);
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
@@ -149,4 +177,3 @@ mod test {
         assert_eq!(p.strings_count(), 0);
     }
 }
-

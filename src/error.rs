@@ -16,7 +16,7 @@ limitations under the License.
 
 use std::fmt;
 
-/// Parse error returned by `parse_sentence`. The string is used instead of static str 
+/// Parse error returned by `parse_sentence`. The string is used instead of static str
 /// because the error messages are expected to contain context-specific details.
 #[derive(Clone, Debug, PartialEq)]
 pub enum ParseError {
@@ -41,14 +41,9 @@ impl fmt::Display for ParseError {
         match self {
             ParseError::UnsupportedSentenceType(s) => {
                 write!(f, "Unsupported NMEA sentence type: {}", s)
-            },
-            ParseError::CorruptedSentence(s) => {
-                write!(f, "Corrupted NMEA sentence: {}", s)
-            }, 
-            ParseError::InvalidSentence(s) => {
-                write!(f, "Invalid NMEA sentence: {}", s)
-            }, 
+            }
+            ParseError::CorruptedSentence(s) => write!(f, "Corrupted NMEA sentence: {}", s),
+            ParseError::InvalidSentence(s) => write!(f, "Invalid NMEA sentence: {}", s),
         }
     }
 }
-

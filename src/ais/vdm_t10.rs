@@ -20,7 +20,7 @@ use super::*;
 
 /// Type 10: UTC/Date Inquiry
 #[derive(Default, Clone, Debug, PartialEq)]
-pub struct UtcDateInquiry { 
+pub struct UtcDateInquiry {
     /// True if the data is about own vessel, false if about other.
     pub own_vessel: bool,
 
@@ -32,26 +32,21 @@ pub struct UtcDateInquiry {
 
     /// Destination MMSI (30 bits)
     pub destination_mmsi: u32,
-
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// AIS VDM/VDO type 10: UTC/Date Inquiry
-pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::UtcDateInquiry(UtcDateInquiry{
-        own_vessel: {
-            own_vessel
-        },
-        station: {
-            station
-        },
-        source_mmsi: {
-            pick_u64(&bv, 8, 30) as u32
-        },
-        destination_mmsi: {
-            pick_u64(&bv, 40, 30) as u32
-        },
+pub(crate) fn handle(
+    bv: &BitVec,
+    station: Station,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
+    return Ok(ParsedSentence::UtcDateInquiry(UtcDateInquiry {
+        own_vessel: { own_vessel },
+        station: { station },
+        source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
+        destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
     }));
 }
 
@@ -71,19 +66,18 @@ mod test {
                     ParsedSentence::UtcDateInquiry(udi) => {
                         assert_eq!(udi.source_mmsi, 366814480);
                         assert_eq!(udi.destination_mmsi, 366832740);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

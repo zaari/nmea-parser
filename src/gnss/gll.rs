@@ -32,7 +32,7 @@ pub struct GllData {
 
     /// True = data valid, false = data invalid.
     pub data_valid: Option<bool>,
-    
+
     /// FAA mode indicator (NMEA 2.3 and later).
     pub faa_mode: Option<FaaMode>,
 }
@@ -50,34 +50,34 @@ impl LatLon for GllData {
 // -------------------------------------------------------------------------------------------------
 
 /// xxGLL: Geographic Position, Latitude / Longitude and time.
-pub(crate) fn handle(sentence: &str, nav_system: NavigationSystem)
-              -> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(
+    sentence: &str,
+    nav_system: NavigationSystem,
+) -> Result<ParsedSentence, ParseError> {
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Gll(GllData{
-        source:             nav_system,
-        latitude:           parse_latitude_ddmm_mmm(split.get(1).unwrap_or(&""), 
-                                                    split.get(2).unwrap_or(&""))?,
-        longitude:          parse_longitude_dddmm_mmm(split.get(3).unwrap_or(&""), 
-                                                      split.get(4).unwrap_or(&""))?,
-        timestamp:          parse_hhmmss(split.get(5).unwrap_or(&""), now).ok(),
+    return Ok(ParsedSentence::Gll(GllData {
+        source: nav_system,
+        latitude: parse_latitude_ddmm_mmm(
+            split.get(1).unwrap_or(&""),
+            split.get(2).unwrap_or(&""),
+        )?,
+        longitude: parse_longitude_dddmm_mmm(
+            split.get(3).unwrap_or(&""),
+            split.get(4).unwrap_or(&""),
+        )?,
+        timestamp: parse_hhmmss(split.get(5).unwrap_or(&""), now).ok(),
         data_valid: {
             match split.get(6).unwrap_or(&"") {
-                &"A" => {
-                    Some(true)
-                },
-                &"V" => {
-                    Some(false)
-                },
-                _ => {
-                    None
-                }
+                &"A" => Some(true),
+                &"V" => Some(false),
+                _ => None,
             }
         },
-        faa_mode:           FaaMode::new(split.get(7).unwrap_or(&"")).ok(),
+        faa_mode: FaaMode::new(split.get(7).unwrap_or(&"")).ok(),
     }));
-}    
+}
 
 // -------------------------------------------------------------------------------------------------
 
@@ -98,20 +98,22 @@ mod test {
                         assert::close(gll.longitude.unwrap_or(0.0), -123.2, 0.1);
                         assert_eq!(gll.timestamp, {
                             let now: DateTime<Utc> = Utc::now();
-                            Some(Utc.ymd(now.year(), now.month(), now.day()).and_hms(22, 54, 44))
+                            Some(
+                                Utc.ymd(now.year(), now.month(), now.day())
+                                    .and_hms(22, 54, 44),
+                            )
                         });
                         assert_eq!(gll.data_valid, Some(true));
                         assert_eq!(gll.faa_mode, Some(FaaMode::Differential));
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

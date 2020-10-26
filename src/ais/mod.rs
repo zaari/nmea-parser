@@ -16,40 +16,40 @@ limitations under the License.
 
 //! AIS VDM/VDO data structures
 
-pub(crate) mod vdm_t1t2t3;
-pub(crate) mod vdm_t4;
-pub(crate) mod vdm_t5;
-pub(crate) mod vdm_t6;
-pub(crate) mod vdm_t9;
 pub(crate) mod vdm_t10;
 pub(crate) mod vdm_t11;
 pub(crate) mod vdm_t18;
 pub(crate) mod vdm_t19;
-pub(crate) mod vdm_t24;
+pub(crate) mod vdm_t1t2t3;
 pub(crate) mod vdm_t21;
+pub(crate) mod vdm_t24;
 pub(crate) mod vdm_t27;
+pub(crate) mod vdm_t4;
+pub(crate) mod vdm_t5;
+pub(crate) mod vdm_t6;
+pub(crate) mod vdm_t9;
 
 use super::*;
-pub use vdm_t4::{BaseStationReport};
-pub use vdm_t6::{BinaryAddressedMessage};
-pub use vdm_t9::{StandardSarAircraftPositionReport};
-pub use vdm_t10::{UtcDateInquiry};
+pub use vdm_t10::UtcDateInquiry;
 pub use vdm_t21::{AidToNavigationReport, NavAidType};
+pub use vdm_t4::BaseStationReport;
+pub use vdm_t6::BinaryAddressedMessage;
+pub use vdm_t9::StandardSarAircraftPositionReport;
 
 // -------------------------------------------------------------------------------------------------
 
 /// AIS station based on talker id
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum Station {
-    BaseStation, // !AB
+    BaseStation,             // !AB
     DependentAisBaseStation, // !AD
-    MobileStation, // !AI (the most common one)
-    AidToNavigationStation, // !AN
-    AisReceivingStation, // !AR
-    LimitedBaseStation, // !AS
-    AisTransmittingStation, // !AT
-    RepeaterStation, // !AX
-    Other, // !BS, !SA, etc.
+    MobileStation,           // !AI (the most common one)
+    AidToNavigationStation,  // !AN
+    AisReceivingStation,     // !AR
+    LimitedBaseStation,      // !AS
+    AisTransmittingStation,  // !AT
+    RepeaterStation,         // !AX
+    Other,                   // !BS, !SA, etc.
 }
 
 impl Default for Station {
@@ -61,26 +61,24 @@ impl Default for Station {
 impl std::fmt::Display for Station {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Station::BaseStation => { write!(f, "base station") }
-            Station::DependentAisBaseStation => { write!(f, "dependent AIS base station") }
-            Station::MobileStation => { write!(f, "mobile station") }
-            Station::AidToNavigationStation => { write!(f, "aid to navigation station") }
-            Station::AisReceivingStation => { write!(f, "ais receiving station") }
-            Station::LimitedBaseStation => { write!(f, "limited base station") }
-            Station::AisTransmittingStation => { write!(f, "AIS transmitting station") }
-            Station::RepeaterStation => { write!(f, "repeater station") }
-            Station::Other => { write!(f, "other") }
+            Station::BaseStation => write!(f, "base station"),
+            Station::DependentAisBaseStation => write!(f, "dependent AIS base station"),
+            Station::MobileStation => write!(f, "mobile station"),
+            Station::AidToNavigationStation => write!(f, "aid to navigation station"),
+            Station::AisReceivingStation => write!(f, "ais receiving station"),
+            Station::LimitedBaseStation => write!(f, "limited base station"),
+            Station::AisTransmittingStation => write!(f, "AIS transmitting station"),
+            Station::RepeaterStation => write!(f, "repeater station"),
+            Station::Other => write!(f, "other"),
         }
-        
     }
 }
-
 
 // -------------------------------------------------------------------------------------------------
 
 /// Types 1, 2, 3 and 18: Position Report Class A and Long Range AIS Broadcast message
 #[derive(Default, Clone, Debug, PartialEq)]
-pub struct VesselDynamicData { 
+pub struct VesselDynamicData {
     /// True if the data is about own vessel, false if about other.
     pub own_vessel: bool,
 
@@ -92,95 +90,93 @@ pub struct VesselDynamicData {
 
     /// User ID (30 bits)
     pub mmsi: u32,
-    
+
     // TODO: timestamp
-    
     /// Navigation status
     pub nav_status: NavigationStatus,
-    
+
     /// Accurate ROT_sensor (±0..708°/min) if available.
     pub rot: Option<f64>,
-    
+
     /// ROT direction when turn is more than 5°/30s. Left = -1, center = 0, right = 1.
     pub rot_direction: Option<i8>,
-    
+
     /// Speed over ground in knots
     pub sog_knots: Option<f64>,
-    
+
     /// Position accuracy: true = high (<= 10 m), false = low (> 10 m)
     pub high_position_accuracy: bool,
-    
+
     /// Latitude
     pub latitude: Option<f64>,
 
     /// Longitude
     pub longitude: Option<f64>,
-    
+
     /// Course over ground
     pub cog: Option<f64>,
-    
+
     /// True heading (0-359)
     pub heading_true: Option<f64>,
-    
+
     /// Derived from UTC second (6 bits)
     pub timestamp_seconds: u8,
 
     /// Positioning system metadata (included in seconds in UTC timestamp)
     pub positioning_system_meta: Option<PositioningSystemMeta>,
-    
+
     /// GNSS position status (Type 27):
     ///  true = current GNSS position
     ///  false = not GNSS position
     pub current_gnss_position: Option<bool>,
 
-    /// Special manoeuvre indicator. false = not engaged in special manoeuvre, 
+    /// Special manoeuvre indicator. false = not engaged in special manoeuvre,
     /// true = engaged in special manouvre.
     pub special_manoeuvre: Option<bool>,
-    
+
     /// Riverine And Inland Navigation systems blue sign:
-    /// RAIM (Receiver autonomous integrity monitoring) flag of electronic position 
+    /// RAIM (Receiver autonomous integrity monitoring) flag of electronic position
     /// fixing device; false = RAIM not in use = default; true = RAIM in use
     pub raim_flag: bool,
-    
-    // Class B unit flag: false = Class B SOTDMA unit, true = Class B "CS" unit.    
+
+    // Class B unit flag: false = Class B SOTDMA unit, true = Class B "CS" unit.
     pub class_b_unit_flag: Option<bool>,
 
-    /// Class B display: 
+    /// Class B display:
     /// false = No display available; not capable of displaying Message 12 and 14
-    /// true  = Equipped with integrated display displaying Message 12 and 14 
+    /// true  = Equipped with integrated display displaying Message 12 and 14
     pub class_b_display: Option<bool>,
 
-    /// Class B DSC: 
-    /// false = Not equipped with DSC function 
+    /// Class B DSC:
+    /// false = Not equipped with DSC function
     /// true  = Equipped with DSC function (dedicated or time-shared
     pub class_b_dsc: Option<bool>,
 
-    /// Class B band flag: 
-    /// false = Capable of operating over the upper 525 kHz band of the marine band 
-    /// true  = Capable of operating over the whole marine band (irrelevant if 
-    ///         “Class B Message 22 flag” is 0) 
+    /// Class B band flag:
+    /// false = Capable of operating over the upper 525 kHz band of the marine band
+    /// true  = Capable of operating over the whole marine band (irrelevant if
+    ///         “Class B Message 22 flag” is 0)
     pub class_b_band_flag: Option<bool>,
-    
+
     /// Class B Message 22 flag:
-    /// false = No frequency management via Message 22 , operating on AIS1, AIS2 only 
+    /// false = No frequency management via Message 22 , operating on AIS1, AIS2 only
     /// true  = Frequency management via Message 22
     pub class_b_msg22_flag: Option<bool>,
-    
+
     /// Mode flag:
-    /// false = Station operating in autonomous and continuous mode = default 
-    /// true  = Station operating in assigned mode 
+    /// false = Station operating in autonomous and continuous mode = default
+    /// true  = Station operating in assigned mode
     pub class_b_mode_flag: Option<bool>,
-    
+
     /// Communication state selector flag
-    /// false = SOTDMA communication state follows 
+    /// false = SOTDMA communication state follows
     /// true  = ITDMA communication state follows (always “1” for Class-B “CS”)
     pub class_b_css_flag: Option<bool>,
 
     /// Communication state
-    /// Diagnostic information for the radio system. 
+    /// Diagnostic information for the radio system.
     /// https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1371-1-200108-S!!PDF-E.pdf
     pub radio_status: Option<u32>,
-
 }
 
 /// AIS class which is either Class A or Class B
@@ -188,7 +184,7 @@ pub struct VesselDynamicData {
 pub enum AisClass {
     /// AIS class not known.
     Unknown,
-    
+
     /// AIS class A.
     ClassA, // Message types 1, 2, 3, 5
 
@@ -205,11 +201,10 @@ impl Default for AisClass {
 impl std::fmt::Display for AisClass {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            AisClass::Unknown => { write!(f, "unknown") }
-            AisClass::ClassA => { write!(f, "Class A") }
-            AisClass::ClassB => { write!(f, "Class B") }
+            AisClass::Unknown => write!(f, "unknown"),
+            AisClass::ClassA => write!(f, "Class A"),
+            AisClass::ClassB => write!(f, "Class B"),
         }
-        
     }
 }
 
@@ -223,48 +218,46 @@ impl LatLon for VesselDynamicData {
     }
 }
 
-
 /// AIS navigation status for VesselDynamicData
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationStatus {
-    UnderWayUsingEngine, // 0
-    AtAnchor, // 1
-    NotUnderCommand, // 2
+    UnderWayUsingEngine,        // 0
+    AtAnchor,                   // 1
+    NotUnderCommand,            // 2
     RestrictedManoeuverability, // 3
-    ConstrainedByDraught, // 4
-    Moored, // 5
-    Aground, // 6
-    EngagedInFishing, // 7
-    UnderWaySailing, // 8
-    Reserved9, // 9, may be renamed in the future
-    Reserved10, // 10, may be renamed in the future
-    Reserved11, // 11, may be renamed in the future
-    Reserved12, // 12, may be renamed in the future
-    Reserved13, // 13, may be renamed in the future
-    AisSartIsActive, // 14
-    NotDefined, // 15
-
+    ConstrainedByDraught,       // 4
+    Moored,                     // 5
+    Aground,                    // 6
+    EngagedInFishing,           // 7
+    UnderWaySailing,            // 8
+    Reserved9,                  // 9, may be renamed in the future
+    Reserved10,                 // 10, may be renamed in the future
+    Reserved11,                 // 11, may be renamed in the future
+    Reserved12,                 // 12, may be renamed in the future
+    Reserved13,                 // 13, may be renamed in the future
+    AisSartIsActive,            // 14
+    NotDefined,                 // 15
 }
 impl NavigationStatus {
     pub fn new(nav_status: u8) -> NavigationStatus {
         match nav_status {
-            0  => { NavigationStatus::UnderWayUsingEngine },
-            1  => { NavigationStatus::AtAnchor },
-            2  => { NavigationStatus::NotUnderCommand },
-            3  => { NavigationStatus::RestrictedManoeuverability },
-            4  => { NavigationStatus::ConstrainedByDraught },
-            5  => { NavigationStatus::Moored },
-            6  => { NavigationStatus::Aground },
-            7  => { NavigationStatus::EngagedInFishing },
-            8  => { NavigationStatus::UnderWaySailing },
-            9  => { NavigationStatus::Reserved9 },
-            10 => { NavigationStatus::Reserved10 },
-            11 => { NavigationStatus::Reserved11 },
-            12 => { NavigationStatus::Reserved12 },
-            13 => { NavigationStatus::Reserved13 },
-            14 => { NavigationStatus::AisSartIsActive },
-            15 => { NavigationStatus::NotDefined },
-            _ => { NavigationStatus::NotDefined }
+            0 => NavigationStatus::UnderWayUsingEngine,
+            1 => NavigationStatus::AtAnchor,
+            2 => NavigationStatus::NotUnderCommand,
+            3 => NavigationStatus::RestrictedManoeuverability,
+            4 => NavigationStatus::ConstrainedByDraught,
+            5 => NavigationStatus::Moored,
+            6 => NavigationStatus::Aground,
+            7 => NavigationStatus::EngagedInFishing,
+            8 => NavigationStatus::UnderWaySailing,
+            9 => NavigationStatus::Reserved9,
+            10 => NavigationStatus::Reserved10,
+            11 => NavigationStatus::Reserved11,
+            12 => NavigationStatus::Reserved12,
+            13 => NavigationStatus::Reserved13,
+            14 => NavigationStatus::AisSartIsActive,
+            15 => NavigationStatus::NotDefined,
+            _ => NavigationStatus::NotDefined,
         }
     }
 }
@@ -287,21 +280,19 @@ pub enum PositioningSystemMeta {
 impl std::fmt::Display for PositioningSystemMeta {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PositioningSystemMeta::Operative => { write!(f, "operative") }
-            PositioningSystemMeta::ManualInputMode => { write!(f, "manual input mode") }
-            PositioningSystemMeta::DeadReckoningMode => { write!(f, "dead reckoning mode") }
-            PositioningSystemMeta::Inoperative => { write!(f, "inoperative") }
+            PositioningSystemMeta::Operative => write!(f, "operative"),
+            PositioningSystemMeta::ManualInputMode => write!(f, "manual input mode"),
+            PositioningSystemMeta::DeadReckoningMode => write!(f, "dead reckoning mode"),
+            PositioningSystemMeta::Inoperative => write!(f, "inoperative"),
         }
-        
     }
 }
-
 
 // -------------------------------------------------------------------------------------------------
 
 /// Types 5 and 24
 #[derive(Default, Clone, Debug, PartialEq)]
-pub struct VesselStaticData { 
+pub struct VesselStaticData {
     /// True if the data is about own vessel, false if about other vessel.
     pub own_vessel: bool,
 
@@ -312,32 +303,32 @@ pub struct VesselStaticData {
     pub mmsi: u32,
 
     /// AIS version indicator (2 bits)
-    pub ais_version_indicator: u8,  
-    
+    pub ais_version_indicator: u8,
+
     /// IMO number (1-999999999; 30 bits).
     pub imo_number: Option<u32>,
-    
+
     /// Call sign (42 bits)
     pub call_sign: Option<String>,
-    
+
     /// Name (20 ASCII characters)
     pub name: Option<String>,
-    
+
     /// Type of ship (first 4 of 8 bits)
     pub ship_type: ShipType,
-    
+
     /// Type of ship and cargo (last 4 of 8 bits)
     pub cargo_type: CargoType,
-    
-    /// Class B Vendor ID 
+
+    /// Class B Vendor ID
     pub equipment_vendor_id: Option<String>,
-    
+
     /// Class B unite model code
     pub equipment_model: Option<u8>,
-    
+
     /// Class B serial number
     pub equipment_serial_number: Option<u32>,
-    
+
     /// Overall dimension / reference for position A (9 bits)
     pub dimension_to_bow: Option<u16>,
     /// Overall dimension / reference for position B (9 bits)
@@ -346,16 +337,16 @@ pub struct VesselStaticData {
     pub dimension_to_port: Option<u16>,
     /// Overall dimension / reference for position C (6 bits)
     pub dimension_to_starboard: Option<u16>,
-    
+
     // Type of electronic position fixing device.
     pub position_fix_type: Option<PositionFixType>,
-    
+
     /// ETA (20 bits)
     pub eta: Option<DateTime<Utc>>,
-    
+
     /// Maximum present static draught in decimetres (1-255; 8 bits)
     pub draught10: Option<u8>,
-    
+
     /// Destination (120 ASCII characters)
     pub destination: Option<String>,
 
@@ -366,87 +357,71 @@ pub struct VesselStaticData {
 /// AIS ship type derived from ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ShipType {
-    NotAvailable, // 0
-    Reserved1, // 1x
-    WingInGround, // 2x
-    Fishing, // 30
-    Towing, // 31
-    TowingLong, // 32; Towing: length exceeds 200m or breadth exceeds 25m
+    NotAvailable,            // 0
+    Reserved1,               // 1x
+    WingInGround,            // 2x
+    Fishing,                 // 30
+    Towing,                  // 31
+    TowingLong,              // 32; Towing: length exceeds 200m or breadth exceeds 25m
     DredgingOrUnderwaterOps, // 33
-    DivingOps, // 34
-    MilitaryOps, // 35
-    Sailing, // 36
-    PleasureCraft, // 37
-    Reserved38, // 38
-    Reserved39, // 39
-    HighSpeedCraft, // 4x
-    Pilot, // 50
-    SearchAndRescue, // 51
-    Tug, // 52
-    PortTender, // 53
-    AntiPollutionEquipment, // 54
-    LawEnforcement, // 55
-    SpareLocal56, // 56
-    SpareLocal57, // 57
-    MedicalTransport, // 58
-    Noncombatant, // 59; Noncombatant ship according to RR Resolution No. 18
-    Passenger, // 6x
-    Cargo, // 7x
-    Tanker, // 8x
-    Other, // 9x
+    DivingOps,               // 34
+    MilitaryOps,             // 35
+    Sailing,                 // 36
+    PleasureCraft,           // 37
+    Reserved38,              // 38
+    Reserved39,              // 39
+    HighSpeedCraft,          // 4x
+    Pilot,                   // 50
+    SearchAndRescue,         // 51
+    Tug,                     // 52
+    PortTender,              // 53
+    AntiPollutionEquipment,  // 54
+    LawEnforcement,          // 55
+    SpareLocal56,            // 56
+    SpareLocal57,            // 57
+    MedicalTransport,        // 58
+    Noncombatant,            // 59; Noncombatant ship according to RR Resolution No. 18
+    Passenger,               // 6x
+    Cargo,                   // 7x
+    Tanker,                  // 8x
+    Other,                   // 9x
 }
 
 impl ShipType {
     pub fn new(raw: u8) -> ShipType {
         match raw {
-            0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 => {
-                ShipType::NotAvailable
-            },
-            10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 => {
-                ShipType::Reserved1
-            },
-            20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 => {
-                ShipType::WingInGround
-            },
+            0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 => ShipType::NotAvailable,
+            10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 => ShipType::Reserved1,
+            20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 => ShipType::WingInGround,
 
-            30 => { ShipType::Fishing }
-            31 => { ShipType::Towing }
-            32 => { ShipType::TowingLong }
-            33 => { ShipType::DredgingOrUnderwaterOps }
-            34 => { ShipType::DivingOps }
-            35 => { ShipType::MilitaryOps }
-            36 => { ShipType::Sailing }
-            37 => { ShipType::PleasureCraft }
-            38 => { ShipType::Reserved38 }
-            39 => { ShipType::Reserved39 }
-            
-            40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 => {
-                ShipType::HighSpeedCraft
-            },
+            30 => ShipType::Fishing,
+            31 => ShipType::Towing,
+            32 => ShipType::TowingLong,
+            33 => ShipType::DredgingOrUnderwaterOps,
+            34 => ShipType::DivingOps,
+            35 => ShipType::MilitaryOps,
+            36 => ShipType::Sailing,
+            37 => ShipType::PleasureCraft,
+            38 => ShipType::Reserved38,
+            39 => ShipType::Reserved39,
 
-            50 => { ShipType::Pilot }
-            51 => { ShipType::SearchAndRescue }
-            52 => { ShipType::Tug }
-            53 => { ShipType::PortTender }
-            54 => { ShipType::AntiPollutionEquipment }
-            55 => { ShipType::LawEnforcement }
-            56 => { ShipType::SpareLocal56 }
-            57 => { ShipType::SpareLocal57 }
-            58 => { ShipType::MedicalTransport }
-            59 => { ShipType::Noncombatant }
+            40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 => ShipType::HighSpeedCraft,
 
-            60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 => {
-                ShipType::Passenger
-            },
-            70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 => {
-                ShipType::Cargo
-            },
-            80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 => {
-                ShipType::Cargo
-            },
-            90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99 => {
-                ShipType::Cargo
-            },
+            50 => ShipType::Pilot,
+            51 => ShipType::SearchAndRescue,
+            52 => ShipType::Tug,
+            53 => ShipType::PortTender,
+            54 => ShipType::AntiPollutionEquipment,
+            55 => ShipType::LawEnforcement,
+            56 => ShipType::SpareLocal56,
+            57 => ShipType::SpareLocal57,
+            58 => ShipType::MedicalTransport,
+            59 => ShipType::Noncombatant,
+
+            60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 => ShipType::Passenger,
+            70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 => ShipType::Cargo,
+            80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 => ShipType::Cargo,
+            90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99 => ShipType::Cargo,
             _ => {
                 warn!("Unexpected ship and cargo type: {}", raw);
                 ShipType::NotAvailable
@@ -461,38 +436,37 @@ impl Default for ShipType {
     }
 }
 
-
 impl std::fmt::Display for ShipType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            ShipType::NotAvailable => { write!(f,"(not available)") },
-            ShipType::Reserved1 => { write!(f,"(reserved)") },
-            ShipType::WingInGround => { write!(f,"wing in ground") },
-            ShipType::Fishing => { write!(f,"fishing") },
-            ShipType::Towing => { write!(f,"towing") },
-            ShipType::TowingLong => { write!(f,"towing, long") },
-            ShipType::DredgingOrUnderwaterOps => { write!(f,"dredging or underwater ops") },
-            ShipType::DivingOps => { write!(f,"diving ops") },
-            ShipType::MilitaryOps => { write!(f,"military ops") },
-            ShipType::Sailing => { write!(f,"sailing") },
-            ShipType::PleasureCraft => { write!(f,"pleasure craft") },
-            ShipType::Reserved38 => { write!(f,"(reserved)") },
-            ShipType::Reserved39 => { write!(f,"(reserved)") },
-            ShipType::HighSpeedCraft => { write!(f,"high-speed craft") },
-            ShipType::Pilot => { write!(f,"pilot") },
-            ShipType::SearchAndRescue => { write!(f,"search and rescue") },
-            ShipType::Tug => { write!(f,"tug") },
-            ShipType::PortTender => { write!(f,"port tender") },
-            ShipType::AntiPollutionEquipment => { write!(f,"anti-pollution equipment") },
-            ShipType::LawEnforcement => { write!(f,"law enforcement") },
-            ShipType::SpareLocal56 => { write!(f,"(local)") },
-            ShipType::SpareLocal57 => { write!(f,"(local)") },
-            ShipType::MedicalTransport => { write!(f,"medical transport") },
-            ShipType::Noncombatant => { write!(f,"noncombatant") },
-            ShipType::Passenger => { write!(f,"passenger") },
-            ShipType::Cargo => { write!(f,"cargo") },
-            ShipType::Tanker => { write!(f,"tanker") },
-            ShipType::Other => { write!(f,"other") },
+            ShipType::NotAvailable => write!(f, "(not available)"),
+            ShipType::Reserved1 => write!(f, "(reserved)"),
+            ShipType::WingInGround => write!(f, "wing in ground"),
+            ShipType::Fishing => write!(f, "fishing"),
+            ShipType::Towing => write!(f, "towing"),
+            ShipType::TowingLong => write!(f, "towing, long"),
+            ShipType::DredgingOrUnderwaterOps => write!(f, "dredging or underwater ops"),
+            ShipType::DivingOps => write!(f, "diving ops"),
+            ShipType::MilitaryOps => write!(f, "military ops"),
+            ShipType::Sailing => write!(f, "sailing"),
+            ShipType::PleasureCraft => write!(f, "pleasure craft"),
+            ShipType::Reserved38 => write!(f, "(reserved)"),
+            ShipType::Reserved39 => write!(f, "(reserved)"),
+            ShipType::HighSpeedCraft => write!(f, "high-speed craft"),
+            ShipType::Pilot => write!(f, "pilot"),
+            ShipType::SearchAndRescue => write!(f, "search and rescue"),
+            ShipType::Tug => write!(f, "tug"),
+            ShipType::PortTender => write!(f, "port tender"),
+            ShipType::AntiPollutionEquipment => write!(f, "anti-pollution equipment"),
+            ShipType::LawEnforcement => write!(f, "law enforcement"),
+            ShipType::SpareLocal56 => write!(f, "(local)"),
+            ShipType::SpareLocal57 => write!(f, "(local)"),
+            ShipType::MedicalTransport => write!(f, "medical transport"),
+            ShipType::Noncombatant => write!(f, "noncombatant"),
+            ShipType::Passenger => write!(f, "passenger"),
+            ShipType::Cargo => write!(f, "cargo"),
+            ShipType::Tanker => write!(f, "tanker"),
+            ShipType::Other => write!(f, "other"),
         }
     }
 }
@@ -500,52 +474,32 @@ impl std::fmt::Display for ShipType {
 /// AIS cargo type derived from ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CargoType {
-    Undefined, // x0
+    Undefined,          // x0
     HazardousCategoryA, // x1
     HazardousCategoryB, // x2
     HazardousCategoryC, // x3
     HazardousCategoryD, // x4
-    Reserved5, // x5
-    Reserved6, // x6
-    Reserved7, // x7
-    Reserved8, // x8
-    Reserved9, // x9
+    Reserved5,          // x5
+    Reserved6,          // x6
+    Reserved7,          // x7
+    Reserved8,          // x8
+    Reserved9,          // x9
 }
 
 impl CargoType {
     /// Construct a CargoType based on 8-bit NMEA identifier
     pub fn new(raw: u8) -> CargoType {
         match raw {
-            10 | 20 | 40 | 60 | 70 | 80 | 90 => {
-                CargoType::Undefined
-            },
-            11 | 21 | 41 | 61 | 71 | 81 | 91 => {
-                CargoType::HazardousCategoryA
-            },
-            12 | 22 | 42 | 62 | 72 | 82 | 92 => {
-                CargoType::HazardousCategoryB
-            },
-            13 | 23 | 43 | 63 | 73 | 83 | 93 => {
-                CargoType::HazardousCategoryC
-            },
-            14 | 24 | 44 | 64 | 74 | 84 | 94 => {
-                CargoType::HazardousCategoryD
-            },
-            15 | 25 | 45 | 65 | 75 | 85 | 95 => {
-                CargoType::Reserved5
-            },
-            16 | 26 | 46 | 66 | 76 | 86 | 96 => {
-                CargoType::Reserved6
-            },
-            17 | 27 | 47 | 67 | 77 | 87 | 97 => {
-                CargoType::Reserved7
-            },
-            18 | 28 | 48 | 68 | 78 | 88 | 98 => {
-                CargoType::Reserved8
-            },
-            19 | 29 | 49 | 69 | 79 | 89 | 99 => {
-                CargoType::Reserved9
-            },
+            10 | 20 | 40 | 60 | 70 | 80 | 90 => CargoType::Undefined,
+            11 | 21 | 41 | 61 | 71 | 81 | 91 => CargoType::HazardousCategoryA,
+            12 | 22 | 42 | 62 | 72 | 82 | 92 => CargoType::HazardousCategoryB,
+            13 | 23 | 43 | 63 | 73 | 83 | 93 => CargoType::HazardousCategoryC,
+            14 | 24 | 44 | 64 | 74 | 84 | 94 => CargoType::HazardousCategoryD,
+            15 | 25 | 45 | 65 | 75 | 85 | 95 => CargoType::Reserved5,
+            16 | 26 | 46 | 66 | 76 | 86 | 96 => CargoType::Reserved6,
+            17 | 27 | 47 | 67 | 77 | 87 | 97 => CargoType::Reserved7,
+            18 | 28 | 48 | 68 | 78 | 88 | 98 => CargoType::Reserved8,
+            19 | 29 | 49 | 69 | 79 | 89 | 99 => CargoType::Reserved9,
             _ => {
                 warn!("Unexpected ship and cargo type: {}", raw);
                 CargoType::Undefined
@@ -557,16 +511,16 @@ impl CargoType {
 impl std::fmt::Display for CargoType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            CargoType::Undefined => { write!(f,"undefined") },
-            CargoType::HazardousCategoryA => { write!(f,"hazardous category A") },
-            CargoType::HazardousCategoryB => { write!(f,"hazardous category B") },
-            CargoType::HazardousCategoryC => { write!(f,"hazardous category C") },
-            CargoType::HazardousCategoryD => { write!(f,"hazardous category D") },
-            CargoType::Reserved5 => { write!(f,"(reserved)") },
-            CargoType::Reserved6 => { write!(f,"(reserved)") },
-            CargoType::Reserved7 => { write!(f,"(reserved)") },
-            CargoType::Reserved8 => { write!(f,"(reserved)") },
-            CargoType::Reserved9 => { write!(f,"(reserved)") },
+            CargoType::Undefined => write!(f, "undefined"),
+            CargoType::HazardousCategoryA => write!(f, "hazardous category A"),
+            CargoType::HazardousCategoryB => write!(f, "hazardous category B"),
+            CargoType::HazardousCategoryC => write!(f, "hazardous category C"),
+            CargoType::HazardousCategoryD => write!(f, "hazardous category D"),
+            CargoType::Reserved5 => write!(f, "(reserved)"),
+            CargoType::Reserved6 => write!(f, "(reserved)"),
+            CargoType::Reserved7 => write!(f, "(reserved)"),
+            CargoType::Reserved8 => write!(f, "(reserved)"),
+            CargoType::Reserved9 => write!(f, "(reserved)"),
         }
     }
 }
@@ -577,19 +531,18 @@ impl Default for CargoType {
     }
 }
 
-
 /// AIS EPFD position fix types
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositionFixType {
-    Undefined, // 0
-    GPS, // 1
-    GLONASS, // 2
-    GPSGLONASS, // 3
-    LoranC, // 4
-    Chayka, // 5
+    Undefined,                  // 0
+    GPS,                        // 1
+    GLONASS,                    // 2
+    GPSGLONASS,                 // 3
+    LoranC,                     // 4
+    Chayka,                     // 5
     IntegratedNavigationSystem, // 6
-    Surveyed, // 7
-    Galileo, // 8
+    Surveyed,                   // 7
+    Galileo,                    // 8
 }
 
 impl PositionFixType {
@@ -607,7 +560,7 @@ impl PositionFixType {
             _ => {
                 warn!("Unrecognized position fix type: {}", raw);
                 PositionFixType::Undefined
-            },
+            }
         }
     }
 }
@@ -615,23 +568,24 @@ impl PositionFixType {
 impl std::fmt::Display for PositionFixType {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            PositionFixType::Undefined => { write!(f, "undefined") }
-            PositionFixType::GPS => { write!(f, "GPS") }
-            PositionFixType::GLONASS => { write!(f, "GLONASS") }
-            PositionFixType::GPSGLONASS => { write!(f, "GPS/GLONASS") }
-            PositionFixType::LoranC => { write!(f, "Loran-C") }
-            PositionFixType::Chayka => { write!(f, "Chayka") }
-            PositionFixType::IntegratedNavigationSystem => { write!(f, "integrated navigation system") }
-            PositionFixType::Surveyed => { write!(f, "surveyed") }
-            PositionFixType::Galileo => { write!(f, "Galileo") }
+            PositionFixType::Undefined => write!(f, "undefined"),
+            PositionFixType::GPS => write!(f, "GPS"),
+            PositionFixType::GLONASS => write!(f, "GLONASS"),
+            PositionFixType::GPSGLONASS => write!(f, "GPS/GLONASS"),
+            PositionFixType::LoranC => write!(f, "Loran-C"),
+            PositionFixType::Chayka => write!(f, "Chayka"),
+            PositionFixType::IntegratedNavigationSystem => {
+                write!(f, "integrated navigation system")
+            }
+            PositionFixType::Surveyed => write!(f, "surveyed"),
+            PositionFixType::Galileo => write!(f, "Galileo"),
         }
-        
     }
 }
 
 impl VesselStaticData {
     /// Derive ISO 3166 country code from MID part of MMSI.
-    pub fn country(&self)-> Option<&'static str> {
+    pub fn country(&self) -> Option<&'static str> {
         match self.mmsi / 1000000 {
             // Mapping generated with mid-to-iso3166.py
             201 => Some("AL"), // Albania
@@ -713,8 +667,8 @@ impl VesselStaticData {
             304 => Some("AG"), // Antigua and Barbuda
             305 => Some("AG"), // Antigua and Barbuda
             306 => Some("BQ"), // Bonaire, Sint Eustatius and Saba
-//            306 => Some("CW"), // Curaçao
-//            306 => Some("SX"), // Sint Maarten
+            //            306 => Some("CW"), // Curaçao
+            //            306 => Some("SX"), // Sint Maarten
             307 => Some("AW"), // Aruba
             308 => Some("BS"), // Bahamas
             309 => Some("BS"), // Bahamas
@@ -928,8 +882,7 @@ impl VesselStaticData {
             765 => Some("SR"), // Suriname
             770 => Some("UY"), // Uruguay
             775 => Some("VE"), // Venezuela
-            _ => { None }
+            _ => None,
         }
     }
 }
-

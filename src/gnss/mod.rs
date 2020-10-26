@@ -17,18 +17,18 @@ limitations under the License.
 //! GNSS-related data structures
 
 pub(crate) mod gga;
+pub(crate) mod gll;
 pub(crate) mod gsa;
 pub(crate) mod gsv;
 pub(crate) mod rmc;
 pub(crate) mod vtg;
-pub(crate) mod gll;
 
 use super::*;
-pub use rmc::RmcData;
 pub use gga::{GgaData, GgaQualityIndicator};
 pub use gll::GllData;
-pub use gsa::{GsaData,GsaFixMode};
+pub use gsa::{GsaData, GsaFixMode};
 pub use gsv::GsvData;
+pub use rmc::RmcData;
 pub use vtg::VtgData;
 
 // -------------------------------------------------------------------------------------------------
@@ -38,25 +38,25 @@ pub use vtg::VtgData;
 pub enum NavigationSystem {
     /// Combination of several satellite systems
     Combination, // GNxxx
-    
+
     /// American GPS
     Gps, // GPxxx
-    
+
     /// Russian GLONASS
     Glonass, // GLxxx
-    
+
     /// European Galileo
     Galileo, // GAxxx
-    
+
     // Chinese BeiDou
-    Beidou,  // BDxxx
-    
+    Beidou, // BDxxx
+
     // Indian NavIC
-    Navic,  // GIxxx
-    
+    Navic, // GIxxx
+
     // Japanese Qzss
-    Qzss,  // QZxxx
-    
+    Qzss, // QZxxx
+
     // Some other
     Other,
 }
@@ -64,16 +64,15 @@ pub enum NavigationSystem {
 impl std::fmt::Display for NavigationSystem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            NavigationSystem::Combination => { write!(f, "combination") }
-            NavigationSystem::Gps => { write!(f, "GPS") }
-            NavigationSystem::Glonass => { write!(f, "GLONASS") }
-            NavigationSystem::Galileo => { write!(f, "Galileo") }
-            NavigationSystem::Beidou => { write!(f, "BeiDou") }
-            NavigationSystem::Navic => { write!(f, "Navic") }
-            NavigationSystem::Qzss => { write!(f, "QZSS") }
-            NavigationSystem::Other => { write!(f, "other") }
+            NavigationSystem::Combination => write!(f, "combination"),
+            NavigationSystem::Gps => write!(f, "GPS"),
+            NavigationSystem::Glonass => write!(f, "GLONASS"),
+            NavigationSystem::Galileo => write!(f, "Galileo"),
+            NavigationSystem::Beidou => write!(f, "BeiDou"),
+            NavigationSystem::Navic => write!(f, "Navic"),
+            NavigationSystem::Qzss => write!(f, "QZSS"),
+            NavigationSystem::Other => write!(f, "other"),
         }
-        
     }
 }
 
@@ -83,16 +82,16 @@ impl std::fmt::Display for NavigationSystem {
 pub enum FaaMode {
     /// Autonomous mode (automatic 2D/3D)
     Autonomous,
-    
+
     /// Differential GPS mode (DGPS).
     Differential,
-    
+
     /// Estimated (dead-reckoning) data.
     Estimated,
-    
+
     /// No valid data available.
     NotValid,
-    
+
     /// Simulated data.
     Simulator,
 }
@@ -104,7 +103,7 @@ impl FaaMode {
             "D" => Ok(FaaMode::Differential),
             "E" => Ok(FaaMode::Estimated),
             "N" => Ok(FaaMode::NotValid),
-            _ => { Err(format!("Unrecognized FAA information value: {}", val)) }
+            _ => Err(format!("Unrecognized FAA information value: {}", val)),
         }
     }
 }
@@ -112,13 +111,11 @@ impl FaaMode {
 impl std::fmt::Display for FaaMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            FaaMode::Autonomous => { write!(f, "A") }
-            FaaMode::Differential => { write!(f, "D") }
-            FaaMode::Estimated => { write!(f, "E") }
-            FaaMode::NotValid => { write!(f, "N") }
-            _ => { write!(f, "?") }
+            FaaMode::Autonomous => write!(f, "A"),
+            FaaMode::Differential => write!(f, "D"),
+            FaaMode::Estimated => write!(f, "E"),
+            FaaMode::NotValid => write!(f, "N"),
+            _ => write!(f, "?"),
         }
-        
     }
 }
-

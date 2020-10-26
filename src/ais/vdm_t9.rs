@@ -20,7 +20,7 @@ use super::*;
 
 /// Type 9: Standard SAR Aircraft Position Report
 #[derive(Default, Clone, Debug, PartialEq)]
-pub struct StandardSarAircraftPositionReport { 
+pub struct StandardSarAircraftPositionReport {
     /// True if the data is about own vessel, false if about other.
     pub own_vessel: bool,
 
@@ -44,7 +44,7 @@ pub struct StandardSarAircraftPositionReport {
 
     /// Longitude
     pub longitude: Option<f64>,
-    
+
     /// Course over ground
     pub cog: Option<f64>,
 
@@ -63,7 +63,7 @@ pub struct StandardSarAircraftPositionReport {
     pub assigned: bool,
 
     /// Riverine And Inland Navigation systems blue sign:
-    /// RAIM (Receiver autonomous integrity monitoring) flag of electronic position 
+    /// RAIM (Receiver autonomous integrity monitoring) flag of electronic position
     /// fixing device; false = RAIM not in use = default; true = RAIM in use
     pub raim_flag: bool,
 
@@ -84,77 +84,65 @@ impl LatLon for StandardSarAircraftPositionReport {
 // -------------------------------------------------------------------------------------------------
 
 /// AIS VDM/VDO type 9: Standard SAR Aircraft Position Report
-pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::StandardSarAircraftPositionReport(StandardSarAircraftPositionReport{
-        own_vessel: {
-            own_vessel
+pub(crate) fn handle(
+    bv: &BitVec,
+    station: Station,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
+    return Ok(ParsedSentence::StandardSarAircraftPositionReport(
+        StandardSarAircraftPositionReport {
+            own_vessel: { own_vessel },
+            station: { station },
+            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            altitude: {
+                let raw = pick_u64(&bv, 38, 12) as u16;
+                if raw != 4095 {
+                    Some(raw)
+                } else {
+                    None
+                }
+            },
+            sog_knots: {
+                let raw = pick_u64(&bv, 50, 10) as u16;
+                if raw != 1023 {
+                    Some(raw)
+                } else {
+                    None
+                }
+            },
+            high_position_accuracy: { pick_u64(&bv, 60, 1) != 0 },
+            latitude: {
+                let lat_raw = pick_i64(&bv, 89, 27) as i32;
+                if lat_raw != 0x3412140 {
+                    Some((lat_raw as f64) / 600000.0)
+                } else {
+                    None
+                }
+            },
+            longitude: {
+                let lon_raw = pick_i64(&bv, 61, 28) as i32;
+                if lon_raw != 0x6791AC0 {
+                    Some((lon_raw as f64) / 600000.0)
+                } else {
+                    None
+                }
+            },
+            cog: {
+                let cog_raw = pick_u64(&bv, 116, 12);
+                if cog_raw != 0xE10 {
+                    Some(cog_raw as f64 * 0.1)
+                } else {
+                    None
+                }
+            },
+            timestamp_seconds: pick_u64(&bv, 128, 6) as u8,
+            regional: { pick_u64(&bv, 134, 8) as u8 },
+            dte: { pick_u64(&bv, 142, 1) == 0 },
+            assigned: { pick_u64(&bv, 146, 1) != 0 },
+            raim_flag: { pick_u64(&bv, 147, 1) != 0 },
+            radio_status: { pick_u64(&bv, 148, 20) as u32 },
         },
-        station: {
-            station
-        },
-        mmsi: {
-            pick_u64(&bv, 8, 30) as u32
-        },
-        altitude: {
-            let raw = pick_u64(&bv, 38, 12) as u16;
-            if raw != 4095 {
-                Some(raw)
-            } else {
-                None
-            }
-        },
-        sog_knots: {
-            let raw = pick_u64(&bv, 50, 10) as u16;
-            if raw != 1023 {
-                Some(raw)
-            } else {
-                None
-            }
-        },
-        high_position_accuracy: {
-            pick_u64(&bv, 60, 1) != 0
-        },
-        latitude: {
-            let lat_raw = pick_i64(&bv, 89, 27) as i32;
-            if lat_raw != 0x3412140 {
-                Some((lat_raw as f64) / 600000.0) 
-            } else {
-                None
-            }
-        },
-        longitude: {
-            let lon_raw = pick_i64(&bv, 61, 28) as i32;
-            if lon_raw != 0x6791AC0 {
-                Some((lon_raw as f64) / 600000.0)
-            } else {
-                None
-            }
-        },
-        cog: {
-            let cog_raw = pick_u64(&bv, 116, 12);
-            if cog_raw != 0xE10 {
-                Some(cog_raw as f64 * 0.1)
-            } else {
-                None
-            }
-        },
-        timestamp_seconds: pick_u64(&bv, 128, 6) as u8,
-        regional: {
-            pick_u64(&bv, 134, 8) as u8
-        },
-        dte: {
-            pick_u64(&bv, 142, 1) == 0
-        },
-        assigned: {
-            pick_u64(&bv, 146, 1) != 0
-        },
-        raim_flag: {
-            pick_u64(&bv, 147, 1) != 0
-        },
-        radio_status: {
-            pick_u64(&bv, 148, 20) as u32
-        },
-    }));
+    ));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -184,19 +172,18 @@ mod test {
                         assert_eq!(sapr.assigned, false);
                         assert_eq!(sapr.raim_flag, false);
                         assert_eq!(sapr.radio_status, 33392);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

@@ -16,30 +16,40 @@ limitations under the License.
 use super::*;
 
 /// AIS VDM/VDO type 24: Static data report
-pub(crate) fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own_vessel: bool)
--> Result<ParsedSentence, ParseError> {
+pub(crate) fn handle(
+    bv: &BitVec,
+    _station: Station,
+    store: &mut NmeaParser,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
     // Check whether the message bit layout follows part A or part B format
     // We use two complementary booleans to make the code more readable.
     let (part_a, part_b) = match pick_u64(&bv, 38, 2) {
-        0 => { (true, false) },
-        1 => { (false, true) },
+        0 => (true, false),
+        1 => (false, true),
         _ => {
-            return Err(format!("AIVDM type 24 part number has unexpected value: {}", 
-                               pick_u64(&bv, 38, 2)).into());
+            return Err(format!(
+                "AIVDM type 24 part number has unexpected value: {}",
+                pick_u64(&bv, 38, 2)
+            )
+            .into());
         }
     };
-    
-    // Pick the fields 
-    let vsd = VesselStaticData{
-        own_vessel:              own_vessel,
-        ais_type:                AisClass::ClassB,
-        mmsi:                    pick_u64(&bv, 8, 30) as u32,
-        ais_version_indicator:   0,
-        imo_number:              None,
+
+    // Pick the fields
+    let vsd = VesselStaticData {
+        own_vessel: own_vessel,
+        ais_type: AisClass::ClassB,
+        mmsi: pick_u64(&bv, 8, 30) as u32,
+        ais_version_indicator: 0,
+        imo_number: None,
         call_sign: {
             if part_b {
                 let raw = pick_string(&bv, 90, 7);
-                match raw.as_str() { "" => { None }, _ => { Some(raw) }, }
+                match raw.as_str() {
+                    "" => None,
+                    _ => Some(raw),
+                }
             } else {
                 None
             }
@@ -47,7 +57,10 @@ pub(crate) fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own
         name: {
             if part_a {
                 let raw = pick_string(&bv, 40, 120);
-                match raw.as_str() { "" => { None }, _ => { Some(raw) }, }
+                match raw.as_str() {
+                    "" => None,
+                    _ => Some(raw),
+                }
             } else {
                 None
             }
@@ -108,24 +121,24 @@ pub(crate) fn handle(bv: &BitVec, _station: Station, store: &mut NmeaParser, own
                 None
             }
         },
-        dimension_to_starboard: { 
+        dimension_to_starboard: {
             if part_b {
                 Some(pick_u64(&bv, 156, 6) as u16)
             } else {
                 None
             }
         },
-        position_fix_type:  None,
-        eta:                None,
-        draught10:          None,
-        destination:        None,
+        position_fix_type: None,
+        eta: None,
+        draught10: None,
+        destination: None,
         mothership_mmsi: {
             if part_b {
                 Some(pick_u64(&bv, 132, 30) as u32)
             } else {
                 None
             }
-        }
+        },
     };
 
     // Check whether we can return a complete or incomplete response
@@ -142,20 +155,31 @@ impl VesselStaticData {
     /// of class B AIVDM type 24 messages.
     fn merge(&self, other: &VesselStaticData) -> Result<VesselStaticData, String> {
         if self.ais_type != other.ais_type {
-            Err(format!("Mismatching AIS types: {} != {}", self.ais_type, other.ais_type))
+            Err(format!(
+                "Mismatching AIS types: {} != {}",
+                self.ais_type, other.ais_type
+            ))
         } else if self.mmsi != other.mmsi {
-            Err(format!("Mismatching MMSI numbers: {} != {}", self.mmsi, other.mmsi))
+            Err(format!(
+                "Mismatching MMSI numbers: {} != {}",
+                self.mmsi, other.mmsi
+            ))
         } else if self.imo_number != other.imo_number {
-            Err(format!("Mismatching MMSI numbers: {} != {}", self.mmsi, other.mmsi))
+            Err(format!(
+                "Mismatching MMSI numbers: {} != {}",
+                self.mmsi, other.mmsi
+            ))
         } else if self.ais_version_indicator != other.ais_version_indicator {
-            Err(format!("Mismatching AIS version indicators: {} != {}", 
-                        self.ais_version_indicator, other.ais_version_indicator))
+            Err(format!(
+                "Mismatching AIS version indicators: {} != {}",
+                self.ais_version_indicator, other.ais_version_indicator
+            ))
         } else {
-            Ok(VesselStaticData{
+            Ok(VesselStaticData {
                 own_vessel: self.own_vessel,
                 ais_type: self.ais_type.clone(),
                 mmsi: self.mmsi.clone(),
-                ais_version_indicator: self.ais_version_indicator.clone(),  
+                ais_version_indicator: self.ais_version_indicator.clone(),
                 imo_number: choose_some(self.imo_number, other.imo_number),
                 call_sign: choose_some_string(&self.call_sign, &other.call_sign),
                 name: choose_some_string(&self.name, &other.name),
@@ -173,16 +197,22 @@ impl VesselStaticData {
                         other.cargo_type
                     }
                 },
-                equipment_vendor_id: choose_some_string(&self.equipment_vendor_id, 
-                                                        &other.equipment_vendor_id),
+                equipment_vendor_id: choose_some_string(
+                    &self.equipment_vendor_id,
+                    &other.equipment_vendor_id,
+                ),
                 equipment_model: choose_some(self.equipment_model, other.equipment_model),
-                equipment_serial_number: choose_some(self.equipment_serial_number, 
-                                                     other.equipment_serial_number),
+                equipment_serial_number: choose_some(
+                    self.equipment_serial_number,
+                    other.equipment_serial_number,
+                ),
                 dimension_to_bow: choose_some(self.dimension_to_bow, other.dimension_to_bow),
                 dimension_to_stern: choose_some(self.dimension_to_stern, other.dimension_to_stern),
                 dimension_to_port: choose_some(self.dimension_to_port, other.dimension_to_port),
-                dimension_to_starboard: choose_some(self.dimension_to_starboard, 
-                                                    other.dimension_to_starboard),
+                dimension_to_starboard: choose_some(
+                    self.dimension_to_starboard,
+                    other.dimension_to_starboard,
+                ),
                 position_fix_type: choose_some(self.position_fix_type, other.position_fix_type),
                 eta: choose_some(self.eta, other.eta),
                 draught10: choose_some(self.draught10, other.draught10),
@@ -220,25 +250,28 @@ mod test {
     #[test]
     fn test_parse_vdm_type24() {
         let mut p = NmeaParser::new();
-    
+
         let s1 = "!AIVDM,1,1,,A,H42O55i18tMET00000000000000,2*6D";
         match p.parse_sentence(s1) {
             Ok(ps) => {
                 match ps {
                     // The expected result
                     ParsedSentence::VesselStaticData(_) => {
-                        assert!(false); return;
-                    },
+                        assert!(false);
+                        return;
+                    }
                     ParsedSentence::Incomplete => {
                         // As expected
-                    },
+                    }
                     _ => {
-                        assert!(false); return;
+                        assert!(false);
+                        return;
                     }
                 }
-            },
+            }
             Err(e) => {
-                assert_eq!(e.to_string(), "OK"); return;
+                assert_eq!(e.to_string(), "OK");
+                return;
             }
         }
         let s2 = "!AIVDM,1,1,,A,H42O55lti4hhhilD3nink000?050,0*40";
@@ -256,33 +289,32 @@ mod test {
                         assert_eq!(vsd.cargo_type, CargoType::Undefined);
 
                         assert_eq!(vsd.equipment_vendor_id, Some("1D0".into()));
-//                                assert_eq!(vsd.equipment_model, None);
-//                                assert_eq!(vsd.equipment_serial_number, None);
-//                                assert_eq!(vsd.mothership_mmsi, None);
-// TODO: find the right hand side of the variables above
-                        
+                        //                                assert_eq!(vsd.equipment_model, None);
+                        //                                assert_eq!(vsd.equipment_serial_number, None);
+                        //                                assert_eq!(vsd.mothership_mmsi, None);
+                        // TODO: find the right hand side of the variables above
+
                         assert_eq!(vsd.dimension_to_bow, Some(0));
                         assert_eq!(vsd.dimension_to_stern, Some(15));
                         assert_eq!(vsd.dimension_to_port, Some(0));
                         assert_eq!(vsd.dimension_to_starboard, Some(5));
-                        
+
                         assert_eq!(vsd.position_fix_type, None);
                         assert_eq!(vsd.eta, None);
                         assert_eq!(vsd.draught10, None);
                         assert_eq!(vsd.destination, None);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
 }
-

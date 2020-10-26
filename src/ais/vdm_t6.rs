@@ -20,7 +20,7 @@ use super::*;
 
 /// Type 6: Binary Addressed Message
 #[derive(Default, Clone, Debug, PartialEq)]
-pub struct BinaryAddressedMessage { 
+pub struct BinaryAddressedMessage {
     /// True if the data is about own vessel, false if about other.
     pub own_vessel: bool,
 
@@ -44,7 +44,6 @@ pub struct BinaryAddressedMessage {
 
     /// Functional ID, FID (6 bits)
     pub fid: u8,
-
     // TODO: data (depending on DAC and FID
 }
 
@@ -62,35 +61,23 @@ impl LatLon for BinaryAddressedMessage {
 
 /// AIS VDM/VDO type 6: Binary Addressed Message. Implementation of the 920-bit data field is
 /// unimplemented currently.
-pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::BinaryAddressedMessage(BinaryAddressedMessage{
-        own_vessel: {
-            own_vessel
+pub(crate) fn handle(
+    bv: &BitVec,
+    station: Station,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
+    return Ok(ParsedSentence::BinaryAddressedMessage(
+        BinaryAddressedMessage {
+            own_vessel: { own_vessel },
+            station: { station },
+            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            sequence_number: { pick_u64(&bv, 38, 2) as u8 },
+            destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
+            retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
+            dac: { pick_u64(&bv, 72, 10) as u16 },
+            fid: { pick_u64(&bv, 82, 6) as u8 }, // TODO: data (depending on DAC and FID
         },
-        station: {
-            station
-        },
-        mmsi: {
-            pick_u64(&bv, 8, 30) as u32
-        },
-        sequence_number: {
-            pick_u64(&bv, 38, 2) as u8
-        },
-        destination_mmsi: {
-            pick_u64(&bv, 40, 30) as u32
-        },
-        retransmit_flag: {
-            pick_u64(&bv, 70, 1) != 0
-        },
-        dac: {
-            pick_u64(&bv, 72, 10) as u16
-        },
-        fid: {
-            pick_u64(&bv, 82, 6) as u8
-        }
-
-        // TODO: data (depending on DAC and FID
-    }));
+    ));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -114,20 +101,18 @@ mod test {
                         assert_eq!(bam.dac, 669);
                         assert_eq!(bam.fid, 11);
                         // TODO: check data
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
         }
     }
-
 }
-

@@ -16,82 +16,73 @@ limitations under the License.
 use super::*;
 
 /// AIS VDM/VDO type 18: Standard Class B CS Position Report
-pub(crate) fn handle(bv: &BitVec, station: Station, own_vessel: bool) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData{
-        own_vessel: {
-            own_vessel
-        },
-        station: {
-            station
-        },
-        ais_type: {
-            AisClass::ClassB
-        },
-        mmsi: {
-            pick_u64(&bv, 8, 30) as u32
-        },
+pub(crate) fn handle(
+    bv: &BitVec,
+    station: Station,
+    own_vessel: bool,
+) -> Result<ParsedSentence, ParseError> {
+    return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData {
+        own_vessel: { own_vessel },
+        station: { station },
+        ais_type: { AisClass::ClassB },
+        mmsi: { pick_u64(&bv, 8, 30) as u32 },
         sog_knots: {
-                let raw = pick_u64(&bv, 46, 10);
-                if raw < 1023 {
-                    Some((raw as f64) * 0.1)
-                } else {
-                    None
-                }
-            },
+            let raw = pick_u64(&bv, 46, 10);
+            if raw < 1023 {
+                Some((raw as f64) * 0.1)
+            } else {
+                None
+            }
+        },
         high_position_accuracy: pick_u64(&bv, 56, 1) != 0,
         longitude: {
-                let lon_raw = pick_i64(&bv, 57, 28) as i32;
-                if lon_raw != 0x6791AC0 {
-                    Some((lon_raw as f64) / 600000.0)
-                } else {
-                    None
-                }
-            },
+            let lon_raw = pick_i64(&bv, 57, 28) as i32;
+            if lon_raw != 0x6791AC0 {
+                Some((lon_raw as f64) / 600000.0)
+            } else {
+                None
+            }
+        },
         latitude: {
-                let lat_raw = pick_i64(&bv, 85, 27) as i32;
-                if lat_raw != 0x3412140 {
-                    Some((lat_raw as f64) / 600000.0)
-                } else {
-                    None
-                }
-            },
+            let lat_raw = pick_i64(&bv, 85, 27) as i32;
+            if lat_raw != 0x3412140 {
+                Some((lat_raw as f64) / 600000.0)
+            } else {
+                None
+            }
+        },
         cog: {
-                let cog_raw = pick_u64(&bv, 112, 12);
-                if cog_raw != 0xE10 {
-                    Some(cog_raw as f64 * 0.1)
-                } else {
-                    None
-                }
-            },
+            let cog_raw = pick_u64(&bv, 112, 12);
+            if cog_raw != 0xE10 {
+                Some(cog_raw as f64 * 0.1)
+            } else {
+                None
+            }
+        },
         heading_true: {
-                let th_raw = pick_u64(&bv, 124, 9);
-                if th_raw != 511 {
-                    Some(th_raw as f64)
-                } else {
-                    None
-                }
-            },
+            let th_raw = pick_u64(&bv, 124, 9);
+            if th_raw != 511 {
+                Some(th_raw as f64)
+            } else {
+                None
+            }
+        },
         timestamp_seconds: pick_u64(&bv, 133, 6) as u8,
-        class_b_unit_flag: { 
-            None 
-        },
-        class_b_display:    Some(pick_u64(&bv, 141, 1) != 0),
-        class_b_dsc:        Some(pick_u64(&bv, 142, 1) != 0),
-        class_b_band_flag:  Some(pick_u64(&bv, 143, 1) != 0),
+        class_b_unit_flag: { None },
+        class_b_display: Some(pick_u64(&bv, 141, 1) != 0),
+        class_b_dsc: Some(pick_u64(&bv, 142, 1) != 0),
+        class_b_band_flag: Some(pick_u64(&bv, 143, 1) != 0),
         class_b_msg22_flag: Some(pick_u64(&bv, 144, 1) != 0),
-        class_b_mode_flag:  Some(pick_u64(&bv, 145, 1) != 0),
-        raim_flag:          pick_u64(&bv, 141, 1) != 0,
-        class_b_css_flag: {
-            None
-        },
-        radio_status:            Some(pick_u64(&bv, 149, 19) as u32),
-        nav_status:              NavigationStatus::NotDefined,
-        rot:                     None,
-        rot_direction:           None,
+        class_b_mode_flag: Some(pick_u64(&bv, 145, 1) != 0),
+        raim_flag: pick_u64(&bv, 141, 1) != 0,
+        class_b_css_flag: { None },
+        radio_status: Some(pick_u64(&bv, 149, 19) as u32),
+        nav_status: NavigationStatus::NotDefined,
+        rot: None,
+        rot_direction: None,
         positioning_system_meta: None,
-        current_gnss_position:   None,
-        special_manoeuvre:       None,
-
+        current_gnss_position: None,
+        special_manoeuvre: None,
     }));
 }
 
@@ -105,7 +96,7 @@ mod test {
         match p.parse_sentence("!AIVDM,1,1,,A,B52K>;h00Fc>jpUlNV@ikwpUoP06,0*4C") {
             Ok(ps) => {
                 match ps {
-                   // The expected result
+                    // The expected result
                     ParsedSentence::VesselDynamicData(vdd) => {
                         assert_eq!(vdd.mmsi, 338087471);
                         assert_eq!(vdd.nav_status, NavigationStatus::NotDefined);
@@ -121,19 +112,18 @@ mod test {
                         assert_eq!(vdd.positioning_system_meta, None);
                         assert_eq!(vdd.special_manoeuvre, None);
                         assert_eq!(vdd.raim_flag, true);
-                    },
+                    }
                     ParsedSentence::Incomplete => {
                         assert!(false);
-                    },
+                    }
                     _ => {
                         assert!(false);
                     }
                 }
-            },
+            }
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
-        }       
+        }
     }
 }
-

@@ -16,28 +16,29 @@ limitations under the License.
 
 //! # NMEA Parser: NMEA parser for Rust
 //!
-//! This crate aims to cover the most important AIS and GNSS sentences. 
-//! Supports AIS class A and B types. Identifies GPS, GLONASS, Galileo, BeiDou, 
-//! Navic and QZSS satellite systems. 
+//! This crate aims to cover the most important AIS and GNSS sentences.
+//! Supports AIS class A and B types. Identifies GPS, GLONASS, Galileo, BeiDou,
+//! Navic and QZSS satellite systems.
 //!
 
 #![allow(dead_code)]
 
-#[macro_use] extern crate log;
+#[macro_use]
+extern crate log;
 
-use std::collections::{HashMap};
 use bitvec::prelude::*;
 pub use chrono;
-use chrono::{DateTime};
 use chrono::prelude::*;
+use chrono::DateTime;
+use std::collections::HashMap;
 
 pub mod ais;
-pub mod gnss;
 mod error;
+pub mod gnss;
 mod util;
 
+pub use error::ParseError;
 use util::*;
-pub use error::{ParseError};
 
 // -------------------------------------------------------------------------------------------------
 /// Result from function `parse_sentence`
@@ -49,21 +50,21 @@ pub enum ParsedSentence {
 
     /// AIS VDM/VDO t1, t2, t3, t18 and t27
     VesselDynamicData(ais::VesselDynamicData),
-    
+
     /// AIS VDM/VDO t5 and t24
     VesselStaticData(ais::VesselStaticData),
-    
+
     /// AIS VDM/VDO type 4
     BaseStationReport(ais::BaseStationReport),
-    
+
     /// AIS VDM/VDO type 6
     BinaryAddressedMessage(ais::BinaryAddressedMessage),
-//    
-//    /// AIS VDM/VDO type 7
-//    BinaryAcknowledge(ais::BinaryAcknowledge),
-//    
-//    /// AIS VDM/VDO type 8
-//    BinaryBroadcastMessage(ais::BinaryBroadcastMessage),
+    //
+    //    /// AIS VDM/VDO type 7
+    //    BinaryAcknowledge(ais::BinaryAcknowledge),
+    //
+    //    /// AIS VDM/VDO type 8
+    //    BinaryBroadcastMessage(ais::BinaryBroadcastMessage),
 
     // AIS VDM/VDO type 9
     StandardSarAircraftPositionReport(ais::StandardSarAircraftPositionReport),
@@ -76,29 +77,29 @@ pub enum ParsedSentence {
 
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
-    
+
     /// GGA
     Gga(gnss::GgaData),
-    
+
     /// RMC
-    Rmc(gnss::RmcData),   
-    
+    Rmc(gnss::RmcData),
+
     /// GSA
-    Gsa(gnss::GsaData),         
-    
+    Gsa(gnss::GsaData),
+
     /// GSV
-    Gsv(Vec<gnss::GsvData>),   
-    
+    Gsv(Vec<gnss::GsvData>),
+
     /// VTG
     Vtg(gnss::VtgData),
-    
+
     /// GLL
     Gll(gnss::GllData),
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// Provides access to geographical position in the implementing struct.
+/// Provides read access to geographical position in the implementing type.
 pub trait LatLon {
     /// Returns the latitude of the position contained by the object. If the position is not
     /// available returns None.
@@ -122,10 +123,10 @@ impl NmeaParser {
     pub fn new() -> NmeaParser {
         NmeaParser {
             saved_fragments: HashMap::new(),
-            saved_vsds:      HashMap::new(),
+            saved_vsds: HashMap::new(),
         }
     }
-    
+
     /// Push string-to-string mapping to store.
     fn push_string(&mut self, key: String, value: String) {
         self.saved_fragments.insert(key, value);
@@ -150,7 +151,7 @@ impl NmeaParser {
     fn push_vsd(&mut self, mmsi: u32, vsd: ais::VesselStaticData) {
         self.saved_vsds.insert(mmsi, vsd);
     }
-    
+
     /// Pull MMSI-to-VesselStaticData mapping from store.
     fn pull_vsd(&mut self, mmsi: u32) -> Option<ais::VesselStaticData> {
         self.saved_vsds.remove(&mmsi)
@@ -161,16 +162,19 @@ impl NmeaParser {
         self.saved_vsds.len()
     }
 
-    /// Parses NMEA sentence into `ParsedSentence` enum. If the given sentence is part of 
-    /// multipart message, the state is saved into the parser and `ParsedSentence::Incomplete` 
+    /// Parses NMEA sentence into `ParsedSentence` enum. If the given sentence is part of
+    /// multipart message, the state is saved into the parser and `ParsedSentence::Incomplete`
     /// returned. The actual result is returned when all the parts have been provided for the function.
     pub fn parse_sentence(&mut self, sentence: &str) -> Result<ParsedSentence, ParseError> {
         // Calculace NMEA checksum and compare it to the given one. Also, remove the checksum part
         // from the sentence to simplify next processing steps.
         let mut checksum = 0;
-        let (sentence, checksum_hex_given) = { 
+        let (sentence, checksum_hex_given) = {
             if let Some(pos) = sentence.rfind('*') {
-                (sentence[0..pos].to_string(), sentence[(pos+1)..(pos+3)].to_string())
+                (
+                    sentence[0..pos].to_string(),
+                    sentence[(pos + 1)..(pos + 3)].to_string(),
+                )
             } else {
                 debug!("No checksum found for sentence: {}", sentence);
                 (sentence.to_string(), "".to_string())
@@ -181,17 +185,21 @@ impl NmeaParser {
         }
         let checksum_hex_calculated = format!("{:02X?}", checksum);
         if checksum_hex_calculated != checksum_hex_given && checksum_hex_given != "" {
-            return Err(ParseError::CorruptedSentence(
-                       format!("Corrupted NMEA sentence: {:02X?} != {:02X?}", 
-                               checksum_hex_calculated, checksum_hex_given)));
+            return Err(ParseError::CorruptedSentence(format!(
+                "Corrupted NMEA sentence: {:02X?} != {:02X?}",
+                checksum_hex_calculated, checksum_hex_given
+            )));
         }
-        
+
         // Pick sentence type
         let mut sentence_type: String = {
             if let Some(i) = sentence.find(',') {
                 sentence[0..i].into()
             } else {
-                return Err(ParseError::InvalidSentence(format!("Invalid NMEA sentence: {}", sentence)));
+                return Err(ParseError::InvalidSentence(format!(
+                    "Invalid NMEA sentence: {}",
+                    sentence
+                )));
             }
         };
 
@@ -248,91 +256,119 @@ impl NmeaParser {
         match sentence_type.as_str() {
             // $xxGGA - Global Positioning System Fix Data
             "$GGA" => {
-                return gnss::gga::handle(sentence.as_str(), 
-                                         nav_system.unwrap_or(gnss::NavigationSystem::Other));
-            },
+                return gnss::gga::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
             // $xxRMC - Recommended minimum specific GPS/Transit data
             "$RMC" => {
-                return gnss::rmc::handle(sentence.as_str(), 
-                                         nav_system.unwrap_or(gnss::NavigationSystem::Other));
-            },
-            // $xxGSA - GPS DOP and active satellites 
+                return gnss::rmc::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
+            // $xxGSA - GPS DOP and active satellites
             "$GSA" => {
-                return gnss::gsa::handle(sentence.as_str(), 
-                                         nav_system.unwrap_or(gnss::NavigationSystem::Other));
-            },
+                return gnss::gsa::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
             // $xxGSV - GPS Satellites in view
             "$GSV" => {
-                return gnss::gsv::handle(sentence.as_str(), 
-                                         nav_system.unwrap_or(gnss::NavigationSystem::Other), 
-                                         self);
-            },
+                return gnss::gsv::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                    self,
+                );
+            }
             // $xxVTG - Track made good and ground speed
             "$VTG" => {
-                return gnss::vtg::handle(sentence.as_str(), 
-                                         nav_system.unwrap_or(gnss::NavigationSystem::Other));
-            },
+                return gnss::vtg::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
             // $xxGLL - Geographic position, latitude / longitude
             "$GLL" => {
-                return gnss::gll::handle(sentence.as_str(), 
-                                         nav_system.unwrap_or(gnss::NavigationSystem::Other));
-            },
-
+                return gnss::gll::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
 
             // $xxALM - Almanac Data
             "$ALM" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxHDT - Heading, True
             "$HDT" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxTRF - Transit Fix Data
             "$TRF" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxSTN - Multiple Data ID
             "$STN" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxVBW - Dual Ground / Water Speed
             "$VBW" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxXTC - Cross track error
             "$XTC" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxXTE - Cross-track error, Measured
             "$XTE" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxZDA - Date & Time
             "$ZDA" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
 
-
-
-            // $xxBOD Bearing Origin to Destination 
+            // $xxBOD Bearing Origin to Destination
             "$BOD" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
             // $xxRMA - Recommended minimum specific Loran-C data
             "$RMA" => {
-                return Err(ParseError::UnsupportedSentenceType(
-                           format!("Unimplemented NMEA sentence: {}", sentence_type))); // TODO
-            },
-
+                return Err(ParseError::UnsupportedSentenceType(format!(
+                    "Unimplemented NMEA sentence: {}",
+                    sentence_type
+                ))); // TODO
+            }
 
             // Received AIS data from other or own vessel
             "!VDM" | "!VDO" => {
@@ -347,37 +383,44 @@ impl NmeaParser {
                     match num {
                         1 => {
                             match s.parse::<u8>() {
-                                Ok(i) => { fragment_count = i; },
-                                Err(_) => { 
-                                    return Err(ParseError::InvalidSentence(
-                                               format!("Failed to parse fragment count: {}", s))); 
+                                Ok(i) => {
+                                    fragment_count = i;
+                                }
+                                Err(_) => {
+                                    return Err(ParseError::InvalidSentence(format!(
+                                        "Failed to parse fragment count: {}",
+                                        s
+                                    )));
                                 }
                             };
-                        },
+                        }
                         2 => {
                             match s.parse::<u8>() {
-                                Ok(i) => { fragment_number = i; },
-                                Err(_) => { 
-                                    return Err(ParseError::InvalidSentence(
-                                               format!("Failed to parse fragment count: {}", s))); 
+                                Ok(i) => {
+                                    fragment_number = i;
+                                }
+                                Err(_) => {
+                                    return Err(ParseError::InvalidSentence(format!(
+                                        "Failed to parse fragment count: {}",
+                                        s
+                                    )));
                                 }
                             };
-                        },
+                        }
                         3 => {
                             message_id = s.parse::<u64>().ok();
-                        },
+                        }
                         4 => {
                             // Radio channel code
                             radio_channel_code = Some(s);
-                        },
+                        }
                         5 => {
                             payload_string = s.to_string();
-                        },
+                        }
                         6 => {
                             // fill bits
-                        },
-                        _ => {
                         }
+                        _ => {}
                     }
                     num += 1;
                 }
@@ -388,15 +431,25 @@ impl NmeaParser {
                     bv = parse_payload(&payload_string).ok();
                 } else if fragment_count == 2 {
                     if let Some(msg_id) = message_id {
-                        let key1 = make_fragment_key(&sentence_type.to_string(), msg_id, fragment_count, 
-                                                     1, radio_channel_code.unwrap_or(""));
-                        let key2 = make_fragment_key(&sentence_type.to_string(), msg_id, fragment_count, 
-                                                     2, radio_channel_code.unwrap_or(""));
+                        let key1 = make_fragment_key(
+                            &sentence_type.to_string(),
+                            msg_id,
+                            fragment_count,
+                            1,
+                            radio_channel_code.unwrap_or(""),
+                        );
+                        let key2 = make_fragment_key(
+                            &sentence_type.to_string(),
+                            msg_id,
+                            fragment_count,
+                            2,
+                            radio_channel_code.unwrap_or(""),
+                        );
                         if fragment_number == 1 {
                             if let Some(p) = self.pull_string(key2.into()) {
                                 let mut payload_string_combined = payload_string;
                                 payload_string_combined.push_str(p.as_str());
-                                bv = parse_payload(&payload_string_combined). ok();
+                                bv = parse_payload(&payload_string_combined).ok();
                             } else {
                                 self.push_string(key1.into(), payload_string);
                             }
@@ -409,13 +462,22 @@ impl NmeaParser {
                                 self.push_string(key2.into(), payload_string);
                             }
                         } else {
-                            warn!("Unexpected NMEA fragment number: {}/{}", fragment_number, fragment_count);
+                            warn!(
+                                "Unexpected NMEA fragment number: {}/{}",
+                                fragment_number, fragment_count
+                            );
                         }
                     } else {
-                        warn!("NMEA message_id missing from {} than supported 2", sentence_type);
+                        warn!(
+                            "NMEA message_id missing from {} than supported 2",
+                            sentence_type
+                        );
                     }
                 } else {
-                    warn!("NMEA sentence fragment count greater ({}) than supported 2", fragment_count);
+                    warn!(
+                        "NMEA sentence fragment count greater ({}) than supported 2",
+                        fragment_count
+                    );
                 }
 
                 if let Some(bv) = bv {
@@ -423,170 +485,221 @@ impl NmeaParser {
                     match message_type {
                         // Position Report with SOTDMA/ITDMA
                         1 | 2 | 3 => {
-                            return ais::vdm_t1t2t3::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                          own_vessel);
-                        },
+                            return ais::vdm_t1t2t3::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
                         // Base Station Report
                         4 => {
-                            return ais::vdm_t4::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
+                            return ais::vdm_t4::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
                         // Ship static voyage related data
                         5 => {
-                            return ais::vdm_t5::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                      own_vessel);
-                        },
-                        // Addressed Binary Message 
+                            return ais::vdm_t5::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
+                        // Addressed Binary Message
                         6 => {
-                            return ais::vdm_t6::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                      own_vessel);
-                        },
+                            return ais::vdm_t6::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
                         // Binary Acknowledge
                         7 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Binary Broadcast Message 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Binary Broadcast Message
                         8 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Standard SAR Aircraft position report 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Standard SAR Aircraft position report
                         9 => {
-                            return ais::vdm_t9::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
-                        // UTC and Date inquiry 
+                            return ais::vdm_t9::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
+                        // UTC and Date inquiry
                         10 => {
-                            return ais::vdm_t10::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
-                        // UTC and Date response 
+                            return ais::vdm_t10::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
+                        // UTC and Date response
                         11 => {
-                            return ais::vdm_t11::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
-                        // Addressed safety related message 
+                            return ais::vdm_t11::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
+                        // Addressed safety related message
                         12 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Safety related Acknowledge 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Safety related Acknowledge
                         13 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Safety related Broadcast Message 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Safety related Broadcast Message
                         14 => {
                             // TODO: implementation (Class B)
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Interrogation 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Interrogation
                         15 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Assigned Mode Command 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Assigned Mode Command
                         16 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // GNSS Binary Broadcast Message  
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // GNSS Binary Broadcast Message
                         17 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Standard Class B CS Position Report 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Standard Class B CS Position Report
                         18 => {
-                            return ais::vdm_t18::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
+                            return ais::vdm_t18::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
                         // Extended Class B Equipment Position Report
                         19 => {
-                            return ais::vdm_t19::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
-                        // Data Link Management 
+                            return ais::vdm_t19::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
+                        // Data Link Management
                         20 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Aids-to-navigation Report 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Aids-to-navigation Report
                         21 => {
-                            return ais::vdm_t21::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                       own_vessel);
-                        },
-                        // Channel Management 
+                            return ais::vdm_t21::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
+                        // Channel Management
                         22 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
-                        // Group Assignment Command 
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
+                        // Group Assignment Command
                         23 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
                         // Class B CS Static Data Report
                         24 => {
-                            return ais::vdm_t24::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                        self, own_vessel);
-                        },
+                            return ais::vdm_t24::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                self,
+                                own_vessel,
+                            );
+                        }
                         // Single Slot Binary Message
                         25 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
                         // Multiple Slot Binary Message
                         26 => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
-                        },
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
+                        }
                         // Long Range AIS Broadcast message
                         27 => {
-                            return ais::vdm_t27::handle(&bv, station.unwrap_or(ais::Station::Other), 
-                                                        own_vessel);
-                        },
+                            return ais::vdm_t27::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
+                        }
                         _ => {
                             // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(
-                                       format!("Unsupported {} message type: {}", 
-                                               sentence_type, message_type)));
+                            return Err(ParseError::UnsupportedSentenceType(format!(
+                                "Unsupported {} message type: {}",
+                                sentence_type, message_type
+                            )));
                         }
                     }
                 } else {
                     Ok(ParsedSentence::Incomplete)
                 }
-            },
-            _ => {
-                Err(ParseError::UnsupportedSentenceType(
-                    format!("Unsupported sentence type: {}", sentence_type)))
             }
+            _ => Err(ParseError::UnsupportedSentenceType(format!(
+                "Unsupported sentence type: {}",
+                sentence_type
+            ))),
         }
     }
 }
@@ -599,20 +712,26 @@ mod test {
     fn test_parse_corrupted() {
         // Try a sentence with mismatching checksum
         let mut p = NmeaParser::new();
-        assert!(p.parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*41").ok().is_none());
+        assert!(p
+            .parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0*41")
+            .ok()
+            .is_none());
     }
 
     #[test]
     fn test_parse_missing_checksum() {
         // Try a sentence without checksum
         let mut p = NmeaParser::new();
-        assert!(p.parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0").ok().is_some());
+        assert!(p
+            .parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0")
+            .ok()
+            .is_some());
     }
 
     #[test]
     fn test_self() {
         let mut p = NmeaParser::new();
-        
+
         // String test
         p.push_string("a".into(), "b".into());
         assert_eq!(p.strings_count(), 1);
@@ -622,7 +741,7 @@ mod test {
         assert_eq!(p.strings_count(), 1);
         p.pull_string("c".into());
         assert_eq!(p.strings_count(), 0);
-        
+
         // VesselStaticData test
         p.push_vsd(1, Default::default());
         assert_eq!(p.vsds_count(), 1);
@@ -637,7 +756,7 @@ mod test {
     #[test]
     fn test_mmsi_to_country_code_conversion() {
         let mut vsd = ais::VesselStaticData::default();
-        
+
         vsd.mmsi = 230992580; assert_eq!(vsd.country().unwrap(), "FI");
         vsd.mmsi = 276009860; assert_eq!(vsd.country().unwrap(), "EE");
         vsd.mmsi = 265803690; assert_eq!(vsd.country().unwrap(), "SE");
@@ -653,6 +772,4 @@ mod test {
         vsd.mmsi =   2300049; assert_eq!(vsd.country(), None);
         vsd.mmsi =         0; assert_eq!(vsd.country(), None);
     }
-
 }
-
