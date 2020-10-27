@@ -24,6 +24,7 @@ pub(crate) mod vdm_t9;
 pub(crate) mod vdm_t10;
 pub(crate) mod vdm_t11;
 pub(crate) mod vdm_t12;
+pub(crate) mod vdm_t13;
 pub(crate) mod vdm_t18;
 pub(crate) mod vdm_t19;
 pub(crate) mod vdm_t21;
@@ -31,12 +32,13 @@ pub(crate) mod vdm_t24;
 pub(crate) mod vdm_t27;
 
 use super::*;
-pub use vdm_t10::UtcDateInquiry;
-pub use vdm_t12::AddressedSafetyRelatedMessage;
-pub use vdm_t21::{AidToNavigationReport, NavAidType};
 pub use vdm_t4::BaseStationReport;
 pub use vdm_t6::BinaryAddressedMessage;
 pub use vdm_t9::StandardSarAircraftPositionReport;
+pub use vdm_t10::UtcDateInquiry;
+pub use vdm_t12::AddressedSafetyRelatedMessage;
+pub use vdm_t13::SafetyRelatedAcknowledgement;
+pub use vdm_t21::{AidToNavigationReport, NavAidType};
 
 // -------------------------------------------------------------------------------------------------
 

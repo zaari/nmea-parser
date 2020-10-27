@@ -5,12 +5,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for AIS VDM/VDO sentence type 13 parsing
 - Implementation for AIS VDM/VDO sentence type 12 parsing
 - Implementation for AIS VDM/VDO sentence type 11 parsing
 - Implementation for AIS VDM/VDO sentence type 10 parsing
 - Implementation for AIS VDM/VDO sentence type 9 parsing
 ### Changed
 - Sentence checksum length limited to two characters (as some messages may have non-standard extensions)
+- Re-export of `chrono` crate
 - Turned crate `assert` into a dev-dependency
 ### Removed
 - Dependency to `env_logger` removed
