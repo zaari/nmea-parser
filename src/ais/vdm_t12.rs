@@ -35,10 +35,10 @@ pub struct AddressedSafetyRelatedMessage {
 
     /// Destination MMSI (30 bits)
     pub destination_mmsi: u32,
-    
+
     /// Retransmit flag (1 bit)
     pub retransmit_flag: bool,
-    
+
     /// Text (936 bits; 1-156 chars)
     pub text: String,
 }
@@ -51,15 +51,17 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::AddressedSafetyRelatedMessage(AddressedSafetyRelatedMessage {
-        own_vessel: { own_vessel },
-        station: { station },
-        source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        sequence_number: { pick_u64(&bv, 38, 2) as u8 },
-        destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
-        retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
-        text: { pick_string(&bv, 72, 156) },
-    }));
+    return Ok(ParsedSentence::AddressedSafetyRelatedMessage(
+        AddressedSafetyRelatedMessage {
+            own_vessel: { own_vessel },
+            station: { station },
+            source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            sequence_number: { pick_u64(&bv, 38, 2) as u8 },
+            destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
+            retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
+            text: { pick_string(&bv, 72, 156) },
+        },
+    ));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -72,7 +74,9 @@ mod test {
     fn test_parse_vdm_type12() {
         // First sentence
         let mut p = NmeaParser::new();
-        match p.parse_sentence("!AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37") {
+        match p.parse_sentence(
+            "!AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37",
+        ) {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -97,7 +101,9 @@ mod test {
         }
 
         // Second sentence
-        match p.parse_sentence("!AIVDM,1,1,,A,<CR3B@<0TO3j5@PmkiP31BCPphPDB13;CPihkP=?D?PmP3B5GPpn,0*3A") {
+        match p.parse_sentence(
+            "!AIVDM,1,1,,A,<CR3B@<0TO3j5@PmkiP31BCPphPDB13;CPihkP=?D?PmP3B5GPpn,0*3A",
+        ) {
             Ok(ps) => {
                 match ps {
                     // The expected result

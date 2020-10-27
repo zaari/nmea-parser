@@ -105,32 +105,40 @@ pub enum ParsedSentence {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Provides read access to geographical position in the implementing type.
+/// Read-only access to geographical position in the implementing type.
 pub trait LatLon {
-    /// Returns the latitude of the position contained by the object. If the position is not
-    /// available returns None.
+    /// Return the latitude of the position contained by the object. If the position is not
+    /// available return `None`.
     fn latitude(&self) -> Option<f64>;
 
-    /// Returns the longitude of the position contained by the object. If the position is not
-    /// available returns None.
+    /// Return the longitude of the position contained by the object. If the position is not
+    /// available return `None`.
     fn longitude(&self) -> Option<f64>;
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// Parser which keeps multi-sentence state between `parse_sentence` calls.
+/// NMEA sentence parser which keeps multi-sentence state between `parse_sentence` calls.
+#[derive(Clone)]
 pub struct NmeaParser {
     saved_fragments: HashMap<String, String>,
     saved_vsds: HashMap<u32, ais::VesselStaticData>,
 }
 
 impl NmeaParser {
-    /// Default constructor.
+    /// Construct an empty parser which is ready to receive sentences.
     pub fn new() -> NmeaParser {
         NmeaParser {
             saved_fragments: HashMap::new(),
             saved_vsds: HashMap::new(),
         }
+    }
+
+    /// Clear internal state of the parser. Multi-sentence state is lost after this function
+    /// is called.
+    pub fn reset(&mut self) {
+        self.saved_fragments.clear();
+        self.saved_vsds.clear();
     }
 
     /// Push string-to-string mapping to store.
@@ -168,9 +176,10 @@ impl NmeaParser {
         self.saved_vsds.len()
     }
 
-    /// Parses NMEA sentence into `ParsedSentence` enum. If the given sentence is part of
-    /// multipart message, the state is saved into the parser and `ParsedSentence::Incomplete`
-    /// returned. The actual result is returned when all the parts have been provided for the function.
+    /// Parse NMEA sentence into `ParsedSentence` enum. If the given sentence is part of
+    /// a multipart message the related state is saved into the parser and
+    /// `ParsedSentence::Incomplete` is returned. The actual result is returned when all the parts
+    /// have been sent to the parser.
     pub fn parse_sentence(&mut self, sentence: &str) -> Result<ParsedSentence, ParseError> {
         // Calculace NMEA checksum and compare it to the given one. Also, remove the checksum part
         // from the sentence to simplify next processing steps.
@@ -489,7 +498,7 @@ impl NmeaParser {
                 if let Some(bv) = bv {
                     let message_type = pick_u64(&bv, 0, 6);
                     match message_type {
-                        // Position Report with SOTDMA/ITDMA
+                        // Position report with SOTDMA/ITDMA
                         1 | 2 | 3 => {
                             return ais::vdm_t1t2t3::handle(
                                 &bv,
@@ -497,7 +506,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Base Station Report
+                        // Base station report
                         4 => {
                             return ais::vdm_t4::handle(
                                 &bv,
@@ -513,7 +522,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Addressed Binary Message
+                        // Addressed binary message
                         6 => {
                             return ais::vdm_t6::handle(
                                 &bv,
@@ -521,7 +530,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Binary Acknowledge
+                        // Binary acknowledge
                         7 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -529,7 +538,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Binary Broadcast Message
+                        // Binary broadcast message
                         8 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -537,7 +546,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Standard SAR Aircraft position report
+                        // Standard SAR aircraft position report
                         9 => {
                             return ais::vdm_t9::handle(
                                 &bv,
@@ -553,7 +562,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // UTC and Date response
+                        // UTC and date response
                         11 => {
                             return ais::vdm_t11::handle(
                                 &bv,
@@ -569,7 +578,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Safety related Acknowledge
+                        // Safety related acknowledge
                         13 => {
                             return ais::vdm_t13::handle(
                                 &bv,
@@ -577,7 +586,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Safety related Broadcast Message
+                        // Safety related broadcast message
                         14 => {
                             // TODO: implementation (Class B)
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -593,7 +602,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Assigned Mode Command
+                        // Assigned mode command
                         16 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -601,7 +610,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // GNSS Binary Broadcast Message
+                        // GNSS binary broadcast message
                         17 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -609,7 +618,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Standard Class B CS Position Report
+                        // Standard class B CS position report
                         18 => {
                             return ais::vdm_t18::handle(
                                 &bv,
@@ -617,7 +626,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Extended Class B Equipment Position Report
+                        // Extended class B equipment position report
                         19 => {
                             return ais::vdm_t19::handle(
                                 &bv,
@@ -625,7 +634,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Data Link Management
+                        // Data link management
                         20 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -633,7 +642,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Aids-to-navigation Report
+                        // Aids-to-navigation report
                         21 => {
                             return ais::vdm_t21::handle(
                                 &bv,
@@ -641,7 +650,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Channel Management
+                        // Channel management
                         22 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -649,7 +658,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Group Assignment Command
+                        // Group assignment command
                         23 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -657,7 +666,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Class B CS Static Data Report
+                        // Class B CS static data report
                         24 => {
                             return ais::vdm_t24::handle(
                                 &bv,
@@ -666,7 +675,7 @@ impl NmeaParser {
                                 own_vessel,
                             );
                         }
-                        // Single Slot Binary Message
+                        // Single slot binary message
                         25 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -674,7 +683,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Multiple Slot Binary Message
+                        // Multiple slot binary message
                         26 => {
                             // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
@@ -682,7 +691,7 @@ impl NmeaParser {
                                 sentence_type, message_type
                             )));
                         }
-                        // Long Range AIS Broadcast message
+                        // Long range AIS broadcast message
                         27 => {
                             return ais::vdm_t27::handle(
                                 &bv,
@@ -691,7 +700,6 @@ impl NmeaParser {
                             );
                         }
                         _ => {
-                            // TODO: implementation
                             return Err(ParseError::UnsupportedSentenceType(format!(
                                 "Unsupported {} message type: {}",
                                 sentence_type, message_type
@@ -714,6 +722,7 @@ impl NmeaParser {
 mod test {
     use super::*;
 
+    /// Test that parsing a corrupted sentence fails.
     #[test]
     fn test_parse_corrupted() {
         // Try a sentence with mismatching checksum
@@ -724,6 +733,7 @@ mod test {
             .is_none());
     }
 
+    /// Test sentence without a trailing check sum
     #[test]
     fn test_parse_missing_checksum() {
         // Try a sentence without checksum
@@ -734,8 +744,9 @@ mod test {
             .is_some());
     }
 
+    /// Test internals of `NmeaParser`.
     #[test]
-    fn test_self() {
+    fn test_nmea_parser() {
         let mut p = NmeaParser::new();
 
         // String test
@@ -759,23 +770,29 @@ mod test {
         assert_eq!(p.vsds_count(), 0);
     }
 
+    /// Test country decoding
     #[test]
-    fn test_mmsi_to_country_code_conversion() {
-        let mut vsd = ais::VesselStaticData::default();
+    fn test_decode_country() {
+        assert_eq!(vsd(230992580).decode_country().unwrap(), "FI");
+        assert_eq!(vsd(276009860).decode_country().unwrap(), "EE");
+        assert_eq!(vsd(265803690).decode_country().unwrap(), "SE");
+        assert_eq!(vsd(273353180).decode_country().unwrap(), "RU");
+        assert_eq!(vsd(211805060).decode_country().unwrap(), "DE");
+        assert_eq!(vsd(257037270).decode_country().unwrap(), "NO");
+        assert_eq!(vsd(227232370).decode_country().unwrap(), "FR");
+        assert_eq!(vsd(248221000).decode_country().unwrap(), "MT");
+        assert_eq!(vsd(374190000).decode_country().unwrap(), "PA");
+        assert_eq!(vsd(412511368).decode_country().unwrap(), "CN");
+        assert_eq!(vsd(512003200).decode_country().unwrap(), "NZ");
+        assert_eq!(vsd(995126020).decode_country(), None);
+        assert_eq!(vsd(2300049).decode_country(), None);
+        assert_eq!(vsd(0).decode_country(), None);
+    }
 
-        vsd.mmsi = 230992580; assert_eq!(vsd.country().unwrap(), "FI");
-        vsd.mmsi = 276009860; assert_eq!(vsd.country().unwrap(), "EE");
-        vsd.mmsi = 265803690; assert_eq!(vsd.country().unwrap(), "SE");
-        vsd.mmsi = 273353180; assert_eq!(vsd.country().unwrap(), "RU");
-        vsd.mmsi = 211805060; assert_eq!(vsd.country().unwrap(), "DE");
-        vsd.mmsi = 257037270; assert_eq!(vsd.country().unwrap(), "NO");
-        vsd.mmsi = 227232370; assert_eq!(vsd.country().unwrap(), "FR");
-        vsd.mmsi = 248221000; assert_eq!(vsd.country().unwrap(), "MT");
-        vsd.mmsi = 374190000; assert_eq!(vsd.country().unwrap(), "PA");
-        vsd.mmsi = 412511368; assert_eq!(vsd.country().unwrap(), "CN");
-        vsd.mmsi = 512003200; assert_eq!(vsd.country().unwrap(), "NZ");
-        vsd.mmsi = 995126020; assert_eq!(vsd.country(), None);
-        vsd.mmsi =   2300049; assert_eq!(vsd.country(), None);
-        vsd.mmsi =         0; assert_eq!(vsd.country(), None);
+    /// Create a `VesselStaticData` with the given MMSI
+    fn vsd(mmsi: u32) -> ais::VesselStaticData {
+        let mut vsd = ais::VesselStaticData::default();
+        vsd.mmsi = mmsi;
+        vsd
     }
 }

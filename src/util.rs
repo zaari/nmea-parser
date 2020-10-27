@@ -150,7 +150,7 @@ pub(crate) fn pick_number_field<T: std::str::FromStr>(
 }
 
 /// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
-pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, String> {
+pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, ParseError> {
     let (hour, minute, second) =
         parse_time(hhmmss).map_err(|_| format!("Invalid time format: {}", hhmmss))?;
     Ok(Utc
@@ -159,7 +159,7 @@ pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<
 }
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to DateTime<Utc>.
-pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, String> {
+pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, ParseError> {
     let century = (Utc::now().year() / 100) * 100;
     let (day, month, year) =
         parse_date(yymmdd).map_err(|_| format!("Invalid date format: {}", yymmdd))?;
@@ -198,7 +198,7 @@ fn pick_s2(s: &str, i: usize) -> &str {
 pub(crate) fn parse_latitude_ddmm_mmm(
     lat_string: &str,
     hemisphere: &str,
-) -> Result<Option<f64>, String> {
+) -> Result<Option<f64>, ParseError> {
     // DDMM.MMM
     if lat_string.is_empty() {
         return Ok(None);
@@ -213,10 +213,7 @@ pub(crate) fn parse_latitude_ddmm_mmm(
             .map(|c| c.is_ascii_digit())
             .unwrap_or(false))
     {
-        return Err(format!(
-            "Failed to parse latitude (DDMM.MMM) from {}",
-            lat_string
-        ));
+        return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string).into());
     }
     let end = 5 + byte_string
         .iter()
@@ -344,11 +341,12 @@ mod test {
 
     #[test]
     fn test_pick_number_field() {
-        let s: Vec<&str> = "128,0,8.0,xyz".split(',').collect();
+        let s: Vec<&str> = "128,0,8.0,,xyz".split(',').collect();
         assert_eq!(pick_number_field::<u8>(&s, 0).ok().unwrap().unwrap(), 128);
         assert_eq!(pick_number_field::<u8>(&s, 1).ok().unwrap().unwrap(), 0);
         assert_eq!(pick_number_field::<f64>(&s, 2).ok().unwrap().unwrap(), 8.0);
-        assert_eq!(pick_number_field::<f64>(&s, 3).is_ok(), false);
-        assert_eq!(pick_number_field::<f64>(&s, 4).ok().unwrap(), None);
+        assert_eq!(pick_number_field::<u16>(&s, 3).ok().unwrap(), None);
+        assert_eq!(pick_number_field::<u32>(&s, 4).is_ok(), false);
+        assert_eq!(pick_number_field::<u32>(&s, 5).ok().unwrap(), None);
     }
 }

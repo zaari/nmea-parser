@@ -80,7 +80,7 @@ impl std::fmt::Display for Station {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Types 1, 2, 3 and 18: Position Report Class A and Long Range AIS Broadcast message
+/// Types 1, 2, 3 and 18: Position Report Class A, and Long Range AIS Broadcast message
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselDynamicData {
     /// True if the data is about own vessel, false if about other.
@@ -143,7 +143,7 @@ pub struct VesselDynamicData {
     /// fixing device; false = RAIM not in use = default; true = RAIM in use
     pub raim_flag: bool,
 
-    // Class B unit flag: false = Class B SOTDMA unit, true = Class B "CS" unit.
+    /// Class B unit flag: false = Class B SOTDMA unit, true = Class B "CS" unit.
     pub class_b_unit_flag: Option<bool>,
 
     /// Class B display:
@@ -294,7 +294,7 @@ impl std::fmt::Display for PositioningSystemMeta {
 
 // -------------------------------------------------------------------------------------------------
 
-/// Types 5 and 24
+/// Types 5 and 24: Ship static voyage related data, and boat static data report.
 #[derive(Default, Clone, Debug, PartialEq)]
 pub struct VesselStaticData {
     /// True if the data is about own vessel, false if about other vessel.
@@ -312,7 +312,7 @@ pub struct VesselStaticData {
     /// IMO number (1-999999999; 30 bits).
     pub imo_number: Option<u32>,
 
-    /// Call sign (42 bits)
+    /// Call sign (7 ASCII characters)
     pub call_sign: Option<String>,
 
     /// Name (20 ASCII characters)
@@ -358,7 +358,7 @@ pub struct VesselStaticData {
     pub mothership_mmsi: Option<u32>,
 }
 
-/// AIS ship type derived from ship and cargo type field
+/// AIS ship type derived from combined ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ShipType {
     NotAvailable,            // 0
@@ -392,6 +392,7 @@ pub enum ShipType {
 }
 
 impl ShipType {
+    /// Construct a new `ShipType` using the higher bits of the ship and cargo type field of NMEA.
     pub fn new(raw: u8) -> ShipType {
         match raw {
             0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 => ShipType::NotAvailable,
@@ -475,7 +476,7 @@ impl std::fmt::Display for ShipType {
     }
 }
 
-/// AIS cargo type derived from ship and cargo type field
+/// AIS cargo type derived from combined ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CargoType {
     Undefined,          // x0
@@ -491,7 +492,7 @@ pub enum CargoType {
 }
 
 impl CargoType {
-    /// Construct a CargoType based on 8-bit NMEA identifier
+    /// Construct a new `CargoType` using the higher bits of the ship and cargo type field of NMEA.
     pub fn new(raw: u8) -> CargoType {
         match raw {
             10 | 20 | 40 | 60 | 70 | 80 | 90 => CargoType::Undefined,
@@ -589,7 +590,7 @@ impl std::fmt::Display for PositionFixType {
 
 impl VesselStaticData {
     /// Derive ISO 3166 country code from MID part of MMSI.
-    pub fn country(&self) -> Option<&'static str> {
+    pub fn decode_country(&self) -> Option<&'static str> {
         match self.mmsi / 1000000 {
             // Mapping generated with mid-to-iso3166.py
             201 => Some("AL"), // Albania

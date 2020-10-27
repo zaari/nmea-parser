@@ -8,8 +8,9 @@
 [docsrs-image]: https://docs.rs/nmea-parser/badge.svg
 [docsrs]: https://docs.rs/nmea-parser
 
-This [Rust] crate aims to cover the most important [AIS] and [GNSS] NMEA 0183 sentences. It supports 
-both AIS class A and class B.
+This [Rust] crate aims to cover all [AIS] sentences and the most important
+[GNSS] sentences used with [NMEA 0183] standard. It supports both AIS class A
+and class B.
 
 ## Usage
 
@@ -20,10 +21,10 @@ Include the following fragment in your `Cargo.toml` file:
 nmea-parser = "0.4.1"
 ```
 
-The following sample program uses the crate to parse the given NMEA sentence and 
-to print some fields of the resulting data object. The program relies on lazy `unwrap()`
-functions to simplify the example. In real-life applications proper handling of
-`None` cases is needed.
+The following sample program uses the crate to parse the given NMEA sentence
+and to print some fields of the resulting data object. The program relies on
+lazy `unwrap()` functions to simplify the example. In real-life applications
+proper handling of `None` cases is needed.
 
 ```rust
 use nmea_parser::*;
@@ -47,7 +48,7 @@ for sentence in sentences {
         },
         ParsedSentence::VesselStaticData(vsd) => {
             println!("MMSI:  {}", vsd.mmsi);
-            println!("Flag:  {}", vsd.country().unwrap());
+            println!("Flag:  {}", vsd.decode_country().unwrap());
             println!("Name:  {}", vsd.name.unwrap());
             println!("Type:  {}", vsd.ship_type);
             println!("");
@@ -86,8 +87,8 @@ Longitude: 11.517°
 
 ## Features
 
-The following features are included in the published version of the crate. Details about
-version history can be found from the [changelog].
+The following features are included in the published version of the crate. 
+Details about version history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
@@ -97,9 +98,10 @@ version history can be found from the [changelog].
 
 ## Roadmap
 
-Until version 1.0 refactoring and renaming of crate's code elements is likely to happen.
-The following table outlines the high-level changes that are going to be inclided in the future 
-version. Prioritisation is based on estimated significance and implementation effort of each item.
+Until version 1.0 refactoring and renaming of crate's code elements is likely 
+to happen. The following table outlines the high-level changes that are going 
+to be inclided in the future version. Prioritisation is based on estimated 
+significance and implementation effort of each item.
 
 |Version |Category    |Content                                                |
 |--------|------------|-------------------------------------------------------|
@@ -117,12 +119,12 @@ The crate's minimum supported Rust toolchain version is 1.44.
 
 ## License
 
-This crate is licensed under [Apache 2.0 license] which also includes the liability and warranty
-statements.
+This crate is licensed under [Apache 2.0 license] which also includes the 
+liability and warranty statements.
 
 [changelog]: CHANGELOG.md
 [Apache 2.0 license]: LICENSE
 [Rust]: https://en.wikipedia.org/wiki/Rust_(programming_language)
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [GNSS]: https://en.wikipedia.org/wiki/Satellite_navigation
-
+[NMEA 0183]: https://en.wikipedia.org/wiki/NMEA_0183

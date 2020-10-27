@@ -29,7 +29,7 @@ pub struct SafetyRelatedAcknowledgement {
 
     /// Source MMSI (30 bits)
     pub source_mmsi: u32,
-    
+
     /// MMSI number 1 (30 bits)
     pub mmsi1: u32,
 
@@ -63,19 +63,21 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::SafetyRelatedAcknowledgement(SafetyRelatedAcknowledgement {
-        own_vessel: { own_vessel },
-        station: { station },
-        source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        mmsi1:       { pick_u64(&bv, 40, 30) as u32 },
-        mmsi1_seq:   { pick_u64(&bv, 70, 2) as u8 },
-        mmsi2:       { pick_u64(&bv, 72, 30) as u32 },
-        mmsi2_seq:   { pick_u64(&bv, 102, 2) as u8 },
-        mmsi3:       { pick_u64(&bv, 104, 30) as u32 },
-        mmsi3_seq:   { pick_u64(&bv, 134, 2) as u8 },
-        mmsi4:       { pick_u64(&bv, 136, 30) as u32 },
-        mmsi4_seq:   { pick_u64(&bv, 166, 2) as u8 },
-    }));
+    return Ok(ParsedSentence::SafetyRelatedAcknowledgement(
+        SafetyRelatedAcknowledgement {
+            own_vessel: { own_vessel },
+            station: { station },
+            source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi1: { pick_u64(&bv, 40, 30) as u32 },
+            mmsi1_seq: { pick_u64(&bv, 70, 2) as u8 },
+            mmsi2: { pick_u64(&bv, 72, 30) as u32 },
+            mmsi2_seq: { pick_u64(&bv, 102, 2) as u8 },
+            mmsi3: { pick_u64(&bv, 104, 30) as u32 },
+            mmsi3_seq: { pick_u64(&bv, 134, 2) as u8 },
+            mmsi4: { pick_u64(&bv, 136, 30) as u32 },
+            mmsi4_seq: { pick_u64(&bv, 166, 2) as u8 },
+        },
+    ));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -94,14 +96,14 @@ mod test {
                     // The expected result
                     ParsedSentence::SafetyRelatedAcknowledgement(sra) => {
                         assert_eq!(sra.source_mmsi, 211378120);
-                        assert_eq!(sra.mmsi1,       211217560);
-                        assert_eq!(sra.mmsi1_seq,   2);
-                        assert_eq!(sra.mmsi2,       0);
-                        assert_eq!(sra.mmsi2_seq,   0);
-                        assert_eq!(sra.mmsi3,       0);
-                        assert_eq!(sra.mmsi3_seq,   0);
-                        assert_eq!(sra.mmsi4,       0);
-                        assert_eq!(sra.mmsi4_seq,   0);
+                        assert_eq!(sra.mmsi1, 211217560);
+                        assert_eq!(sra.mmsi1_seq, 2);
+                        assert_eq!(sra.mmsi2, 0);
+                        assert_eq!(sra.mmsi2_seq, 0);
+                        assert_eq!(sra.mmsi3, 0);
+                        assert_eq!(sra.mmsi3_seq, 0);
+                        assert_eq!(sra.mmsi4, 0);
+                        assert_eq!(sra.mmsi4_seq, 0);
                     }
                     ParsedSentence::Incomplete => {
                         assert!(false);
