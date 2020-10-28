@@ -62,8 +62,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::SafetyRelatedAcknowledgement(
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::SafetyRelatedAcknowledgement(
         SafetyRelatedAcknowledgement {
             own_vessel: { own_vessel },
             station: { station },
@@ -93,7 +93,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::SafetyRelatedAcknowledgement(sra) => {
+                    ParsedMessage::SafetyRelatedAcknowledgement(sra) => {
                         assert_eq!(sra.source_mmsi, 211378120);
                         assert_eq!(sra.mmsi1, 211217560);
                         assert_eq!(sra.mmsi1_seq, 2);
@@ -104,7 +104,7 @@ mod test {
                         assert_eq!(sra.mmsi4, 0);
                         assert_eq!(sra.mmsi4_seq, 0);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

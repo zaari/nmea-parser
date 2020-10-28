@@ -41,8 +41,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::UtcDateInquiry(UtcDateInquiry {
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::UtcDateInquiry(UtcDateInquiry {
         own_vessel: { own_vessel },
         station: { station },
         source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
@@ -63,11 +63,11 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::UtcDateInquiry(udi) => {
+                    ParsedMessage::UtcDateInquiry(udi) => {
                         assert_eq!(udi.source_mmsi, 366814480);
                         assert_eq!(udi.destination_mmsi, 366832740);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

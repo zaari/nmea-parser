@@ -225,7 +225,7 @@ impl LatLon for VesselDynamicData {
     }
 }
 
-/// AIS navigation status for VesselDynamicData
+/// Navigation status for VesselDynamicData
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationStatus {
     UnderWayUsingEngine,        // 0
@@ -275,7 +275,7 @@ impl Default for NavigationStatus {
     }
 }
 
-/// AIS location metadata about positioning system
+/// Location metadata about positioning system
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositioningSystemMeta {
     Operative, // When timestamp second is 0-59
@@ -390,7 +390,7 @@ pub struct VesselStaticData {
     pub mothership_mmsi: Option<u32>,
 }
 
-/// AIS ship type derived from combined ship and cargo type field
+/// Ship type derived from combined ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ShipType {
     NotAvailable,            // 0
@@ -508,7 +508,7 @@ impl std::fmt::Display for ShipType {
     }
 }
 
-/// AIS cargo type derived from combined ship and cargo type field
+/// Cargo type derived from combined ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CargoType {
     Undefined,          // x0
@@ -568,7 +568,7 @@ impl Default for CargoType {
     }
 }
 
-/// AIS EPFD position fix types
+/// EPFD position fix types
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositionFixType {
     Undefined,                  // 0
@@ -621,8 +621,8 @@ impl std::fmt::Display for PositionFixType {
 }
 
 impl VesselStaticData {
-    /// Derive ISO 3166 country code from MID part of MMSI.
-    pub fn decode_country(&self) -> Option<&'static str> {
+    /// Decode ISO 3166 country code from MID part of MMSI.
+    pub fn country(&self) -> Option<&'static str> {
         match self.mmsi / 1000000 {
             // Mapping generated with mid-to-iso3166.py
             201 => Some("AL"), // Albania

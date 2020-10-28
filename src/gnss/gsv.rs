@@ -41,7 +41,7 @@ pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
     store: &mut NmeaParser,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
     let msg_type = split.get(0).unwrap_or(&"");
@@ -84,9 +84,9 @@ pub(crate) fn handle(
             }
         }
 
-        return Ok(ParsedSentence::Gsv(v));
+        return Ok(ParsedMessage::Gsv(v));
     } else {
-        return Ok(ParsedSentence::Incomplete);
+        return Ok(ParsedMessage::Incomplete);
     }
 }
 
@@ -113,7 +113,7 @@ mod test {
             .parse_sentence("$GPGSV,3,1,11,03,03,111,00,04,15,270,00,06,01,010,00,13,06,292,00*74")
         {
             Ok(ps) => match ps {
-                ParsedSentence::Incomplete => {}
+                ParsedMessage::Incomplete => {}
                 _ => {
                     assert!(false);
                 }
@@ -128,7 +128,7 @@ mod test {
             .parse_sentence("$GPGSV,3,2,11,14,25,170,00,16,57,208,39,18,67,296,40,19,40,246,00*74")
         {
             Ok(ps) => match ps {
-                ParsedSentence::Incomplete => {}
+                ParsedMessage::Incomplete => {}
                 _ => {
                     assert!(false);
                 }
@@ -143,7 +143,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Gsv(v) => {
+                    ParsedMessage::Gsv(v) => {
                         assert_eq!(v.len(), 11);
 
                         // 2nd satellite

@@ -53,11 +53,11 @@ impl LatLon for GllData {
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Gll(GllData {
+    return Ok(ParsedMessage::Gll(GllData {
         source: nav_system,
         latitude: parse_latitude_ddmm_mmm(
             split.get(1).unwrap_or(&""),
@@ -92,7 +92,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Gll(gll) => {
+                    ParsedMessage::Gll(gll) => {
                         assert_eq!(gll.source, NavigationSystem::Galileo);
                         assert::close(gll.latitude.unwrap_or(0.0), 49.3, 0.1);
                         assert::close(gll.longitude.unwrap_or(0.0), -123.2, 0.1);

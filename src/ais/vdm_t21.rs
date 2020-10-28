@@ -287,8 +287,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::AidToNavigationReport(
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::AidToNavigationReport(
         AidToNavigationReport {
             own_vessel: { own_vessel },
             station: { station },
@@ -346,7 +346,7 @@ mod test {
         let mut p = NmeaParser::new();
         match p.parse_sentence("!AIVDM,2,1,5,B,E1mg=5J1T4W0h97aRh6ba84<h2d;W:Te=eLvH50```q,0*46") {
             Ok(ps) => match ps {
-                ParsedSentence::Incomplete => {
+                ParsedMessage::Incomplete => {
                     assert!(true);
                 }
                 _ => {
@@ -362,7 +362,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::AidToNavigationReport(atnr) => {
+                    ParsedMessage::AidToNavigationReport(atnr) => {
                         assert_eq!(atnr.mmsi, 123456789);
                         assert_eq!(atnr.aid_type, NavAidType::CardinalMarkNorth);
                         assert_eq!(atnr.name, "CHINA ROSE MURPHY EXPRESS ALERT");
@@ -381,7 +381,7 @@ mod test {
                         assert_eq!(atnr.virtual_aid_flag, false);
                         assert_eq!(atnr.assigned_mode_flag, false);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

@@ -20,8 +20,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::VesselDynamicData(VesselDynamicData {
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::VesselDynamicData(VesselDynamicData {
         own_vessel: { own_vessel },
         station: { station },
         ais_type: { AisClass::ClassB },
@@ -97,7 +97,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::VesselDynamicData(vdd) => {
+                    ParsedMessage::VesselDynamicData(vdd) => {
                         assert_eq!(vdd.mmsi, 338087471);
                         assert_eq!(vdd.nav_status, NavigationStatus::NotDefined);
                         assert_eq!(vdd.rot, None);
@@ -113,7 +113,7 @@ mod test {
                         assert_eq!(vdd.special_manoeuvre, None);
                         assert_eq!(vdd.raim_flag, true);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

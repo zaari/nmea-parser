@@ -65,8 +65,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::BinaryAddressedMessage(
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::BinaryAddressedMessage(
         BinaryAddressedMessage {
             own_vessel: { own_vessel },
             station: { station },
@@ -93,7 +93,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::BinaryAddressedMessage(bam) => {
+                    ParsedMessage::BinaryAddressedMessage(bam) => {
                         assert_eq!(bam.mmsi, 150834090);
                         assert_eq!(bam.sequence_number, 3);
                         assert_eq!(bam.destination_mmsi, 313240222);
@@ -102,7 +102,7 @@ mod test {
                         assert_eq!(bam.fid, 11);
                         // TODO: check data
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

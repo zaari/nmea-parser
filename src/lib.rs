@@ -16,10 +16,9 @@ limitations under the License.
 
 //! # NMEA Parser: NMEA parser for Rust
 //!
-//! This crate aims to cover the most important AIS and GNSS sentences.
-//! Supports AIS class A and B types. Identifies GPS, GLONASS, Galileo, BeiDou,
-//! Navic and QZSS satellite systems.
-//!
+//! This crate aims to cover all AIS sentences and the most important GNSS sentences used with 
+//! NMEA 0183 standard. The parser supports AIS class A and B types and identifies GPS, GLONASS, 
+//! Galileo, BeiDou, NavIC and QZSS satellite systems.
 
 #![allow(dead_code)]
 
@@ -41,9 +40,11 @@ pub use error::ParseError;
 use util::*;
 
 // -------------------------------------------------------------------------------------------------
-/// Result from function `parse_sentence`
+
+/// Result from function `NmeaParser::parse_sentence()`. If the given sentence represents only a 
+/// partial message `ParsedMessage::Incomplete` is returned.
 #[derive(Clone, Debug, PartialEq)]
-pub enum ParsedSentence {
+pub enum ParsedMessage {
     /// The given sentence is only part of multi-sentence message and we need more data to
     /// create the actual result. State is stored in `NmeaParser` object.
     Incomplete,
@@ -122,6 +123,8 @@ pub trait LatLon {
 // -------------------------------------------------------------------------------------------------
 
 /// NMEA sentence parser which keeps multi-sentence state between `parse_sentence` calls.
+/// The parser tries to be as permissible as possible about the field formats because some NMEA
+/// encoders don't follow the standards strictly.
 #[derive(Clone)]
 pub struct NmeaParser {
     saved_fragments: HashMap<String, String>,
@@ -179,11 +182,11 @@ impl NmeaParser {
         self.saved_vsds.len()
     }
 
-    /// Parse NMEA sentence into `ParsedSentence` enum. If the given sentence is part of
+    /// Parse NMEA sentence into `ParsedMessage` enum. If the given sentence is part of
     /// a multipart message the related state is saved into the parser and
-    /// `ParsedSentence::Incomplete` is returned. The actual result is returned when all the parts
+    /// `ParsedMessage::Incomplete` is returned. The actual result is returned when all the parts
     /// have been sent to the parser.
-    pub fn parse_sentence(&mut self, sentence: &str) -> Result<ParsedSentence, ParseError> {
+    pub fn parse_sentence(&mut self, sentence: &str) -> Result<ParsedMessage, ParseError> {
         // Calculace NMEA checksum and compare it to the given one. Also, remove the checksum part
         // from the sentence to simplify next processing steps.
         let mut checksum = 0;
@@ -221,7 +224,7 @@ impl NmeaParser {
             }
         };
 
-        // Recognize GNSS system by talker ID.
+        // Identify GNSS system by talker ID.
         let nav_system = {
             if &sentence_type[0..1] == "$" {
                 match &sentence_type[1..3] {
@@ -245,7 +248,7 @@ impl NmeaParser {
             }
         }
 
-        // Recognize AIS station
+        // Identify AIS station
         let station = {
             if &sentence_type[0..1] == "!" {
                 match &sentence_type[1..3] {
@@ -710,7 +713,7 @@ impl NmeaParser {
                         }
                     }
                 } else {
-                    Ok(ParsedSentence::Incomplete)
+                    Ok(ParsedMessage::Incomplete)
                 }
             }
             _ => Err(ParseError::UnsupportedSentenceType(format!(
@@ -725,7 +728,6 @@ impl NmeaParser {
 mod test {
     use super::*;
 
-    /// Test that parsing a corrupted sentence fails.
     #[test]
     fn test_parse_corrupted() {
         // Try a sentence with mismatching checksum
@@ -736,7 +738,6 @@ mod test {
             .is_none());
     }
 
-    /// Test sentence without a trailing check sum
     #[test]
     fn test_parse_missing_checksum() {
         // Try a sentence without checksum
@@ -747,7 +748,6 @@ mod test {
             .is_some());
     }
 
-    /// Test internals of `NmeaParser`.
     #[test]
     fn test_nmea_parser() {
         let mut p = NmeaParser::new();
@@ -773,23 +773,22 @@ mod test {
         assert_eq!(p.vsds_count(), 0);
     }
 
-    /// Test country decoding
     #[test]
-    fn test_decode_country() {
-        assert_eq!(vsd(230992580).decode_country().unwrap(), "FI");
-        assert_eq!(vsd(276009860).decode_country().unwrap(), "EE");
-        assert_eq!(vsd(265803690).decode_country().unwrap(), "SE");
-        assert_eq!(vsd(273353180).decode_country().unwrap(), "RU");
-        assert_eq!(vsd(211805060).decode_country().unwrap(), "DE");
-        assert_eq!(vsd(257037270).decode_country().unwrap(), "NO");
-        assert_eq!(vsd(227232370).decode_country().unwrap(), "FR");
-        assert_eq!(vsd(248221000).decode_country().unwrap(), "MT");
-        assert_eq!(vsd(374190000).decode_country().unwrap(), "PA");
-        assert_eq!(vsd(412511368).decode_country().unwrap(), "CN");
-        assert_eq!(vsd(512003200).decode_country().unwrap(), "NZ");
-        assert_eq!(vsd(995126020).decode_country(), None);
-        assert_eq!(vsd(2300049).decode_country(), None);
-        assert_eq!(vsd(0).decode_country(), None);
+    fn test_country() {
+        assert_eq!(vsd(230992580).country().unwrap(), "FI");
+        assert_eq!(vsd(276009860).country().unwrap(), "EE");
+        assert_eq!(vsd(265803690).country().unwrap(), "SE");
+        assert_eq!(vsd(273353180).country().unwrap(), "RU");
+        assert_eq!(vsd(211805060).country().unwrap(), "DE");
+        assert_eq!(vsd(257037270).country().unwrap(), "NO");
+        assert_eq!(vsd(227232370).country().unwrap(), "FR");
+        assert_eq!(vsd(248221000).country().unwrap(), "MT");
+        assert_eq!(vsd(374190000).country().unwrap(), "PA");
+        assert_eq!(vsd(412511368).country().unwrap(), "CN");
+        assert_eq!(vsd(512003200).country().unwrap(), "NZ");
+        assert_eq!(vsd(995126020).country(), None);
+        assert_eq!(vsd(2300049).country(), None);
+        assert_eq!(vsd(0).country(), None);
     }
 
     /// Create a `VesselStaticData` with the given MMSI

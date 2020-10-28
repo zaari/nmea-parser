@@ -20,8 +20,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     _station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::VesselStaticData(VesselStaticData {
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::VesselStaticData(VesselStaticData {
         own_vessel: own_vessel,
         ais_type: AisClass::ClassB,
         mmsi: pick_u64(&bv, 8, 30) as u32,
@@ -109,7 +109,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::VesselStaticData(vsd) => {
+                    ParsedMessage::VesselStaticData(vsd) => {
                         assert_eq!(vsd.mmsi, 351759000);
                         assert_eq!(vsd.ais_version_indicator, 0);
                         assert_eq!(vsd.imo_number, Some(9134270));
@@ -139,7 +139,7 @@ mod test {
                         assert_eq!(vsd.draught10, Some(122));
                         assert_eq!(vsd.destination, Some("NEW YORK".into()));
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -166,7 +166,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::VesselStaticData(vsd) => {
+                    ParsedMessage::VesselStaticData(vsd) => {
                         assert_eq!(vsd.mmsi, 351759000);
                         assert_eq!(vsd.ais_version_indicator, 0);
                         assert_eq!(vsd.imo_number, Some(9134270));
@@ -200,7 +200,7 @@ mod test {
                         assert_eq!(vsd.draught10, Some(122));
                         assert_eq!(vsd.destination, Some("NEW YORK".into()));
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

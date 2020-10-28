@@ -50,8 +50,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::AddressedSafetyRelatedMessage(
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::AddressedSafetyRelatedMessage(
         AddressedSafetyRelatedMessage {
             own_vessel: { own_vessel },
             station: { station },
@@ -80,14 +80,14 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::AddressedSafetyRelatedMessage(asrm) => {
+                    ParsedMessage::AddressedSafetyRelatedMessage(asrm) => {
                         assert_eq!(asrm.source_mmsi, 2275200);
                         assert_eq!(asrm.sequence_number, 0);
                         assert_eq!(asrm.destination_mmsi, 215724000);
                         assert_eq!(asrm.retransmit_flag, false);
                         assert_eq!(asrm.text, "PLEASE REPORT TO JOBOURG TRAFFIC CHANNEL 13");
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -107,14 +107,14 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::AddressedSafetyRelatedMessage(asrm) => {
+                    ParsedMessage::AddressedSafetyRelatedMessage(asrm) => {
                         assert_eq!(asrm.source_mmsi, 237032000);
                         assert_eq!(asrm.sequence_number, 3);
                         assert_eq!(asrm.destination_mmsi, 2391100);
                         assert_eq!(asrm.retransmit_flag, true);
                         assert_eq!(asrm.text, "EP 531 CARS 80 TRACKS 103 MOTO 5 CREW 86");
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

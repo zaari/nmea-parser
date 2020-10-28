@@ -21,8 +21,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::UtcDateResponse(BaseStationReport {
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::UtcDateResponse(BaseStationReport {
         own_vessel: { own_vessel },
         station: { station },
         mmsi: { pick_u64(&bv, 8, 30) as u32 },
@@ -82,7 +82,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::UtcDateResponse(bsr) => {
+                    ParsedMessage::UtcDateResponse(bsr) => {
                         assert_eq!(bsr.mmsi, 304137000);
                         assert_eq!(bsr.timestamp, Some(Utc.ymd(2009, 5, 22).and_hms(2, 22, 40)));
                         assert_eq!(bsr.high_position_accuracy, true);
@@ -92,7 +92,7 @@ mod test {
                         assert_eq!(bsr.raim_flag, false);
                         assert_eq!(bsr.radio_status, 0);
                     },
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     },
                     _ => {

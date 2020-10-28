@@ -88,8 +88,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::StandardSarAircraftPositionReport(
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::StandardSarAircraftPositionReport(
         StandardSarAircraftPositionReport {
             own_vessel: { own_vessel },
             station: { station },
@@ -158,7 +158,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::StandardSarAircraftPositionReport(sapr) => {
+                    ParsedMessage::StandardSarAircraftPositionReport(sapr) => {
                         assert_eq!(sapr.mmsi, 111232511);
                         assert_eq!(sapr.altitude, Some(303));
                         assert_eq!(sapr.sog_knots, Some(42));
@@ -173,7 +173,7 @@ mod test {
                         assert_eq!(sapr.raim_flag, false);
                         assert_eq!(sapr.radio_status, 33392);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

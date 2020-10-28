@@ -37,29 +37,29 @@ let sentences = vec![
   "$GAGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*56",
 ];
 
-// Parse the sentences and print the parsed data 
+// Parse the sentences and print some fields of the messages
 for sentence in sentences {    
     match parser.parse_sentence(sentence)? {
-        ParsedSentence::VesselDynamicData(vdd) => {
+        ParsedMessage::VesselDynamicData(vdd) => {
             println!("MMSI:    {}",        vdd.mmsi);
             println!("Speed:   {:.1} kts", vdd.sog_knots.unwrap());
             println!("Heading: {}°",       vdd.heading_true.unwrap());
             println!("");
         },
-        ParsedSentence::VesselStaticData(vsd) => {
+        ParsedMessage::VesselStaticData(vsd) => {
             println!("MMSI:  {}", vsd.mmsi);
-            println!("Flag:  {}", vsd.decode_country().unwrap());
+            println!("Flag:  {}", vsd.country().unwrap());
             println!("Name:  {}", vsd.name.unwrap());
             println!("Type:  {}", vsd.ship_type);
             println!("");
         },
-        ParsedSentence::Gga(gga) => {
+        ParsedMessage::Gga(gga) => {
             println!("Source:    {}",     gga.source);
             println!("Latitude:  {:.3}°", gga.latitude.unwrap());
             println!("Longitude: {:.3}°", gga.longitude.unwrap());
             println!("");
         },
-        ParsedSentence::Rmc(rmc) => {
+        ParsedMessage::Rmc(rmc) => {
             println!("Source:  {}",        rmc.source);
             println!("Speed:   {:.1} kts", rmc.sog_knots.unwrap());
             println!("Bearing: {}°",       rmc.bearing.unwrap());
@@ -98,10 +98,10 @@ Details about version history can be found from the [changelog].
 
 ## Roadmap
 
-Until version 1.0 refactoring and renaming of crate's code elements is likely 
-to happen. The following table outlines the high-level changes that are going 
-to be inclided in the future version. Prioritisation is based on estimated 
-significance and implementation effort of each item.
+The following table outlines the high-level changes that are going to be 
+included in the future version. Prioritization is based on estimated 
+significance and implementation effort of each item. Until version 1.0 
+refactoring and renaming of code elements is likely to happen. 
 
 |Version |Category    |Content                                                |
 |--------|------------|-------------------------------------------------------|

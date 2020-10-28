@@ -14,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-//! GNSS-related data structures
+//! GNSS data structures
 
 pub(crate) mod gga;
 pub(crate) mod gll;

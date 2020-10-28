@@ -68,10 +68,10 @@ impl std::fmt::Display for GsaFixMode {
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Gsa(GsaData {
+    return Ok(ParsedMessage::Gsa(GsaData {
         source: nav_system,
         mode1_automatic: {
             let s = split.get(1).unwrap_or(&"");
@@ -126,7 +126,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Gsa(gsa) => {
+                    ParsedMessage::Gsa(gsa) => {
                         assert_eq!(gsa.mode1_automatic, Some(true));
                         assert_eq!(gsa.mode2_3d, Some(GsaFixMode::Fix3D));
                         assert_eq!(gsa.prn_numbers, vec![19, 28, 14, 18, 27, 22, 31, 39]);
@@ -134,7 +134,7 @@ mod test {
                         assert_eq!(gsa.hdop, Some(1.0));
                         assert_eq!(gsa.vdop, Some(1.3));
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

@@ -20,7 +20,7 @@ pub(crate) fn handle(
     _bv: &BitVec,
     _station: Station,
     _own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     // TODO: implementation (Class B)
     return Err(ParseError::UnsupportedSentenceType(
         "Unsupported AIVDM message type: 19".into(),

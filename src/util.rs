@@ -33,9 +33,9 @@ pub(crate) fn make_fragment_key(
     )
 }
 
-/// Converts AIVDM playload armored string into bit vector.
+/// Convert AIS VDM/VDO payload armored string into a `BitVec`.
 pub(crate) fn parse_payload(payload: &String) -> Result<BitVec, String> {
-    let mut bv = BitVec::<LocalBits, usize>::with_capacity(payload.len() * 6); // or Lsb0 or Msb0 ?
+    let mut bv = BitVec::<LocalBits, usize>::with_capacity(payload.len() * 6);
     for c in payload.chars() {
         let mut ci = (c as u8) - 48;
         if ci > 40 {
@@ -51,7 +51,7 @@ pub(crate) fn parse_payload(payload: &String) -> Result<BitVec, String> {
     Ok(bv)
 }
 
-/// Picks a numberic field from BitVec.
+/// Pick a numberic field from `BitVec`.
 pub(crate) fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
     let mut res = 0;
     for pos in index..(index + len) {
@@ -60,7 +60,7 @@ pub(crate) fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
     res
 }
 
-/// Picks a signed numberic field from BitVec.
+/// Pick a signed numberic field from `BitVec`.
 pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
     let mut res = 0;
     for pos in index..(index + len) {
@@ -75,7 +75,8 @@ pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
     }
 }
 
-/// Pick a string from BitVec. Char_count is the length in characters. Character size is 6-bits.
+/// Pick a string from BitVec. Field `char_count` defines string length in characters. 
+/// Characters consist of 6 bits.
 pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> String {
     let mut res = String::with_capacity(char_count);
     for i in 0..char_count {
@@ -134,7 +135,7 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime<Utc>> {
     }
 }
 
-/// Pick field from comma-separated sentence or None if empty field.
+/// Pick field from a comma-separated sentence or `None` in case of an empty field.
 pub(crate) fn pick_number_field<T: std::str::FromStr>(
     split: &[&str],
     num: usize,
@@ -149,7 +150,7 @@ pub(crate) fn pick_number_field<T: std::str::FromStr>(
         .transpose()
 }
 
-/// Parse time field of format HHMMSS and convert it to DateTime<Utc> using the current time.
+/// Parse time field of format HHMMSS and convert it to `DateTime<Utc>` using the current time.
 pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, ParseError> {
     let (hour, minute, second) =
         parse_time(hhmmss).map_err(|_| format!("Invalid time format: {}", hhmmss))?;
@@ -158,7 +159,7 @@ pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<
         .and_hms(hour, minute, second))
 }
 
-/// Parse time fields of formats YYMMDD and HHMMSS and convert them to DateTime<Utc>.
+/// Parse time fields of formats YYMMDD and HHMMSS and convert them to `DateTime<Utc>`.
 pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, ParseError> {
     let century = (Utc::now().year() / 100) * 100;
     let (day, month, year) =
@@ -193,8 +194,9 @@ fn pick_s2(s: &str, i: usize) -> &str {
 }
 
 /// Parse latitude from two string.
-/// lat_string = DDMM.MMM representing latitude
-/// hemisphere = N for north, S for south
+/// Argument `lat_string` expects format DDMM.MMM representing latitude.
+/// Argument `hemisphere` expects "N" for north or "S" for south. If `hemisphere` value
+/// is something else, north is quietly used as a fallback.
 pub(crate) fn parse_latitude_ddmm_mmm(
     lat_string: &str,
     hemisphere: &str,
@@ -233,11 +235,12 @@ pub(crate) fn parse_latitude_ddmm_mmm(
 }
 
 /// Parse longitude from two string.
-/// lon_string = DDDMM.MMM representing latitude
-/// eastwest = E for north, W for south
+/// Argument `lon_string` expects format DDDMM.MMM representing longitude.
+/// Argument `hemisphere` expects "E" for east or "W" for west. If `hemisphere` value is 
+/// something else, east is quietly used as a fallback.
 pub(crate) fn parse_longitude_dddmm_mmm(
     lon_string: &str,
-    eastwest: &str,
+    hemisphere: &str,
 ) -> Result<Option<f64>, String> {
     // DDDMM.MMM
     if lon_string.is_empty() {
@@ -268,7 +271,7 @@ pub(crate) fn parse_longitude_dddmm_mmm(
     let d = lon_string[0..3].parse::<f64>().unwrap_or(0.0);
     let m = lon_string[3..end].parse::<f64>().unwrap_or(0.0);
     let val = d + m / 60.0;
-    Ok(Some(match eastwest {
+    Ok(Some(match hemisphere {
         "E" => val,
         "W" => -val,
         _ => val,

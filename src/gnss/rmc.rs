@@ -59,10 +59,10 @@ impl LatLon for RmcData {
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Rmc(RmcData {
+    return Ok(ParsedMessage::Rmc(RmcData {
         source: nav_system,
         timestamp: parse_yymmdd_hhmmss(split.get(9).unwrap_or(&""), split.get(1).unwrap_or(&""))
             .ok(),
@@ -118,7 +118,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Rmc(rmc) => {
+                    ParsedMessage::Rmc(rmc) => {
                         assert_eq!(rmc.status_active, Some(true));
                         assert_eq!(rmc.timestamp, {
                             Some(Utc.ymd(2020, 11, 19).and_hms(22, 54, 46))
@@ -127,7 +127,7 @@ mod test {
                         assert::close(rmc.bearing.unwrap_or(0.0), 54.7, 0.1);
                         assert_eq!(rmc.variation.unwrap(), 20.3);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -148,7 +148,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Rmc(rmc) => {
+                    ParsedMessage::Rmc(rmc) => {
                         assert_eq!(rmc.status_active, Some(true));
                         assert_eq!(rmc.timestamp, {
                             Some(Utc.ymd(2009, 8, 7).and_hms(22, 54, 46))
@@ -157,7 +157,7 @@ mod test {
                         assert_eq!(rmc.bearing, None);
                         assert_eq!(rmc.variation, None);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

@@ -41,8 +41,8 @@ pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::SafetyRelatedBroadcastMessage(
+) -> Result<ParsedMessage, ParseError> {
+    return Ok(ParsedMessage::SafetyRelatedBroadcastMessage(
         SafetyRelatedBroadcastMessage {
             own_vessel: { own_vessel },
             station: { station },
@@ -67,11 +67,11 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::SafetyRelatedBroadcastMessage(srbm) => {
+                    ParsedMessage::SafetyRelatedBroadcastMessage(srbm) => {
                         assert_eq!(srbm.source_mmsi, 351809000);
                         assert_eq!(srbm.text, "RCVD YR TEST MSG");
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -89,11 +89,11 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::SafetyRelatedBroadcastMessage(srbm) => {
+                    ParsedMessage::SafetyRelatedBroadcastMessage(srbm) => {
                         assert_eq!(srbm.source_mmsi, 237008900);
                         assert_eq!(srbm.text, "EP228 IX48 FG3 DK7 PL56.");
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -111,11 +111,11 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::SafetyRelatedBroadcastMessage(srbm) => {
+                    ParsedMessage::SafetyRelatedBroadcastMessage(srbm) => {
                         assert_eq!(srbm.source_mmsi, 311764000);
                         assert_eq!(srbm.text, "TEST");
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

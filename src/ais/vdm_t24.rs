@@ -21,7 +21,7 @@ pub(crate) fn handle(
     _station: Station,
     store: &mut NmeaParser,
     own_vessel: bool,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     // Check whether the message bit layout follows part A or part B format
     // We use two complementary booleans to make the code more readable.
     let (part_a, part_b) = match pick_u64(&bv, 38, 2) {
@@ -143,10 +143,10 @@ pub(crate) fn handle(
 
     // Check whether we can return a complete or incomplete response
     if let Some(vsd2) = store.pull_vsd(vsd.mmsi) {
-        Ok(ParsedSentence::VesselStaticData(vsd.merge(&vsd2)?))
+        Ok(ParsedMessage::VesselStaticData(vsd.merge(&vsd2)?))
     } else {
         store.push_vsd(vsd.mmsi, vsd);
-        Ok(ParsedSentence::Incomplete)
+        Ok(ParsedMessage::Incomplete)
     }
 }
 
@@ -256,11 +256,11 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::VesselStaticData(_) => {
+                    ParsedMessage::VesselStaticData(_) => {
                         assert!(false);
                         return;
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         // As expected
                     }
                     _ => {
@@ -279,7 +279,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::VesselStaticData(vsd) => {
+                    ParsedMessage::VesselStaticData(vsd) => {
                         assert_eq!(vsd.mmsi, 271041815);
                         assert_eq!(vsd.ais_version_indicator, 0);
                         assert_eq!(vsd.imo_number, None);
@@ -304,7 +304,7 @@ mod test {
                         assert_eq!(vsd.draught10, None);
                         assert_eq!(vsd.destination, None);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

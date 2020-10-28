@@ -118,11 +118,11 @@ impl std::fmt::Display for GgaQualityIndicator {
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Gga(GgaData {
+    return Ok(ParsedMessage::Gga(GgaData {
         source: nav_system,
         timestamp: parse_hhmmss(split.get(1).unwrap_or(&""), now).ok(),
         latitude: parse_latitude_ddmm_mmm(
@@ -157,7 +157,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Gga(gga) => {
+                    ParsedMessage::Gga(gga) => {
                         assert_eq!(gga.timestamp, {
                             let now: DateTime<Utc> = Utc::now();
                             Some(
@@ -175,7 +175,7 @@ mod test {
                         assert_eq!(gga.age_of_dgps, None);
                         assert_eq!(gga.ref_station_id, None);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -196,7 +196,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Gga(gga) => {
+                    ParsedMessage::Gga(gga) => {
                         assert_eq!(
                             (gga.latitude.unwrap_or(0.0) * 1000.0).round() as i32,
                             -48117
@@ -206,7 +206,7 @@ mod test {
                             -11517
                         );
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {
@@ -227,7 +227,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Gga(gga) => {
+                    ParsedMessage::Gga(gga) => {
                         assert_eq!(gga.timestamp, {
                             let now: DateTime<Utc> = Utc::now();
                             Some(
@@ -245,7 +245,7 @@ mod test {
                         assert_eq!(gga.age_of_dgps, None);
                         assert_eq!(gga.ref_station_id, None);
                     }
-                    ParsedSentence::Incomplete => {
+                    ParsedMessage::Incomplete => {
                         assert!(false);
                     }
                     _ => {

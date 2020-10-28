@@ -16,8 +16,8 @@ limitations under the License.
 
 use std::fmt;
 
-/// Parse error returned by `parse_sentence`. The string is used instead of static str
-/// because the error messages are expected to contain context-specific details.
+/// Parse error returned by `NmeaParser::parse_sentence()`. `String` data type is used instead of 
+/// `static &str` because the error messages are expected to contain context-specific details.
 #[derive(Clone, Debug, PartialEq)]
 pub enum ParseError {
     /// Unsupported (or unimplemented) sentence type

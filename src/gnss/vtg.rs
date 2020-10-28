@@ -43,10 +43,10 @@ pub struct VtgData {
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
-) -> Result<ParsedSentence, ParseError> {
+) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedSentence::Vtg(VtgData {
+    return Ok(ParsedMessage::Vtg(VtgData {
         source: nav_system,
         cog_true: pick_number_field(&split, 1).ok().unwrap_or(None),
         cog_magnetic: pick_number_field(&split, 3).ok().unwrap_or(None),
@@ -69,7 +69,7 @@ mod test {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::Vtg(vtg) => {
+                    ParsedMessage::Vtg(vtg) => {
                         assert_eq!(vtg.source, NavigationSystem::Beidou);
                         assert::close(vtg.cog_true.unwrap_or(0.0), 54.7, 0.1);
                         assert::close(vtg.cog_magnetic.unwrap_or(0.0), 34.4, 0.1);

@@ -15,9 +15,9 @@
 # limitations under the License.
 
 #
-# This script is used to generate code for VesselStaticData::country method in types.rs.
+# This script is used to generate code for VesselStaticData::country() method 
+# in src/ais/mod.rs.
 #
-
 
 import re
 import sys
@@ -644,7 +644,7 @@ for mid_line in MID.split('\n'):
       else:
         print("//            %s => Some(\"%s\"), // %s" % (mid, a2, country))
     else:
-      print("Unmatching country: %s" % country)
+      print("Mismatching country: %s" % country)
       sys.exit(1)
     prev_mid = mid
 
