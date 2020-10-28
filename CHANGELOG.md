@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for AIS VDM/VDO sentence type 14 parsing
 - Implementation for AIS VDM/VDO sentence type 13 parsing
 - Implementation for AIS VDM/VDO sentence type 12 parsing
 - Implementation for AIS VDM/VDO sentence type 11 parsing

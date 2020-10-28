@@ -43,11 +43,11 @@ pub(crate) fn handle(
             if raw == -128 {
                 None
             } else if raw <= -2 {
-                Some(-1)
+                Some(RotDirection::Port)
             } else if raw < 2 {
-                Some(0)
+                Some(RotDirection::Center)
             } else if raw < 128 {
-                Some(1)
+                Some(RotDirection::Starboard)
             } else {
                 None
             }
@@ -147,7 +147,7 @@ mod test {
                         assert_eq!(vdd.mmsi, 371798000);
                         assert_eq!(vdd.nav_status, NavigationStatus::UnderWayUsingEngine);
                         assert_eq!(vdd.rot, None);
-                        assert_eq!(vdd.rot_direction, Some(-1));
+                        assert_eq!(vdd.rot_direction, Some(RotDirection::Port));
                         assert_eq!(vdd.sog_knots, Some(12.3));
                         assert_eq!(vdd.high_position_accuracy, true);
                         assert_eq!((vdd.latitude.unwrap_or(0.0) * 10.0).round() as i32, 484); // 48.38163333333
@@ -227,7 +227,7 @@ mod test {
                         assert_eq!(vdd.mmsi, 563808000);
                         assert_eq!(vdd.nav_status, NavigationStatus::Moored);
                         assert_eq!(vdd.rot, Some(0.0));
-                        assert_eq!(vdd.rot_direction, Some(0));
+                        assert_eq!(vdd.rot_direction, Some(RotDirection::Center));
                         assert_eq!(vdd.sog_knots, Some(0.0));
                         assert_eq!(vdd.high_position_accuracy, true);
                         assert::close(vdd.latitude.unwrap_or(0.0), 36.91, 0.01);

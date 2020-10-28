@@ -105,8 +105,8 @@ pub struct VesselDynamicData {
     /// Accurate ROT_sensor (±0..708°/min) if available.
     pub rot: Option<f64>,
 
-    /// ROT direction when turn is more than 5°/30s. Left = -1, center = 0, right = 1.
-    pub rot_direction: Option<i8>,
+    /// ROT direction when turn is more than 5°/30s.
+    pub rot_direction: Option<RotDirection>,
 
     /// Speed over ground in knots
     pub sog_knots: Option<f64>,
@@ -291,6 +291,35 @@ impl std::fmt::Display for PositioningSystemMeta {
             PositioningSystemMeta::ManualInputMode => write!(f, "manual input mode"),
             PositioningSystemMeta::DeadReckoningMode => write!(f, "dead reckoning mode"),
             PositioningSystemMeta::Inoperative => write!(f, "inoperative"),
+        }
+    }
+}
+
+/// Vessel rotation direction
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum RotDirection {
+    /// Turning port (left, when seen by an observer aboard the vessel looking forward)
+    Port,
+
+    /// Not turning
+    Center,
+
+    /// Turning starboard (right, when seen by an observer aboard the vessel looking forward)
+    Starboard,
+}
+
+impl Default for RotDirection {
+    fn default() -> RotDirection {
+        RotDirection::Center
+    }
+}
+
+impl std::fmt::Display for RotDirection {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            RotDirection::Port => write!(f, "port"),
+            RotDirection::Center => write!(f, "center"),
+            RotDirection::Starboard => write!(f, "starboard"),
         }
     }
 }
