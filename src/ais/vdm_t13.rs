@@ -88,7 +88,6 @@ mod test {
 
     #[test]
     fn test_parse_vdm_type13() {
-        // First sentence
         let mut p = NmeaParser::new();
         match p.parse_sentence("!AIVDM,1,1,,A,=39UOj0jFs9R,0*65") {
             Ok(ps) => {

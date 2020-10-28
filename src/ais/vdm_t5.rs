@@ -95,7 +95,7 @@ mod test {
         let s1 = "!AIVDM,2,1,1,A,55?MbV02;H;s<HtKR20EHE:0@T4@Dn2222222216L961O5Gf0NSQEp6ClRp8,0*1C";
         let s2 = "!AIVDM,2,2,1,A,88888888880,2*25";
 
-        // Process fragment 1
+        // Process sentence 1
         match p.parse_sentence(s1) {
             Ok(_) => {}
             Err(e) => {
@@ -104,7 +104,7 @@ mod test {
         }
         assert_eq!(p.strings_count(), 1);
 
-        // Process fragment 2
+        // Process sentence 2
         match p.parse_sentence(s2) {
             Ok(ps) => {
                 match ps {
@@ -152,7 +152,7 @@ mod test {
             }
         }
 
-        // Process fragment 2 (reversed order)
+        // Process sentence 2 (reversed order)
         match p.parse_sentence(s2) {
             Ok(_) => {}
             Err(e) => {
@@ -161,7 +161,7 @@ mod test {
         }
         assert_eq!(p.strings_count(), 1);
 
-        // Process fragment 1 (reversed order)
+        // Process sentence 1 (reversed order)
         match p.parse_sentence(s1) {
             Ok(ps) => {
                 match ps {

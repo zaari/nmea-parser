@@ -18,9 +18,9 @@ use super::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// Type 12: Addressed Safety-Related Message
+/// Type 14: Safety-Related Broadcast Message
 #[derive(Default, Clone, Debug, PartialEq)]
-pub struct AddressedSafetyRelatedMessage {
+pub struct SafetyRelatedBroadcastMessage {
     /// True if the data is about own vessel, false if about other.
     pub own_vessel: bool,
 
@@ -30,36 +30,24 @@ pub struct AddressedSafetyRelatedMessage {
     /// Source MMSI (30 bits)
     pub source_mmsi: u32,
 
-    /// Sequence number (2 bits)
-    pub sequence_number: u8,
-
-    /// Destination MMSI (30 bits)
-    pub destination_mmsi: u32,
-
-    /// Retransmit flag (1 bit)
-    pub retransmit_flag: bool,
-
-    /// Text (936 bits; 1-156 chars)
+    /// Text (1-161 ASCII chars)
     pub text: String,
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// AIS VDM/VDO type 12: Addressed Safety-Related Message
+/// AIS VDM/VDO type 14: Safety-Related Broadcast Message
 pub(crate) fn handle(
     bv: &BitVec,
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedSentence, ParseError> {
-    return Ok(ParsedSentence::AddressedSafetyRelatedMessage(
-        AddressedSafetyRelatedMessage {
+    return Ok(ParsedSentence::SafetyRelatedBroadcastMessage(
+        SafetyRelatedBroadcastMessage {
             own_vessel: { own_vessel },
             station: { station },
             source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
-            sequence_number: { pick_u64(&bv, 38, 2) as u8 },
-            destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
-            retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
-            text: { pick_string(&bv, 72, 156) },
+            text: { pick_string(&bv, 40, 161) },
         },
     ));
 }
@@ -71,21 +59,17 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_vdm_type12() {
-        // First message
+    fn test_parse_vdm_type14() {
         let mut p = NmeaParser::new();
-        match p.parse_sentence(
-            "!AIVDM,1,1,,A,<02:oP0kKcv0@<51C5PB5@?BDPD?P:?2?EB7PDB16693P381>>5<PikP,0*37",
-        ) {
+
+        // First message
+        match p.parse_sentence("!AIVDM,1,1,,A,>5?Per18=HB1U:1@E=B0m<L,2*51") {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::AddressedSafetyRelatedMessage(asrm) => {
-                        assert_eq!(asrm.source_mmsi, 2275200);
-                        assert_eq!(asrm.sequence_number, 0);
-                        assert_eq!(asrm.destination_mmsi, 215724000);
-                        assert_eq!(asrm.retransmit_flag, false);
-                        assert_eq!(asrm.text, "PLEASE REPORT TO JOBOURG TRAFFIC CHANNEL 13");
+                    ParsedSentence::SafetyRelatedBroadcastMessage(srbm) => {
+                        assert_eq!(srbm.source_mmsi, 351809000);
+                        assert_eq!(srbm.text, "RCVD YR TEST MSG");
                     }
                     ParsedSentence::Incomplete => {
                         assert!(false);
@@ -101,18 +85,35 @@ mod test {
         }
 
         // Second message
-        match p.parse_sentence(
-            "!AIVDM,1,1,,A,<CR3B@<0TO3j5@PmkiP31BCPphPDB13;CPihkP=?D?PmP3B5GPpn,0*3A",
-        ) {
+        match p.parse_sentence("!AIVDM,1,1,,A,>3R1p10E3;;R0USCR0HO>0@gN10kGJp,2*7F") {
             Ok(ps) => {
                 match ps {
                     // The expected result
-                    ParsedSentence::AddressedSafetyRelatedMessage(asrm) => {
-                        assert_eq!(asrm.source_mmsi, 237032000);
-                        assert_eq!(asrm.sequence_number, 3);
-                        assert_eq!(asrm.destination_mmsi, 2391100);
-                        assert_eq!(asrm.retransmit_flag, true);
-                        assert_eq!(asrm.text, "EP 531 CARS 80 TRACKS 103 MOTO 5 CREW 86");
+                    ParsedSentence::SafetyRelatedBroadcastMessage(srbm) => {
+                        assert_eq!(srbm.source_mmsi, 237008900);
+                        assert_eq!(srbm.text, "EP228 IX48 FG3 DK7 PL56.");
+                    }
+                    ParsedSentence::Incomplete => {
+                        assert!(false);
+                    }
+                    _ => {
+                        assert!(false);
+                    }
+                }
+            }
+            Err(e) => {
+                assert_eq!(e.to_string(), "OK");
+            }
+        }
+
+        // Third message
+        match p.parse_sentence("!AIVDM,1,1,,A,>4aDT81@E=@,2*2E") {
+            Ok(ps) => {
+                match ps {
+                    // The expected result
+                    ParsedSentence::SafetyRelatedBroadcastMessage(srbm) => {
+                        assert_eq!(srbm.source_mmsi, 311764000);
+                        assert_eq!(srbm.text, "TEST");
                     }
                     ParsedSentence::Incomplete => {
                         assert!(false);

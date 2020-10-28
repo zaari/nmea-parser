@@ -21,10 +21,10 @@ Include the following fragment in your `Cargo.toml` file:
 nmea-parser = "0.4.1"
 ```
 
-The following sample program uses the crate to parse the given NMEA sentence
-and to print some fields of the resulting data object. The program relies on
-lazy `unwrap()` functions to simplify the example. In real-life applications
-proper handling of `None` cases is needed.
+The following sample program uses the crate to parse the given NMEA sentences
+and to print some parsed fields. The program relies on `unwrap()` function 
+to simplify the example. In real-life applications proper handling of `None` 
+cases is needed.
 
 ```rust
 use nmea_parser::*;

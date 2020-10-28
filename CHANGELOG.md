@@ -12,6 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation for AIS VDM/VDO sentence type 9 parsing
 ### Changed
 - Sentence checksum length limited to two characters (as some messages may have non-standard extensions)
+- Renamed `VesselStaticData::country()` to `VesselStaticData::decode_country()`
 - Re-export of `chrono` crate
 - Turned crate `assert` into a dev-dependency
 ### Removed
