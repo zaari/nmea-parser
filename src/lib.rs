@@ -16,8 +16,8 @@ limitations under the License.
 
 //! # NMEA Parser: NMEA parser for Rust
 //!
-//! This crate aims to cover all AIS sentences and the most important GNSS sentences used with 
-//! NMEA 0183 standard. The parser supports AIS class A and B types and identifies GPS, GLONASS, 
+//! This crate aims to cover all AIS sentences and the most important GNSS sentences used with
+//! NMEA 0183 standard. The parser supports AIS class A and B types and identifies GPS, GLONASS,
 //! Galileo, BeiDou, NavIC and QZSS satellite systems.
 
 #![allow(dead_code)]
@@ -41,7 +41,7 @@ use util::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// Result from function `NmeaParser::parse_sentence()`. If the given sentence represents only a 
+/// Result from function `NmeaParser::parse_sentence()`. If the given sentence represents only a
 /// partial message `ParsedMessage::Incomplete` is returned.
 #[derive(Clone, Debug, PartialEq)]
 pub enum ParsedMessage {
@@ -746,6 +746,18 @@ mod test {
             .parse_sentence("!AIVDM,1,1,,A,38Id705000rRVJhE7cl9n;160000,0")
             .ok()
             .is_some());
+    }
+
+    #[test]
+    fn test_parse_invalid_utc() {
+        // Try a sentence with invalite utc
+        let mut p = NmeaParser::new();
+        assert_eq!(
+            p.parse_sentence("!AIVDM,1,1,,B,4028iqT47wP00wGiNbH8H0700`2H,0*13"),
+            Err(ParseError::InvalidSentence(String::from(
+                "Failed to parse Utc Date from y:4161 m:15 d:31 h:0 m:0 s:0"
+            )))
+        );
     }
 
     #[test]

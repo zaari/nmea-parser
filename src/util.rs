@@ -75,7 +75,7 @@ pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
     }
 }
 
-/// Pick a string from BitVec. Field `char_count` defines string length in characters. 
+/// Pick a string from BitVec. Field `char_count` defines string length in characters.
 /// Characters consist of 6 bits.
 pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> String {
     let mut res = String::with_capacity(char_count);
@@ -97,7 +97,7 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
 }
 
 /// Pick ETA based on UTC month, day, hour and minute.
-pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime<Utc>> {
+pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Result<Option<DateTime<Utc>>, ParseError> {
     let now = Utc::now().naive_utc();
 
     // Pick ETA
@@ -107,7 +107,7 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime<Utc>> {
     let mut minute = pick_u64(bv, index + 4 + 5 + 5, 6) as u32;
 
     if month == 0 && day == 0 && hour == 24 && minute == 60 {
-        return None;
+        return Ok(None);
     }
 
     if month == 0 {
@@ -124,14 +124,17 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Option<DateTime<Utc>> {
         minute = 59;
     }
 
+    // Ensure that that params from nmea are parsable as valid date.
+    parse_valid_utc(now.year(), month, day, hour,minute, 30)?;
+
     // This and next year
     let this_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, 30);
-    let next_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, 30);
+    let next_year_eta = NaiveDate::from_ymd(now.year()+1, month, day).and_hms(hour, minute, 30);
 
     if now <= this_year_eta {
-        Some(DateTime::<Utc>::from_utc(this_year_eta, Utc))
+        Ok(Some(DateTime::<Utc>::from_utc(this_year_eta, Utc)))
     } else {
-        Some(DateTime::<Utc>::from_utc(next_year_eta, Utc))
+        Ok(Some(DateTime::<Utc>::from_utc(next_year_eta, Utc)))
     }
 }
 
@@ -154,9 +157,7 @@ pub(crate) fn pick_number_field<T: std::str::FromStr>(
 pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, ParseError> {
     let (hour, minute, second) =
         parse_time(hhmmss).map_err(|_| format!("Invalid time format: {}", hhmmss))?;
-    Ok(Utc
-        .ymd(now.year(), now.month(), now.day())
-        .and_hms(hour, minute, second))
+    parse_valid_utc(now.year(), now.month(), now.day(), hour, minute, second)
 }
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to `DateTime<Utc>`.
@@ -166,9 +167,7 @@ pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime
         parse_date(yymmdd).map_err(|_| format!("Invalid date format: {}", yymmdd))?;
     let (hour, minute, second) =
         parse_time(hhmmss).map_err(|_| format!("Invalid time format: {}", hhmmss))?;
-    Ok(Utc
-        .ymd(century + year, month, day)
-        .and_hms(hour, minute, second))
+    parse_valid_utc(century + year, month, day, hour, minute, second)
 }
 
 /// Parse day, month and year from YYMMDD string.
@@ -185,6 +184,42 @@ fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseIntError> {
     let minute = pick_s2(hhmmss, 2).parse::<u32>()?;
     let second = pick_s2(hhmmss, 4).parse::<u32>()?;
     Ok((hour, minute, second))
+}
+
+/// Parse Utc date from YYYY MM DD hh mm ss
+pub(crate) fn parse_ymdhs(
+    year: i32,
+    month: u32,
+    day: u32,
+    hour: u32,
+    min: u32,
+    sec: u32,
+) -> Result<DateTime<Utc>, ParseError> {
+    parse_valid_utc(year, month, day, hour, min, sec)
+}
+
+/// Using _opt on Utc. will catch invalid Date (ex: month > 12)
+pub fn parse_valid_utc(
+    year: i32,
+    month: u32,
+    day: u32,
+    hour: u32,
+    min: u32,
+    sec: u32,
+) -> Result<DateTime<Utc>, ParseError> {
+    let opt_utc = Utc.ymd_opt(year, month, day).and_hms_opt(hour, min, sec);
+    match opt_utc {
+        chrono::LocalResult::Single(valid_utc) | chrono::LocalResult::Ambiguous(valid_utc, _) => {
+            Ok(valid_utc)
+        }
+        chrono::LocalResult::None => {
+            return Err(format!(
+                "Failed to parse Utc Date from y:{} m:{} d:{} h:{} m:{} s:{}",
+                year, month, day, hour, min, sec
+            )
+            .into());
+        }
+    }
 }
 
 /// A simple helper to pick a substring of length two from the given string.
@@ -236,7 +271,7 @@ pub(crate) fn parse_latitude_ddmm_mmm(
 
 /// Parse longitude from two string.
 /// Argument `lon_string` expects format DDDMM.MMM representing longitude.
-/// Argument `hemisphere` expects "E" for east or "W" for west. If `hemisphere` value is 
+/// Argument `hemisphere` expects "E" for east or "W" for west. If `hemisphere` value is
 /// something else, east is quietly used as a fallback.
 pub(crate) fn parse_longitude_dddmm_mmm(
     lon_string: &str,
