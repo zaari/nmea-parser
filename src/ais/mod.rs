@@ -26,6 +26,7 @@ pub(crate) mod vdm_t11;
 pub(crate) mod vdm_t12;
 pub(crate) mod vdm_t13;
 pub(crate) mod vdm_t14;
+pub(crate) mod vdm_t15;
 
 pub(crate) mod vdm_t18;
 pub(crate) mod vdm_t19;
@@ -41,6 +42,7 @@ pub use vdm_t10::UtcDateInquiry;
 pub use vdm_t12::AddressedSafetyRelatedMessage;
 pub use vdm_t13::SafetyRelatedAcknowledgement;
 pub use vdm_t14::SafetyRelatedBroadcastMessage;
+pub use vdm_t15::Interrogation;
 pub use vdm_t21::{AidToNavigationReport, NavAidType};
 
 // -------------------------------------------------------------------------------------------------

@@ -85,6 +85,9 @@ pub enum ParsedMessage {
     // AIS VDM/VDO type 14
     SafetyRelatedBroadcastMessage(ais::SafetyRelatedBroadcastMessage),
 
+    // AIS VDM/VRO type 15
+    Interrogation(ais::Interrogation),
+
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
 
@@ -602,11 +605,11 @@ impl NmeaParser {
                         }
                         // Interrogation
                         15 => {
-                            // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )));
+                            return ais::vdm_t15::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
                         }
                         // Assigned mode command
                         16 => {

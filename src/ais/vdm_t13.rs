@@ -28,7 +28,7 @@ pub struct SafetyRelatedAcknowledgement {
     pub station: Station,
 
     /// Source MMSI (30 bits)
-    pub source_mmsi: u32,
+    pub mmsi: u32,
 
     /// MMSI number 1 (30 bits)
     pub mmsi1: u32,
@@ -67,7 +67,7 @@ pub(crate) fn handle(
         SafetyRelatedAcknowledgement {
             own_vessel: { own_vessel },
             station: { station },
-            source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi: { pick_u64(&bv, 8, 30) as u32 },
             mmsi1: { pick_u64(&bv, 40, 30) as u32 },
             mmsi1_seq: { pick_u64(&bv, 70, 2) as u8 },
             mmsi2: { pick_u64(&bv, 72, 30) as u32 },
@@ -94,7 +94,7 @@ mod test {
                 match ps {
                     // The expected result
                     ParsedMessage::SafetyRelatedAcknowledgement(sra) => {
-                        assert_eq!(sra.source_mmsi, 211378120);
+                        assert_eq!(sra.mmsi, 211378120);
                         assert_eq!(sra.mmsi1, 211217560);
                         assert_eq!(sra.mmsi1_seq, 2);
                         assert_eq!(sra.mmsi2, 0);

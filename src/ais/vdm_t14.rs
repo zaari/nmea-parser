@@ -28,7 +28,7 @@ pub struct SafetyRelatedBroadcastMessage {
     pub station: Station,
 
     /// Source MMSI (30 bits)
-    pub source_mmsi: u32,
+    pub mmsi: u32,
 
     /// Text (1-161 ASCII chars)
     pub text: String,
@@ -46,7 +46,7 @@ pub(crate) fn handle(
         SafetyRelatedBroadcastMessage {
             own_vessel: { own_vessel },
             station: { station },
-            source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi: { pick_u64(&bv, 8, 30) as u32 },
             text: { pick_string(&bv, 40, 161) },
         },
     ));
@@ -68,7 +68,7 @@ mod test {
                 match ps {
                     // The expected result
                     ParsedMessage::SafetyRelatedBroadcastMessage(srbm) => {
-                        assert_eq!(srbm.source_mmsi, 351809000);
+                        assert_eq!(srbm.mmsi, 351809000);
                         assert_eq!(srbm.text, "RCVD YR TEST MSG");
                     }
                     ParsedMessage::Incomplete => {
@@ -90,7 +90,7 @@ mod test {
                 match ps {
                     // The expected result
                     ParsedMessage::SafetyRelatedBroadcastMessage(srbm) => {
-                        assert_eq!(srbm.source_mmsi, 237008900);
+                        assert_eq!(srbm.mmsi, 237008900);
                         assert_eq!(srbm.text, "EP228 IX48 FG3 DK7 PL56.");
                     }
                     ParsedMessage::Incomplete => {
@@ -112,7 +112,7 @@ mod test {
                 match ps {
                     // The expected result
                     ParsedMessage::SafetyRelatedBroadcastMessage(srbm) => {
-                        assert_eq!(srbm.source_mmsi, 311764000);
+                        assert_eq!(srbm.mmsi, 311764000);
                         assert_eq!(srbm.text, "TEST");
                     }
                     ParsedMessage::Incomplete => {
