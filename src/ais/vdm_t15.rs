@@ -40,19 +40,19 @@ pub struct Interrogation {
     pub offset1_1: u16,
 
     /// Second message type (6 bits)
-    pub type1_2: u8,
+    pub type1_2: Option<u8>,
 
     /// Second slot offset (12 bits)
-    pub offset1_2: u16,
+    pub offset1_2: Option<u16>,
 
     /// Interrogated MMSI (30 bits)
-    pub mmsi2: u32,
+    pub mmsi2: Option<u32>,
 
     /// First message type (6 bits)
-    pub type2_1: u8,
+    pub type2_1: Option<u8>,
 
     /// First slot offset (12 bits)
-    pub offset2_1: u16,
+    pub offset2_1: Option<u16>,
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -63,6 +63,21 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
+    let case = {
+        let len = bv.len();
+        if len >= 160 {
+            if pick_u64(&bv, 90, 18) == 0 {
+                3 // Case 3 (160 bits but without second type and second slot)
+            } else {
+                4 // Case 4 (160 bits)
+            }
+        } else if len >= 110 {
+            2 // Case 2 (110 bits))
+        } else {
+            1 // Case 1 (88 bits)
+        }
+    };
+
     return Ok(ParsedMessage::Interrogation(Interrogation {
         own_vessel: { own_vessel },
         station: { station },
@@ -70,11 +85,26 @@ pub(crate) fn handle(
         mmsi1: { pick_u64(&bv, 40, 30) as u32 },
         type1_1: { pick_u64(&bv, 70, 6) as u8 },
         offset1_1: { pick_u64(&bv, 76, 12) as u16 },
-        type1_2: { pick_u64(&bv, 90, 6) as u8 },
-        offset1_2: { pick_u64(&bv, 96, 12) as u16 },
-        mmsi2: { pick_u64(&bv, 110, 30) as u32 },
-        type2_1: { pick_u64(&bv, 140, 6) as u8 },
-        offset2_1: { pick_u64(&bv, 146, 12) as u16 },
+        type1_2: match case {
+            2 => Some(pick_u64(&bv, 90, 6) as u8),
+            _ => None,
+        },
+        offset1_2: match case {
+            2 => Some(pick_u64(&bv, 96, 12) as u16),
+            _ => None,
+        },
+        mmsi2: match case {
+            3 => Some(pick_u64(&bv, 110, 30) as u32),
+            _ => None,
+        },
+        type2_1: match case {
+            4 => Some(pick_u64(&bv, 140, 6) as u8),
+            _ => None,
+        },
+        offset2_1: match case {
+            4 => Some(pick_u64(&bv, 146, 12) as u16),
+            _ => None,
+        },
     }));
 }
 
@@ -87,7 +117,7 @@ mod test {
     #[test]
     fn test_parse_vdm_type15() {
         let mut p = NmeaParser::new();
-        match p.parse_sentence("!AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04,d-077,S1832,t004248.00,T48.85520485,r07RPAL1,1272415370") {
+        match p.parse_sentence("!AIVDM,1,1,,B,?h3Ovn1GP<K0<P@59a0,2*04") {
             Ok(ps) => {
                 match ps {
                     // The expected result
@@ -96,11 +126,11 @@ mod test {
                         assert_eq!(i.mmsi1, 367014320);
                         assert_eq!(i.type1_1, 3);
                         assert_eq!(i.offset1_1, 516);
-                        assert_eq!(i.type1_2, 5);
-                        assert_eq!(i.offset1_2, 617);
-                        assert_eq!(i.mmsi2, 0);
-                        assert_eq!(i.type2_1, 0);
-                        assert_eq!(i.offset2_1, 0);
+                        assert_eq!(i.type1_2, Some(5));
+                        assert_eq!(i.offset1_2, Some(617));
+                        assert_eq!(i.mmsi2, None);
+                        assert_eq!(i.type2_1, None);
+                        assert_eq!(i.offset2_1, None);
                     }
                     ParsedMessage::Incomplete => {
                         assert!(false);
