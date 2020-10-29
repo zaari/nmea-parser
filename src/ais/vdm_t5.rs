@@ -69,7 +69,7 @@ pub(crate) fn handle(
                 _ => Some(PositionFixType::new(raw)),
             }
         },
-        eta: pick_eta(&bv, 274),
+        eta: pick_eta(&bv, 274)?,
         draught10: Some(pick_u64(&bv, 294, 8) as u8),
         destination: {
             let raw = pick_string(&bv, 302, 20);
