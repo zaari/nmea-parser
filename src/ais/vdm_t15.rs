@@ -19,13 +19,16 @@ use super::*;
 // -------------------------------------------------------------------------------------------------
 
 /// Type 15: Interrogation
-#[derive(Default, Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Interrogation {
     /// True if the data is about own vessel, false if about other.
     pub own_vessel: bool,
 
     /// AIS station type.
     pub station: Station,
+
+    /// Interrogation case based on data length
+    pub case: InterrogationCase,
 
     /// Source MMSI (30 bits)
     pub mmsi: u32,
@@ -55,6 +58,43 @@ pub struct Interrogation {
     pub offset2_1: Option<u16>,
 }
 
+/// The four cases of interrogation, depending on data length mostly.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub enum InterrogationCase {
+    /// One station is interrogated for one message type.
+    Case1,
+
+    /// One station is interrogated for two message types.
+    Case2,
+
+    /// Two stations are interrogated for one message type each.
+    Case3,
+
+    /// One station is interrogated for two message types, and a second for one message type.
+    Case4,
+}
+
+impl InterrogationCase {
+    pub fn new(bv: &BitVec) -> InterrogationCase {
+        let len = bv.len();
+        if len >= 160 {
+            if pick_u64(&bv, 90, 18) == 0 {
+                // Case 3 (160 bits but without second type and second slot)
+                InterrogationCase::Case3
+            } else {
+                // Case 4 (160 bits)
+                InterrogationCase::Case4
+            }
+        } else if len >= 110 {
+            // Case 2 (110 bits)
+            InterrogationCase::Case2
+        } else {
+            // Case 1 (88 bits)
+            InterrogationCase::Case1
+        }
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// AIS VDM/VDO type 15: Interrogation
@@ -63,46 +103,37 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    let case = {
-        let len = bv.len();
-        if len >= 160 {
-            if pick_u64(&bv, 90, 18) == 0 {
-                3 // Case 3 (160 bits but without second type and second slot)
-            } else {
-                4 // Case 4 (160 bits)
-            }
-        } else if len >= 110 {
-            2 // Case 2 (110 bits))
-        } else {
-            1 // Case 1 (88 bits)
-        }
-    };
-
+    let case = InterrogationCase::new(bv);
     return Ok(ParsedMessage::Interrogation(Interrogation {
         own_vessel: { own_vessel },
         station: { station },
+        case: case,
         mmsi: { pick_u64(&bv, 8, 30) as u32 },
         mmsi1: { pick_u64(&bv, 40, 30) as u32 },
         type1_1: { pick_u64(&bv, 70, 6) as u8 },
         offset1_1: { pick_u64(&bv, 76, 12) as u16 },
         type1_2: match case {
-            2 => Some(pick_u64(&bv, 90, 6) as u8),
+            InterrogationCase::Case2 | InterrogationCase::Case4 => Some(pick_u64(&bv, 90, 6) as u8),
             _ => None,
         },
         offset1_2: match case {
-            2 => Some(pick_u64(&bv, 96, 12) as u16),
+            InterrogationCase::Case2 | InterrogationCase::Case4 => {
+                Some(pick_u64(&bv, 96, 12) as u16)
+            }
             _ => None,
         },
         mmsi2: match case {
-            3 => Some(pick_u64(&bv, 110, 30) as u32),
+            InterrogationCase::Case3 | InterrogationCase::Case4 => {
+                Some(pick_u64(&bv, 110, 30) as u32)
+            }
             _ => None,
         },
         type2_1: match case {
-            4 => Some(pick_u64(&bv, 140, 6) as u8),
+            InterrogationCase::Case4 => Some(pick_u64(&bv, 140, 6) as u8),
             _ => None,
         },
         offset2_1: match case {
-            4 => Some(pick_u64(&bv, 146, 12) as u16),
+            InterrogationCase::Case4 => Some(pick_u64(&bv, 146, 12) as u16),
             _ => None,
         },
     }));
