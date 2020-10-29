@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sentence checksum length limited to two characters (as some messages may have non-standard extensions)
 - Renamed `ParsedSentence` to `ParsedMessage`
 - Changed `VesselDynamicData::rot_direction` from integer to `RotDirection` type
+- Datetime validation
 - Re-export of `chrono` crate
 - Turned crate `assert` into a dev-dependency
 ### Removed

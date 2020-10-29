@@ -125,11 +125,11 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Result<Option<DateTime<Utc>
     }
 
     // Ensure that that params from nmea are parsable as valid date.
-    parse_valid_utc(now.year(), month, day, hour,minute, 30)?;
+    parse_valid_utc(now.year(), month, day, hour, minute, 30)?;
 
     // This and next year
     let this_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, 30);
-    let next_year_eta = NaiveDate::from_ymd(now.year()+1, month, day).and_hms(hour, minute, 30);
+    let next_year_eta = NaiveDate::from_ymd(now.year() + 1, month, day).and_hms(hour, minute, 30);
 
     if now <= this_year_eta {
         Ok(Some(DateTime::<Utc>::from_utc(this_year_eta, Utc)))
@@ -198,7 +198,7 @@ pub(crate) fn parse_ymdhs(
     parse_valid_utc(year, month, day, hour, min, sec)
 }
 
-/// Using _opt on Utc. will catch invalid Date (ex: month > 12)
+/// Using _opt on Utc. Will catch invalid Date (ex: month > 12).
 pub fn parse_valid_utc(
     year: i32,
     month: u32,
