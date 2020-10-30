@@ -13,9 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation for AIS VDM/VDO sentence type 10 parsing
 - Implementation for AIS VDM/VDO sentence type 9 parsing
 ### Changed
-- Sentence checksum length limited to two characters (as some messages may have non-standard extensions)
+- Sentence checksum length limited to two characters (as some messages may have extensions)
 - Renamed `ParsedSentence` to `ParsedMessage`
-- Changed `VesselDynamicData::rot_direction` from integer to `RotDirection` type
+- Changed `VesselDynamicData::rot_direction` from `i8` to `RotDirection` type
 - Datetime validation
 - Re-export of `chrono` crate
 - Turned crate `assert` into a dev-dependency
@@ -34,7 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Partial implementation for AIS VDM/VDO sentence type 6 parsing
 - New field `current_gnss_position` added to `VesselDynamicData` struct
 ### Changed
-- Renamed `NmeaStore` to `NmeaParser` and made `parse_sentence` its member function
+- Renamed `NmeaStore` to `NmeaParser` and made `parse_sentence` as its member function
 - Submodule documentation visibility fixes
 - Type of `VesselDynamicData::radio_status` changed from `u32` to `Option<u32>` because type 27 
   sentences don't have the field

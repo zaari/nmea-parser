@@ -16,6 +16,7 @@ limitations under the License.
 use super::*;
 
 use std::num::ParseIntError;
+use chrono::Duration;
 
 const AIS_CHAR_BITS: usize = 6;
 
@@ -98,18 +99,28 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
 
 /// Pick ETA based on UTC month, day, hour and minute.
 pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Result<Option<DateTime<Utc>>, ParseError> {
-    let now = Utc::now().naive_utc();
+    pick_eta_with_now(bv, index, Utc::now())
+}
 
+/// Pick ETA based on UTC month, day, hour and minute. Define also 'now'. This function is needed
+/// to make tests independent of the system time.
+fn pick_eta_with_now(
+    bv: &BitVec,
+    index: usize,
+    now: DateTime<Utc>,
+) -> Result<Option<DateTime<Utc>>, ParseError> {
     // Pick ETA
     let mut month = pick_u64(bv, index, 4) as u32;
     let mut day = pick_u64(bv, index + 4, 5) as u32;
     let mut hour = pick_u64(bv, index + 4 + 5, 5) as u32;
     let mut minute = pick_u64(bv, index + 4 + 5 + 5, 6) as u32;
 
+    // Check special case for no value
     if month == 0 && day == 0 && hour == 24 && minute == 60 {
         return Ok(None);
     }
 
+    // Complete partially given datetime
     if month == 0 {
         month = now.month();
     }
@@ -124,17 +135,35 @@ pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Result<Option<DateTime<Utc>
         minute = 59;
     }
 
-    // Ensure that that params from nmea are parsable as valid date.
-    parse_valid_utc(now.year(), month, day, hour, minute, 30)?;
-
-    // This and next year
-    let this_year_eta = NaiveDate::from_ymd(now.year(), month, day).and_hms(hour, minute, 30);
-    let next_year_eta = NaiveDate::from_ymd(now.year() + 1, month, day).and_hms(hour, minute, 30);
-
-    if now <= this_year_eta {
-        Ok(Some(DateTime::<Utc>::from_utc(this_year_eta, Utc)))
+    // Ensure that that params from nmea are parsable as valid date
+    // Notice that we can't rely on ? operator here because of leap years
+    let res_this = parse_valid_utc(now.year(), month, day, hour, minute, 30);
+    let res_next = parse_valid_utc(now.year() + 1, month, day, hour, minute, 30);
+    if res_this.is_err() && res_next.is_err() {
+        // Both years result invalid date
+        match res_this {
+            Ok(_) => {
+                unreachable!("This should never be reached");
+            }
+            Err(e) => {
+                return Err(e.into());
+            }
+        }
+    } else if res_this.is_err() {
+        // Only next year results valid date
+        return Ok(Some(res_next.unwrap()));
+    } else if res_next.is_err() {
+        // Only this year results valid date
+        return Ok(Some(res_this.unwrap()));
     } else {
-        Ok(Some(DateTime::<Utc>::from_utc(next_year_eta, Utc)))
+        // Both years result a valid date
+        // If the ETA is more than 180 days in past assume it's about next year
+        let this_year_eta = res_this.unwrap();
+        if now - Duration::days(180) <= this_year_eta {
+            Ok(Some(this_year_eta))
+        } else {
+            Ok(Some(res_next.unwrap()))
+        }
     }
 }
 
@@ -375,6 +404,119 @@ mod test {
             0, 0, 0, 0, 1, 0, // B (rubbish)
         ];
         assert_eq!(pick_string(&bv, 0, bv.len() / 6), "?AG_4:!");
+    }
+
+    #[test]
+    fn test_pick_eta() {
+        // Valid case
+        let bv = bitvec![
+            1, 0, 1, 0, // 10
+            0, 1, 0, 1, 1, // 11
+            1, 0, 1, 1, 0, // 22
+            1, 1, 1, 0, 0, 1, // 57
+        ];
+        let eta = pick_eta(&bv, 0).ok().unwrap();
+        assert_eq!(
+            eta,
+            Some(Utc.ymd(eta.unwrap().year(), 10, 11).and_hms(22, 57, 30))
+        );
+
+        // Invalid month
+        let bv = bitvec![
+            1, 1, 0, 1, // 13
+            0, 1, 0, 1, 1, // 11
+            1, 0, 1, 1, 0, // 22
+            1, 1, 1, 0, 0, 1, // 57
+        ];
+        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+
+        // Invalid day
+        let bv = bitvec![
+            0, 0, 1, 0, // 2
+            1, 1, 1, 1, 1, // 31
+            1, 0, 1, 1, 0, // 22
+            1, 1, 1, 0, 0, 1, // 57
+        ];
+        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+
+        // Invalid hour
+        let bv = bitvec![
+            1, 0, 1, 0, // 10
+            0, 1, 0, 1, 1, // 11
+            1, 1, 0, 0, 1, // 25
+            1, 1, 1, 0, 0, 1, // 57
+        ];
+        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+
+        // Invalid minute
+        let bv = bitvec![
+            1, 0, 1, 0, // 10
+            0, 1, 0, 1, 1, // 11
+            1, 0, 1, 1, 0, // 22
+            1, 1, 1, 1, 0, 1, // 61
+        ];
+        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+    }
+
+    #[test]
+    fn test_pick_eta_with_now() {
+        // February 28
+        let feb28 = bitvec![
+            0, 0, 1, 0, // 2
+            1, 1, 1, 0, 0, // 28
+            0, 0, 0, 0, 0, // 0
+            0, 0, 0, 0, 0, 0, // 0
+        ];
+
+        //February 29
+        let feb29 = bitvec![
+            0, 0, 1, 0, // 2
+            1, 1, 1, 0, 1, // 29
+            0, 0, 0, 0, 0, // 0
+            0, 0, 0, 0, 0, 0, // 0
+        ];
+
+        // Leap day case
+        let then = Utc.ymd(2020, 12, 31).and_hms(0, 0, 0);
+        assert_eq!(
+            pick_eta_with_now(&feb29, 0, then).ok().unwrap(),
+            Some(Utc.ymd(2020, 2, 29).and_hms(0, 0, 30))
+        );
+
+        // Non leap day case
+        let then = Utc.ymd(2020, 12, 31).and_hms(0, 0, 0);
+        assert_eq!(
+            pick_eta_with_now(&feb28, 0, then).ok().unwrap(),
+            Some(Utc.ymd(2021, 2, 28).and_hms(0, 0, 30))
+        );
+
+        // Non leap year invalid case
+        let then = Utc.ymd(2021, 12, 31).and_hms(0, 0, 0);
+        assert_eq!(pick_eta_with_now(&feb29, 0, then).is_ok(), false);
+
+        // Non leap year valid case
+        let then = Utc.ymd(2021, 12, 31).and_hms(0, 0, 0);
+        assert_eq!(pick_eta_with_now(&feb28, 0, then).is_ok(), true);
+
+        // One day late
+        let then = Utc.ymd(2021, 3, 1).and_hms(0, 0, 0);
+        assert_eq!(
+            pick_eta_with_now(&feb28, 0, then).ok().unwrap(),
+            Some(Utc.ymd(2021, 2, 28).and_hms(0, 0, 30))
+        );
+
+        // Six months late
+        let then = Utc.ymd(2021, 8, 31).and_hms(0, 0, 0);
+        assert_eq!(
+            pick_eta_with_now(&feb28, 0, then).ok().unwrap(),
+            Some(Utc.ymd(2022, 2, 28).and_hms(0, 0, 30))
+        );
+    }
+
+    #[test]
+    fn test_parse_valid_utc() {
+        assert_eq!(parse_valid_utc(2020, 2, 29, 0, 0, 0).is_ok(), true);
+        assert_eq!(parse_valid_utc(2021, 2, 29, 0, 0, 0).is_ok(), false);
     }
 
     #[test]

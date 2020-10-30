@@ -8,9 +8,8 @@
 [docsrs-image]: https://docs.rs/nmea-parser/badge.svg
 [docsrs]: https://docs.rs/nmea-parser
 
-This [Rust] crate aims to cover all [AIS] sentences and the most important
-[GNSS] sentences used with [NMEA 0183] standard. It supports both AIS class A
-and class B.
+This [Rust] crate aims to cover all [AIS] sentences and the most important [GNSS] sentences used 
+with [NMEA 0183] standard. It supports both AIS class A and class B.
 
 ## Usage
 
@@ -21,10 +20,9 @@ Include the following fragment in your `Cargo.toml` file:
 nmea-parser = "0.4.1"
 ```
 
-The following sample program uses the crate to parse the given NMEA sentences
-and to print some parsed fields. The program relies on `unwrap()` function 
-to simplify the example. In real-life applications proper handling of `None` 
-cases is needed.
+The following sample program uses the crate to parse the given NMEA sentences and to print some 
+parsed fields. The program relies on `unwrap()` function to simplify the example. In real-life 
+applications proper handling of `None` cases is needed.
 
 ```rust
 use nmea_parser::*;
@@ -87,8 +85,8 @@ Longitude: 11.517°
 
 ## Features
 
-The following features are included in the published version of the crate. 
-Details about version history can be found from the [changelog].
+The following features are included in the published version of the crate. Details about version 
+history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
@@ -98,10 +96,9 @@ Details about version history can be found from the [changelog].
 
 ## Roadmap
 
-The following table outlines the high-level changes that are going to be 
-included in the future version. Prioritization is based on estimated 
-significance and implementation effort of each item. Until version 1.0 
-refactoring and renaming of code elements is likely to happen. 
+The following table outlines the high-level changes that are going to be included in the future 
+versions. Prioritization is based on estimated significance and implementation effort of each item. 
+Until version 1.0 refactoring and renaming of code elements is likely to happen. 
 
 |Version |Category    |Content                                                |
 |--------|------------|-------------------------------------------------------|
@@ -119,8 +116,8 @@ The crate's minimum supported Rust toolchain version is 1.44.
 
 ## License
 
-This crate is licensed under [Apache 2.0 license] which also includes the 
-liability and warranty statements.
+This crate is licensed under [Apache 2.0 license] which also includes the liability and warranty 
+statements.
 
 [changelog]: CHANGELOG.md
 [Apache 2.0 license]: LICENSE
