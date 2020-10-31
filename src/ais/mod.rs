@@ -27,7 +27,8 @@ pub(crate) mod vdm_t12;
 pub(crate) mod vdm_t13;
 pub(crate) mod vdm_t14;
 pub(crate) mod vdm_t15;
-
+pub(crate) mod vdm_t16;
+pub(crate) mod vdm_t17;
 pub(crate) mod vdm_t18;
 pub(crate) mod vdm_t19;
 pub(crate) mod vdm_t21;
@@ -43,6 +44,8 @@ pub use vdm_t12::AddressedSafetyRelatedMessage;
 pub use vdm_t13::SafetyRelatedAcknowledgement;
 pub use vdm_t14::SafetyRelatedBroadcastMessage;
 pub use vdm_t15::{Interrogation, InterrogationCase};
+pub use vdm_t16::AssignmentModeCommand;
+pub use vdm_t17::DgnssBroadcastBinaryMessage;
 pub use vdm_t21::{AidToNavigationReport, NavAidType};
 
 // -------------------------------------------------------------------------------------------------

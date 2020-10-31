@@ -5,6 +5,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for AIS VDM/VDO sentence type 17 parsing
+- Implementation for AIS VDM/VDO sentence type 16 parsing
 - Implementation for AIS VDM/VDO sentence type 15 parsing
 - Implementation for AIS VDM/VDO sentence type 14 parsing
 - Implementation for AIS VDM/VDO sentence type 13 parsing
@@ -15,7 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Sentence checksum length limited to two characters (as some messages may have extensions)
 - Renamed `ParsedSentence` to `ParsedMessage`
-- Changed `VesselDynamicData::rot_direction` from `i8` to `RotDirection` type
+- Changed type of `VesselDynamicData::rot_direction` from `i8` to `RotDirection`
 - Datetime validation
 - Re-export of `chrono` crate
 - Turned crate `assert` into a dev-dependency

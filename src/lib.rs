@@ -17,8 +17,8 @@ limitations under the License.
 //! # NMEA Parser: NMEA parser for Rust
 //!
 //! This crate aims to cover all AIS sentences and the most important GNSS sentences used with
-//! NMEA 0183 standard. The parser supports AIS class A and B types and identifies GPS, GLONASS,
-//! Galileo, BeiDou, NavIC and QZSS satellite systems.
+//! NMEA 0183 standard. The parser supports AIS class A and B types. It also identifies GPS, 
+//! GLONASS, Galileo, BeiDou, NavIC and QZSS satellite systems.
 
 #![allow(dead_code)]
 
@@ -87,6 +87,12 @@ pub enum ParsedMessage {
 
     // AIS VDM/VRO type 15
     Interrogation(ais::Interrogation),
+    
+    // AIS VDM/VRO type 16
+    AssignmentModeCommand(ais::AssignmentModeCommand),
+
+    // AIS VDM/VRO type 17
+    DgnssBroadcastBinaryMessage(ais::DgnssBroadcastBinaryMessage),
 
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
@@ -613,19 +619,19 @@ impl NmeaParser {
                         }
                         // Assigned mode command
                         16 => {
-                            // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )));
+                            return ais::vdm_t16::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
                         }
                         // GNSS binary broadcast message
                         17 => {
-                            // TODO: implementation
-                            return Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )));
+                            return ais::vdm_t17::handle(
+                                &bv,
+                                station.unwrap_or(ais::Station::Other),
+                                own_vessel,
+                            );
                         }
                         // Standard class B CS position report
                         18 => {
