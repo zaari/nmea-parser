@@ -62,18 +62,38 @@ pub(crate) fn handle(
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
     let single = bv.len() < 144;
-    return Ok(ParsedMessage::AssignmentModeCommand(AssignmentModeCommand {
-        own_vessel: { own_vessel },
-        station: { station },
-        assigned_for_single_station: { single },
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        mmsi1: { pick_u64(&bv, 40, 30) as u32 },
-        offset1: { pick_u64(&bv, 70, 12) as u16 },
-        increment1: { pick_u64(&bv, 82, 10) as u16 },
-        mmsi2: { if single { None } else { Some(pick_u64(&bv, 92, 30) as u32) } },
-        offset2: { if single { None } else { Some(pick_u64(&bv, 122, 12) as u16) } },
-        increment2: { if single { None } else { Some(pick_u64(&bv, 134, 10) as u16) } },
-    }));
+    return Ok(ParsedMessage::AssignmentModeCommand(
+        AssignmentModeCommand {
+            own_vessel: { own_vessel },
+            station: { station },
+            assigned_for_single_station: { single },
+            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi1: { pick_u64(&bv, 40, 30) as u32 },
+            offset1: { pick_u64(&bv, 70, 12) as u16 },
+            increment1: { pick_u64(&bv, 82, 10) as u16 },
+            mmsi2: {
+                if single {
+                    None
+                } else {
+                    Some(pick_u64(&bv, 92, 30) as u32)
+                }
+            },
+            offset2: {
+                if single {
+                    None
+                } else {
+                    Some(pick_u64(&bv, 122, 12) as u16)
+                }
+            },
+            increment2: {
+                if single {
+                    None
+                } else {
+                    Some(pick_u64(&bv, 134, 10) as u16)
+                }
+            },
+        },
+    ));
 }
 
 // -------------------------------------------------------------------------------------------------

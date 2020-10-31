@@ -17,7 +17,7 @@ limitations under the License.
 //! # NMEA Parser: NMEA parser for Rust
 //!
 //! This crate aims to cover all AIS sentences and the most important GNSS sentences used with
-//! NMEA 0183 standard. The parser supports AIS class A and B types. It also identifies GPS, 
+//! NMEA 0183 standard. The parser supports AIS class A and B types. It also identifies GPS,
 //! GLONASS, Galileo, BeiDou, NavIC and QZSS satellite systems.
 
 #![allow(dead_code)]
@@ -87,7 +87,7 @@ pub enum ParsedMessage {
 
     // AIS VDM/VRO type 15
     Interrogation(ais::Interrogation),
-    
+
     // AIS VDM/VRO type 16
     AssignmentModeCommand(ais::AssignmentModeCommand),
 
@@ -149,7 +149,7 @@ impl NmeaParser {
         }
     }
 
-    /// Clear internal state of the parser. Multi-sentence state is lost after this function
+    /// Clear internal state of the parser. Multi-sentence state is lost when this function
     /// is called.
     pub fn reset(&mut self) {
         self.saved_fragments.clear();

@@ -18,7 +18,7 @@ use super::*;
 
 // -------------------------------------------------------------------------------------------------
 
-/// Type 17: DGNSS Broadcast Binary Message. 
+/// Type 17: DGNSS Broadcast Binary Message.
 #[derive(Clone, Debug, PartialEq)]
 pub struct DgnssBroadcastBinaryMessage {
     /// True if the data is about own vessel, false if about other.
@@ -48,29 +48,30 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    let single = bv.len() < 144;
-    return Ok(ParsedMessage::DgnssBroadcastBinaryMessage(DgnssBroadcastBinaryMessage {
-        own_vessel: { own_vessel },
-        station: { station },
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        latitude: {
-            let lat_raw = pick_i64(&bv, 58, 17) as i32;
-            if lat_raw != 0xd548 {
-                Some((lat_raw as f64) / 600.0)
-            } else {
-                None
-            }
+    return Ok(ParsedMessage::DgnssBroadcastBinaryMessage(
+        DgnssBroadcastBinaryMessage {
+            own_vessel: { own_vessel },
+            station: { station },
+            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            latitude: {
+                let lat_raw = pick_i64(&bv, 58, 17) as i32;
+                if lat_raw != 0xd548 {
+                    Some((lat_raw as f64) / 600.0)
+                } else {
+                    None
+                }
+            },
+            longitude: {
+                let lon_raw = pick_i64(&bv, 40, 18) as i32;
+                if lon_raw != 0x1a838 {
+                    Some((lon_raw as f64) / 600.0)
+                } else {
+                    None
+                }
+            },
+            payload: bv.iter().skip(80).collect(),
         },
-        longitude: {
-            let lon_raw = pick_i64(&bv, 40, 18) as i32;
-            if lon_raw != 0x1a838 {
-                Some((lon_raw as f64) / 600.0)
-            } else {
-                None
-            }
-        },
-        payload: bv.iter().skip(80).collect(),
-    }));
+    ));
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -82,17 +83,17 @@ mod test {
     #[test]
     fn test_parse_vdm_type17() {
         let mut p = NmeaParser::new();
-        match p.parse_sentence("!AIVDM,2,1,5,A,A02VqLPA4I6C07h5Ed1h<OrsuBTTwS?r:C?w`?la<gno1RTRwSP9:BcurA8a,0*3A") {
-            Ok(ps) => {
-                match ps {
-                    ParsedMessage::Incomplete => {
-                        assert!(true);
-                    }
-                    _ => {
-                        assert!(false);
-                    }
+        match p.parse_sentence(
+            "!AIVDM,2,1,5,A,A02VqLPA4I6C07h5Ed1h<OrsuBTTwS?r:C?w`?la<gno1RTRwSP9:BcurA8a,0*3A",
+        ) {
+            Ok(ps) => match ps {
+                ParsedMessage::Incomplete => {
+                    assert!(true);
                 }
-            }
+                _ => {
+                    assert!(false);
+                }
+            },
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }
