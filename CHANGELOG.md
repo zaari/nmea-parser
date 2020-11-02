@@ -3,6 +3,10 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+### Added
+- Implementation for GNSS ALM parsing
+
 ## [0.5.0] - 2020-10-31
 ### Added
 - Implementation for AIS VDM/VDO sentence type 17 parsing
@@ -18,7 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Sentence checksum length limited to two characters (as some messages may have extensions)
 - Renamed `ParsedSentence` to `ParsedMessage`
 - Changed type of `VesselDynamicData::rot_direction` from `i8` to `RotDirection`
-- Datetime validation
+- Proper datetime validation
 - Re-export of `chrono` crate
 - Turned crate `assert` into a dev-dependency
 ### Removed

@@ -182,6 +182,21 @@ pub(crate) fn pick_number_field<T: std::str::FromStr>(
         .transpose()
 }
 
+/// Pick hex-formatted field from a comma-separated sentence or `None` in case of an empty field.
+pub(crate) fn pick_hex_field<T: num_traits::Num>(
+    split: &[&str],
+    num: usize,
+) -> Result<Option<T>, String> {
+    split
+        .get(num)
+        .filter(|s| !s.is_empty())
+        .map(|s| {
+            T::from_str_radix(s, 16)
+                .map_err(|_| format!("Failed to parse hex field {}: {}", num, s))
+        })
+        .transpose()
+}
+
 /// Parse time field of format HHMMSS and convert it to `DateTime<Utc>` using the current time.
 pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, ParseError> {
     let (hour, minute, second) =
@@ -528,5 +543,15 @@ mod test {
         assert_eq!(pick_number_field::<u16>(&s, 3).ok().unwrap(), None);
         assert_eq!(pick_number_field::<u32>(&s, 4).is_ok(), false);
         assert_eq!(pick_number_field::<u32>(&s, 5).ok().unwrap(), None);
+    }
+    
+    #[test]
+    fn test_pick_hex_field() {
+        let s: Vec<&str> = "ff,0,,FFFF,8080808080808080".split(",").collect();
+        assert_eq!(pick_hex_field::<u8>(&s, 0).unwrap().unwrap(), 255);
+        assert_eq!(pick_hex_field::<u8>(&s, 1).unwrap().unwrap(), 0);
+        assert_eq!(pick_hex_field::<u8>(&s, 2).unwrap(), None);
+        assert_eq!(pick_hex_field::<u16>(&s, 3).unwrap().unwrap(), 65535);
+        assert_eq!(pick_hex_field::<u64>(&s, 4).unwrap().unwrap(), 9259542123273814144);
     }
 }

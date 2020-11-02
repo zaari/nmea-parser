@@ -25,6 +25,8 @@ limitations under the License.
 #[macro_use]
 extern crate log;
 
+extern crate num_traits;
+
 use bitvec::prelude::*;
 pub use chrono;
 use chrono::prelude::*;
@@ -114,6 +116,9 @@ pub enum ParsedMessage {
 
     /// GLL
     Gll(gnss::GllData),
+
+    /// ALM
+    Alm(gnss::AlmData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -201,10 +206,15 @@ impl NmeaParser {
         let mut checksum = 0;
         let (sentence, checksum_hex_given) = {
             if let Some(pos) = sentence.rfind('*') {
-                (
-                    sentence[0..pos].to_string(),
-                    sentence[(pos + 1)..(pos + 3)].to_string(),
-                )
+                if pos + 3 <= sentence.len() {
+                    (
+                        sentence[0..pos].to_string(),
+                        sentence[(pos + 1)..(pos + 3)].to_string(),
+                    )
+                } else {
+                    debug!("Invalid checksum found for sentence: {}", sentence);
+                    (sentence[0..pos].to_string(), "".to_string())
+                }
             } else {
                 debug!("No checksum found for sentence: {}", sentence);
                 (sentence.to_string(), "".to_string())
@@ -327,14 +337,14 @@ impl NmeaParser {
                     nav_system.unwrap_or(gnss::NavigationSystem::Other),
                 );
             }
-
             // $xxALM - Almanac Data
             "$ALM" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
+                return gnss::alm::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
             }
+            
             // $xxHDT - Heading, True
             "$HDT" => {
                 return Err(ParseError::UnsupportedSentenceType(format!(
