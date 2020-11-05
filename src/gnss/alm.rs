@@ -24,40 +24,40 @@ pub struct AlmData {
 
     /// Satellite PRN number (1-32)
     pub prn: Option<u8>,
-    
+
     /// GPS week number (0-1023).
     pub week_number: Option<u16>,
-    
+
     /// Satellite health (bits 17-24)
     pub health_bits: Option<u8>,
-    
+
     /// Eccentricity
     pub eccentricity: Option<u16>,
-    
+
     /// Reference time of almanac (TOA)
     pub reference_time: Option<u8>,
-    
+
     /// Satellite inclination angle (sigma)
     pub sigma: Option<u16>,
-    
+
     /// Rate of right ascension (omega dot)
     pub omega_dot: Option<u16>,
-    
+
     /// Square root of semi-major axis (root a)
     pub root_a: Option<u32>,
-    
+
     /// Argument of perigee (omega)
     pub omega: Option<u32>,
-    
+
     /// Ascending node longitude (omega I)
     pub omega_o: Option<u32>,
-    
+
     /// Mean anomaly (mo)
     pub mo: Option<u32>,
-    
+
     /// Clock parameter 0 (af0)
     pub af0: Option<u16>,
-    
+
     /// Clock parameter 1 (af0)
     pub af1: Option<u16>,
 }
@@ -103,36 +103,33 @@ mod test {
 
     #[test]
     fn test_parse_cpalm() {
-        let mut p = NmeaParser::new();
-        match p.parse_sentence("$GPALM,31,1,02,1617,00,50F6,0F,FD98,FD39,A10CF3,81389B,423632,BD913C,148,001*")
-        {
-            Ok(ps) => {
-                match ps {
-                    // The expected result
-                    ParsedMessage::Alm(alm) => {
-                        assert_eq!(alm.source, NavigationSystem::Gps);
-                        assert_eq!(alm.prn, Some(2));
-                        assert_eq!(alm.week_number, Some(535));
-                        assert_eq!(alm.health_bits, Some(0));
-                        assert_eq!(alm.eccentricity, Some(0x50F6));
-                        assert_eq!(alm.reference_time, Some(0x0f));
-                        assert_eq!(alm.sigma, Some(0xfd98));
-                        assert_eq!(alm.omega_dot, Some(0xfd39));
-                        assert_eq!(alm.root_a, Some(0xa10cf3));
-                        assert_eq!(alm.omega, Some(0x81389b));
-                        assert_eq!(alm.omega_o, Some(0x423632));
-                        assert_eq!(alm.mo, Some(0xbd913c));
-                        assert_eq!(alm.af0, Some(0x148));
-                        assert_eq!(alm.af1, Some(0x001));
-                    }
-                    ParsedMessage::Incomplete => {
-                        assert!(false);
-                    }
-                    _ => {
-                        assert!(false);
-                    }
+        match NmeaParser::new().parse_sentence(
+            "$GPALM,31,1,02,1617,00,50F6,0F,FD98,FD39,A10CF3,81389B,423632,BD913C,148,001*",
+        ) {
+            Ok(ps) => match ps {
+                ParsedMessage::Alm(alm) => {
+                    assert_eq!(alm.source, NavigationSystem::Gps);
+                    assert_eq!(alm.prn, Some(2));
+                    assert_eq!(alm.week_number, Some(535));
+                    assert_eq!(alm.health_bits, Some(0));
+                    assert_eq!(alm.eccentricity, Some(0x50F6));
+                    assert_eq!(alm.reference_time, Some(0x0f));
+                    assert_eq!(alm.sigma, Some(0xfd98));
+                    assert_eq!(alm.omega_dot, Some(0xfd39));
+                    assert_eq!(alm.root_a, Some(0xa10cf3));
+                    assert_eq!(alm.omega, Some(0x81389b));
+                    assert_eq!(alm.omega_o, Some(0x423632));
+                    assert_eq!(alm.mo, Some(0xbd913c));
+                    assert_eq!(alm.af0, Some(0x148));
+                    assert_eq!(alm.af1, Some(0x001));
                 }
-            }
+                ParsedMessage::Incomplete => {
+                    assert!(false);
+                }
+                _ => {
+                    assert!(false);
+                }
+            },
             Err(e) => {
                 assert_eq!(e.to_string(), "OK");
             }

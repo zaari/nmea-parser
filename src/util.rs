@@ -167,7 +167,7 @@ fn pick_eta_with_now(
     }
 }
 
-/// Pick field from a comma-separated sentence or `None` in case of an empty field.
+/// Pick number field from a comma-separated sentence or `None` in case of an empty field.
 pub(crate) fn pick_number_field<T: std::str::FromStr>(
     split: &[&str],
     num: usize,
@@ -195,6 +195,16 @@ pub(crate) fn pick_hex_field<T: num_traits::Num>(
                 .map_err(|_| format!("Failed to parse hex field {}: {}", num, s))
         })
         .transpose()
+}
+
+/// Pick field from a comma-separated sentence or `None` in case of an empty field.
+pub(crate) fn pick_string_field(split: &[&str], num: usize) -> Option<String> {
+    let s = split.get(num).unwrap_or(&"");
+    if s.len() > 0 {
+        Some(s.to_string())
+    } else {
+        None
+    }
 }
 
 /// Parse time field of format HHMMSS and convert it to `DateTime<Utc>` using the current time.
@@ -355,6 +365,50 @@ pub(crate) fn parse_longitude_dddmm_mmm(
         "W" => -val,
         _ => val,
     }))
+}
+
+/// Parse latitude from two string.
+/// Argument `lat_string` expects a latitude offset in minutes
+/// Argument `hemisphere` expects "N" for north or "S" for south. If `hemisphere` value
+/// is something else, north is quietly used as a fallback.
+pub(crate) fn parse_latitude_m_m(
+    lat_string: &str,
+    hemisphere: &str,
+) -> Result<Option<f64>, ParseError> {
+    if lat_string.len() > 0 {
+        match lat_string.parse::<f64>() {
+            Ok(lat) => match hemisphere {
+                "N" => Ok(Some(lat / 60.0)),
+                "S" => Ok(Some(-lat / 60.0)),
+                _ => Err(format!("Bad hemispehre: {}", hemisphere).into()),
+            },
+            Err(_) => Err(format!("Failed to parse float: {}", lat_string).into()),
+        }
+    } else {
+        Ok(None)
+    }
+}
+
+/// Parse longitude from two string.
+/// Argument `long_string` expects a longitude offset in minutes
+/// Argument `hemisphere` expects "E" for east or "W" for west. If `hemisphere` value is
+/// something else, east is quietly used as a fallback.
+pub(crate) fn parse_longitude_m_m(
+    lon_string: &str,
+    hemisphere: &str,
+) -> Result<Option<f64>, String> {
+    if lon_string.len() > 0 {
+        match lon_string.parse::<f64>() {
+            Ok(lon) => match hemisphere {
+                "E" => Ok(Some(lon / 60.0)),
+                "W" => Ok(Some(-lon / 60.0)),
+                _ => Err(format!("Bad hemispehre: {}", hemisphere).into()),
+            },
+            Err(_) => Err(format!("Failed to parse float: {}", lon_string).into()),
+        }
+    } else {
+        Ok(None)
+    }
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -544,7 +598,7 @@ mod test {
         assert_eq!(pick_number_field::<u32>(&s, 4).is_ok(), false);
         assert_eq!(pick_number_field::<u32>(&s, 5).ok().unwrap(), None);
     }
-    
+
     #[test]
     fn test_pick_hex_field() {
         let s: Vec<&str> = "ff,0,,FFFF,8080808080808080".split(",").collect();
@@ -552,6 +606,61 @@ mod test {
         assert_eq!(pick_hex_field::<u8>(&s, 1).unwrap().unwrap(), 0);
         assert_eq!(pick_hex_field::<u8>(&s, 2).unwrap(), None);
         assert_eq!(pick_hex_field::<u16>(&s, 3).unwrap().unwrap(), 65535);
-        assert_eq!(pick_hex_field::<u64>(&s, 4).unwrap().unwrap(), 9259542123273814144);
+        assert_eq!(
+            pick_hex_field::<u64>(&s, 4).unwrap().unwrap(),
+            9259542123273814144
+        );
+    }
+
+    #[test]
+    fn test_parse_latitude_m_m() {
+        assert::close(
+            parse_latitude_m_m("3480", "N").ok().unwrap().unwrap_or(0.0),
+            58.0,
+            0.1,
+        );
+        assert::close(
+            parse_latitude_m_m("3480", "S").ok().unwrap().unwrap_or(0.0),
+            -58.0,
+            0.1,
+        );
+        assert_eq!(parse_latitude_m_m("3480", "X").is_ok(), false);
+        assert_eq!(parse_latitude_m_m("ABCD", "N").is_ok(), false);
+        assert_eq!(parse_latitude_m_m("", "N").is_ok(), true);
+        assert_eq!(parse_latitude_m_m("", "N").ok().unwrap(), None);
+    }
+
+    #[test]
+    fn test_parse_longitude_m_m() {
+        assert::close(
+            parse_longitude_m_m("1140", "E")
+                .ok()
+                .unwrap()
+                .unwrap_or(0.0),
+            19.0,
+            0.1,
+        );
+        assert::close(
+            parse_longitude_m_m("1140", "W")
+                .ok()
+                .unwrap()
+                .unwrap_or(0.0),
+            -19.0,
+            0.1,
+        );
+        assert_eq!(parse_longitude_m_m("1140", "X").is_ok(), false);
+        assert_eq!(parse_longitude_m_m("ABCD", "E").is_ok(), false);
+        assert_eq!(parse_longitude_m_m("", "E").is_ok(), true);
+        assert_eq!(parse_longitude_m_m("", "E").ok().unwrap(), None);
+    }
+
+    #[test]
+    fn test_pick_string_field() {
+        let s: Vec<&str> = "a,b,,dd,e".split(",").collect();
+        assert_eq!(pick_string_field(&s, 0), Some("a".into()));
+        assert_eq!(pick_string_field(&s, 1), Some("b".into()));
+        assert_eq!(pick_string_field(&s, 2), None);
+        assert_eq!(pick_string_field(&s, 3), Some("dd".into()));
+        assert_eq!(pick_string_field(&s, 4), Some("e".into()));
     }
 }

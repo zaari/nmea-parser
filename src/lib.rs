@@ -119,6 +119,9 @@ pub enum ParsedMessage {
 
     /// ALM
     Alm(gnss::AlmData),
+
+    /// DTM
+    Dtm(gnss::DtmData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -344,70 +347,12 @@ impl NmeaParser {
                     nav_system.unwrap_or(gnss::NavigationSystem::Other),
                 );
             }
-            
-            // $xxHDT - Heading, True
-            "$HDT" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxTRF - Transit Fix Data
-            "$TRF" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxSTN - Multiple Data ID
-            "$STN" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxVBW - Dual Ground / Water Speed
-            "$VBW" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxXTC - Cross track error
-            "$XTC" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxXTE - Cross-track error, Measured
-            "$XTE" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxZDA - Date & Time
-            "$ZDA" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-
-            // $xxBOD Bearing Origin to Destination
-            "$BOD" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
-            }
-            // $xxRMA - Recommended minimum specific Loran-C data
-            "$RMA" => {
-                return Err(ParseError::UnsupportedSentenceType(format!(
-                    "Unimplemented NMEA sentence: {}",
-                    sentence_type
-                ))); // TODO
+            // $xxDTM - Datum reference
+            "$DTM" => {
+                return gnss::dtm::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
             }
 
             // Received AIS data from other or own vessel

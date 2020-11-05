@@ -90,7 +90,7 @@ history can be found from the [changelog].
 
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
-|AIS sentences    |VDM/VDO types 1-5, 9-19, 21, 24 and 27                    |
+|AIS sentences    |VDM/VDO types 1-5, 9-19, 21, 24 and 27                     |
 |GNSS sentences   |GGA, RMC, GSA, GSV, VTG, GLL                               |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS              | 
 
@@ -100,14 +100,14 @@ The following table outlines the high-level changes that are going to be include
 versions. Prioritization is based on estimated significance and implementation effort of each item. 
 Until version 1.0 refactoring and renaming of code elements is likely to happen. 
 
-|Version |Category    |Content                                                |
-|--------|------------|-------------------------------------------------------|
-|0.6     |GNSS        |ALM, DTM, GBS, HDT, ROT, STN, TRF, VBW, ZDA, XTC, XTE|
-|0.7     |AIS         |VDM/VDO types 20, 22, 23, 25 and 26                    |
-|0.8     |AIS         |VDM/VDO types 6-8                                      |
+|Version |Category    |Content                                                   |
+|--------|------------|----------------------------------------------------------|
+|0.6     |GNSS        |ALM, DTM, MSS, STN, TRF, VBW, ZDA, XTC, XTE               |
+|0.7     |AIS         |VDM/VDO types 20, 22, 23, 25 and 26                       |
+|0.8     |AIS         |VDM/VDO types 6-8                                         |
 |1.0     |general     |Stable API, optimizations, documentation enhancements, even more unit tests|
-|1.1     |GNSS        |AAM, BOD, BWC, R00, RMB, RTE, WPL, ZTG                 |
-|1.2     |GNSS        |APB, RMA, GRS, GST, MSK, MSS, STN, VBW                 |
+|1.1     |GNSS        |AAM, BOD, BWC, HDT, R00, RMB, ROT, RTE, WPL, ZTG          |
+|1.2     |GNSS        |APB, GBS, RMA, GRS, GST, MSK, STN, VBW                    |
 
 ## Minimum Rust version
 
