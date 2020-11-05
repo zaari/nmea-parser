@@ -122,6 +122,9 @@ pub enum ParsedMessage {
 
     /// DTM
     Dtm(gnss::DtmData),
+
+    /// MSS
+    Mss(gnss::MssData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -350,6 +353,13 @@ impl NmeaParser {
             // $xxDTM - Datum reference
             "$DTM" => {
                 return gnss::dtm::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
+            // $xxMSS - MSK receiver signal
+            "$MSS" => {
+                return gnss::mss::handle(
                     sentence.as_str(),
                     nav_system.unwrap_or(gnss::NavigationSystem::Other),
                 );

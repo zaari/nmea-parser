@@ -24,6 +24,7 @@ pub(crate) mod rmc;
 pub(crate) mod vtg;
 pub(crate) mod alm;
 pub(crate) mod dtm;
+pub(crate) mod mss;
 
 use super::*;
 pub use gga::{GgaData, GgaQualityIndicator};
@@ -34,6 +35,7 @@ pub use rmc::RmcData;
 pub use vtg::VtgData;
 pub use alm::AlmData;
 pub use dtm::DtmData;
+pub use mss::MssData;
 
 // -------------------------------------------------------------------------------------------------
 

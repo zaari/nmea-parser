@@ -20,8 +20,8 @@ Include the following fragment in your `Cargo.toml` file:
 nmea-parser = "0.5.0"
 ```
 
-The following sample program uses the crate to parse the given NMEA sentences and to print some 
-parsed fields. The program relies on `unwrap()` function to simplify the example. In real-life 
+The following example code fragment uses the crate to parse the given NMEA sentences and to print 
+some parsed fields. It relies on `unwrap()` function to simplify the example. In real-life 
 applications proper handling of `None` cases is needed.
 
 ```rust
@@ -70,7 +70,7 @@ for sentence in sentences {
 }
 ```
 
-The program outputs the following lines:
+The example outputs the following lines:
 
 ```
 MMSI:  271041815
