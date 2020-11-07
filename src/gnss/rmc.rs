@@ -112,6 +112,7 @@ mod test {
 
     #[test]
     fn test_parse_cprmc() {
+        // General test
         let mut p = NmeaParser::new();
         match p.parse_sentence("$GPRMC,225446,A,4916.45,N,12311.12,W,000.5,054.7,191120,020.3,E*67")
         {
@@ -139,10 +140,8 @@ mod test {
                 assert_eq!(e.to_string(), "OK");
             }
         }
-    }
 
-    #[test]
-    fn test_parse_cprmc_empty_fields() {
+        // Empty fields test
         let mut p = NmeaParser::new();
         match p.parse_sentence("$GPRMC,225446,A,,,,,,,070809,,*23") {
             Ok(ps) => {

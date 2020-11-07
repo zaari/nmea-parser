@@ -125,6 +125,9 @@ pub enum ParsedMessage {
 
     /// MSS
     Mss(gnss::MssData),
+
+    /// STN
+    Stn(gnss::StnData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -360,6 +363,13 @@ impl NmeaParser {
             // $xxMSS - MSK receiver signal
             "$MSS" => {
                 return gnss::mss::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
+            // $xxSTN - Multiple Data ID
+            "$STN" => {
+                return gnss::stn::handle(
                     sentence.as_str(),
                     nav_system.unwrap_or(gnss::NavigationSystem::Other),
                 );

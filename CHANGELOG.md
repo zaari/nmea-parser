@@ -5,6 +5,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for GNSS STN parsing
 - Implementation for GNSS MSS parsing
 - Implementation for GNSS DTM parsing
 - Implementation for GNSS ALM parsing

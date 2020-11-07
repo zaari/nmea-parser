@@ -662,5 +662,6 @@ mod test {
         assert_eq!(pick_string_field(&s, 2), None);
         assert_eq!(pick_string_field(&s, 3), Some("dd".into()));
         assert_eq!(pick_string_field(&s, 4), Some("e".into()));
+        assert_eq!(pick_string_field(&s, 5), None);
     }
 }

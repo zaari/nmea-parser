@@ -16,44 +16,28 @@ limitations under the License.
 
 use super::*;
 
-/// MSS - Multiple Data ID
+/// STN - MSK Receiver Signal
 #[derive(Clone, Debug, PartialEq)]
-pub struct MssData {
+pub struct StnData {
     /// Navigation system
     pub source: NavigationSystem,
 
-    /// Signal strength (dB)
-    pub ss: Option<u8>,
-
-    /// Signal-to-noise ratio
-    pub snr: Option<u8>,
-
-    /// Beacon frequency
-    pub frequency: Option<f64>,
-
-    /// Beacon bit rate
-    pub bit_rate: Option<u32>,
-
-    /// Channel number
-    pub channel: Option<u32>,
+    /// Talker id numer (0-99)
+    pub talker_id: Option<u8>,
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// xxMSS: Multiple Data ID
+/// xxSTN: MSK Receiver Signal
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Mss(MssData {
+    return Ok(ParsedMessage::Stn(StnData {
         source: nav_system,
-        ss: pick_number_field(&split, 1)?,
-        snr: pick_number_field(&split, 2)?,
-        frequency: pick_number_field(&split, 3)?,
-        bit_rate: pick_number_field(&split, 4)?,
-        channel: pick_number_field(&split, 5)?,
+        talker_id: pick_number_field(&split, 1)?,
     }));
 }
 
@@ -64,16 +48,12 @@ mod test {
     use super::*;
 
     #[test]
-    fn test_parse_cpmss() {
-        match NmeaParser::new().parse_sentence("$GPMSS,55,27,318.0,100,1*57") {
+    fn test_parse_cpstn() {
+        match NmeaParser::new().parse_sentence("$GPSTN,23") {
             Ok(ps) => match ps {
-                ParsedMessage::Mss(mss) => {
-                    assert_eq!(mss.source, NavigationSystem::Gps);
-                    assert_eq!(mss.ss, Some(55));
-                    assert_eq!(mss.snr, Some(27));
-                    assert_eq!(mss.frequency, Some(318.0));
-                    assert_eq!(mss.bit_rate, Some(100));
-                    assert_eq!(mss.channel, Some(1));
+                ParsedMessage::Stn(stn) => {
+                    assert_eq!(stn.source, NavigationSystem::Gps);
+                    assert_eq!(stn.talker_id, Some(23));
                 }
                 ParsedMessage::Incomplete => {
                     assert!(false);
