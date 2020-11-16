@@ -15,6 +15,7 @@ limitations under the License.
 */
 
 use std::fmt;
+use std::num::{ParseIntError, ParseFloatError};
 
 /// Parse error returned by `NmeaParser::parse_sentence()`. `String` data type is used instead of
 /// `static &str` because the error messages are expected to contain context-specific details.
@@ -33,6 +34,18 @@ pub enum ParseError {
 impl From<String> for ParseError {
     fn from(s: String) -> Self {
         ParseError::InvalidSentence(s)
+    }
+}
+
+impl From<ParseIntError> for ParseError {
+    fn from(e: ParseIntError) -> Self {
+        ParseError::InvalidSentence(format!("{}", e))
+    }
+}
+
+impl From<ParseFloatError> for ParseError {
+    fn from(e: ParseFloatError) -> Self {
+        ParseError::InvalidSentence(format!("{}", e))
     }
 }
 

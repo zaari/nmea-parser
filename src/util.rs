@@ -15,7 +15,6 @@ limitations under the License.
 */
 use super::*;
 
-use std::num::ParseIntError;
 use chrono::Duration;
 
 const AIS_CHAR_BITS: usize = 6;
@@ -137,8 +136,8 @@ fn pick_eta_with_now(
 
     // Ensure that that params from nmea are parsable as valid date
     // Notice that we can't rely on ? operator here because of leap years
-    let res_this = parse_valid_utc(now.year(), month, day, hour, minute, 30);
-    let res_next = parse_valid_utc(now.year() + 1, month, day, hour, minute, 30);
+    let res_this = parse_valid_utc(now.year(), month, day, hour, minute, 30, 0);
+    let res_next = parse_valid_utc(now.year() + 1, month, day, hour, minute, 30, 0);
     if res_this.is_err() && res_next.is_err() {
         // Both years result invalid date
         match res_this {
@@ -211,7 +210,7 @@ pub(crate) fn pick_string_field(split: &[&str], num: usize) -> Option<String> {
 pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<Utc>, ParseError> {
     let (hour, minute, second) =
         parse_time(hhmmss).map_err(|_| format!("Invalid time format: {}", hhmmss))?;
-    parse_valid_utc(now.year(), now.month(), now.day(), hour, minute, second)
+    parse_valid_utc(now.year(), now.month(), now.day(), hour, minute, second, 0)
 }
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to `DateTime<Utc>`.
@@ -221,11 +220,29 @@ pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime
         parse_date(yymmdd).map_err(|_| format!("Invalid date format: {}", yymmdd))?;
     let (hour, minute, second) =
         parse_time(hhmmss).map_err(|_| format!("Invalid time format: {}", hhmmss))?;
-    parse_valid_utc(century + year, month, day, hour, minute, second)
+    parse_valid_utc(century + year, month, day, hour, minute, second, 0)
+}
+
+/// Parse time field of format HHMMSS.SS and convert it to `DateTime<Utc>` using the current time.
+pub(crate) fn parse_hhmmss_ss(
+    hhmmss: &str,
+    now: DateTime<Utc>,
+) -> Result<DateTime<Utc>, ParseError> {
+    let (hour, minute, second, nano) = parse_time_with_fractions(hhmmss)
+        .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
+    parse_valid_utc(
+        now.year(),
+        now.month(),
+        now.day(),
+        hour,
+        minute,
+        second,
+        nano,
+    )
 }
 
 /// Parse day, month and year from YYMMDD string.
-fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseIntError> {
+fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseError> {
     let day = pick_s2(yymmdd, 0).parse::<u32>()?;
     let month = pick_s2(yymmdd, 2).parse::<u32>()?;
     let year = pick_s2(yymmdd, 4).parse::<i32>()?;
@@ -233,11 +250,27 @@ fn parse_date(yymmdd: &str) -> Result<(u32, u32, i32), ParseIntError> {
 }
 
 /// Parse hour, minute and second from HHMMSS string.
-fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseIntError> {
+fn parse_time(hhmmss: &str) -> Result<(u32, u32, u32), ParseError> {
     let hour = pick_s2(hhmmss, 0).parse::<u32>()?;
     let minute = pick_s2(hhmmss, 2).parse::<u32>()?;
     let second = pick_s2(hhmmss, 4).parse::<u32>()?;
     Ok((hour, minute, second))
+}
+
+/// Parse hour, minute, second and nano seconds from HHMMSS.SS string.
+fn parse_time_with_fractions(hhmmss: &str) -> Result<(u32, u32, u32, u32), ParseError> {
+    let hour = pick_s2(hhmmss, 0).parse::<u32>()?;
+    let minute = pick_s2(hhmmss, 2).parse::<u32>()?;
+    let second = pick_s2(hhmmss, 4).parse::<u32>()?;
+    let nano = {
+        let nano_str = hhmmss.get(6..).unwrap_or(".0");
+        if nano_str.len() > 0 {
+            (nano_str.parse::<f64>()? * 1000000000.0).round() as u32
+        } else {
+            0
+        }
+    };
+    Ok((hour, minute, second, nano))
 }
 
 /// Parse Utc date from YYYY MM DD hh mm ss
@@ -249,7 +282,7 @@ pub(crate) fn parse_ymdhs(
     min: u32,
     sec: u32,
 ) -> Result<DateTime<Utc>, ParseError> {
-    parse_valid_utc(year, month, day, hour, min, sec)
+    parse_valid_utc(year, month, day, hour, min, sec, 0)
 }
 
 /// Using _opt on Utc. Will catch invalid Date (ex: month > 12).
@@ -260,8 +293,11 @@ pub fn parse_valid_utc(
     hour: u32,
     min: u32,
     sec: u32,
+    nano: u32,
 ) -> Result<DateTime<Utc>, ParseError> {
-    let opt_utc = Utc.ymd_opt(year, month, day).and_hms_opt(hour, min, sec);
+    let opt_utc = Utc
+        .ymd_opt(year, month, day)
+        .and_hms_nano_opt(hour, min, sec, nano);
     match opt_utc {
         chrono::LocalResult::Single(valid_utc) | chrono::LocalResult::Ambiguous(valid_utc, _) => {
             Ok(valid_utc)
@@ -584,8 +620,8 @@ mod test {
 
     #[test]
     fn test_parse_valid_utc() {
-        assert_eq!(parse_valid_utc(2020, 2, 29, 0, 0, 0).is_ok(), true);
-        assert_eq!(parse_valid_utc(2021, 2, 29, 0, 0, 0).is_ok(), false);
+        assert_eq!(parse_valid_utc(2020, 2, 29, 0, 0, 0, 0).is_ok(), true);
+        assert_eq!(parse_valid_utc(2021, 2, 29, 0, 0, 0, 0).is_ok(), false);
     }
 
     #[test]
@@ -663,5 +699,37 @@ mod test {
         assert_eq!(pick_string_field(&s, 3), Some("dd".into()));
         assert_eq!(pick_string_field(&s, 4), Some("e".into()));
         assert_eq!(pick_string_field(&s, 5), None);
+    }
+
+    #[test]
+    fn test_parse_time_with_fractions() {
+        assert_eq!(
+            parse_time_with_fractions("123456.987").unwrap_or((0, 0, 0, 0)),
+            (12, 34, 56, 987000000)
+        );
+        assert_eq!(
+            parse_time_with_fractions("123456").unwrap_or((0, 0, 0, 0)),
+            (12, 34, 56, 0)
+        );
+    }
+
+    #[test]
+    fn test_parse_hhmmss_ss() {
+        // Valid case with fractions
+        let then = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+        assert_eq!(
+            parse_hhmmss_ss("123456.987", then).ok(),
+            Some(Utc.ymd(2000, 1, 1).and_hms_nano(12, 34, 56, 987000000))
+        );
+
+        // Valid case without fractions
+        let then = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+        assert_eq!(
+            parse_hhmmss_ss("123456", then).ok(),
+            Some(Utc.ymd(2000, 1, 1).and_hms_nano(12, 34, 56, 0))
+        );
+
+        // Invalid case
+        assert_eq!(parse_hhmmss_ss("123456@", then).ok(), None);
     }
 }
