@@ -223,22 +223,54 @@ pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime
     parse_valid_utc(century + year, month, day, hour, minute, second, 0)
 }
 
-/// Parse time field of format HHMMSS.SS and convert it to `DateTime<Utc>` using the current time.
+/// Parse time field of format HHMMSS.SS and convert it to `DateTime<Utc>` using the given date.
 pub(crate) fn parse_hhmmss_ss(
     hhmmss: &str,
-    now: DateTime<Utc>,
+    date: DateTime<Utc>,
 ) -> Result<DateTime<Utc>, ParseError> {
     let (hour, minute, second, nano) = parse_time_with_fractions(hhmmss)
         .map_err(|_| format!("Invalid time format: {}", hhmmss))?;
     parse_valid_utc(
-        now.year(),
-        now.month(),
-        now.day(),
+        date.year(),
+        date.month(),
+        date.day(),
         hour,
         minute,
         second,
         nano,
     )
+}
+
+/// Make date by picking the given field numbers. Set time part to midnight.
+pub(crate) fn pick_date_with_fields(
+    split: &[&str],
+    year_field: usize,
+    month_field: usize,
+    day_field: usize,
+) -> Result<DateTime<Utc>, ParseError> {
+    let year = split.get(year_field).unwrap_or(&"").parse::<i32>()?;
+    let month = split.get(month_field).unwrap_or(&"").parse::<u32>()?;
+    let day = split.get(day_field).unwrap_or(&"").parse::<u32>()?;
+    parse_valid_utc(year, month, day, 0, 0, 0, 0)
+}
+
+/// Make time zone (`FixedOffset`) with the given field numbers.
+pub(crate) fn pick_timezone_with_fields(
+    split: &[&str],
+    hour_field: usize,
+    minute_field: usize,
+) -> Result<FixedOffset, ParseError> {
+    let hour = split.get(hour_field).unwrap_or(&"").parse::<i32>()?;
+    let minute = split.get(minute_field).unwrap_or(&"0").parse::<i32>()?;
+
+    if let Some(offset) = FixedOffset::east_opt(hour * 3600 + hour.signum() * minute * 60) {
+        Ok(offset)
+    } else {
+        Err(ParseError::InvalidSentence(format!(
+            "Time zone offset out of bounds: {}:{}",
+            hour, minute
+        )))
+    }
 }
 
 /// Parse day, month and year from YYMMDD string.
@@ -731,5 +763,35 @@ mod test {
 
         // Invalid case
         assert_eq!(parse_hhmmss_ss("123456@", then).ok(), None);
+    }
+
+    #[test]
+    fn test_pick_date_with_fields() {
+        let s: Vec<&str> = "$GPZDA,072914.00,31,05,2018,+02,00".split(',').collect();
+        assert_eq!(
+            pick_date_with_fields(&s, 4, 3, 2).ok(),
+            Some(Utc.ymd(2018, 5, 31).and_hms(0, 0, 0))
+        )
+    }
+
+    #[test]
+    fn test_pick_timezone_with_fields() {
+        // Valid time positive zone
+        let s: Vec<&str> = ",,,,,+4,30".split(',').collect();
+        assert_eq!(
+            pick_timezone_with_fields(&s, 5, 6).ok(),
+            Some(FixedOffset::east(4 * 3600 + 30 * 60))
+        );
+
+        // Valid time negative zone
+        let s: Vec<&str> = ",,,,,-4,30".split(',').collect();
+        assert_eq!(
+            pick_timezone_with_fields(&s, 5, 6).ok(),
+            Some(FixedOffset::east(-4 * 3600 - 30 * 60))
+        );
+
+        // Invalid time zone
+        let s: Vec<&str> = ",,,,,+25,00".split(',').collect();
+        assert_eq!(pick_timezone_with_fields(&s, 5, 6).is_ok(), false);
     }
 }

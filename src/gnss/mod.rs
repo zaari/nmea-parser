@@ -27,6 +27,7 @@ pub(crate) mod dtm;
 pub(crate) mod mss;
 pub(crate) mod stn;
 pub(crate) mod vbw;
+pub(crate) mod zda;
 
 use super::*;
 pub use gga::{GgaData, GgaQualityIndicator};
@@ -40,6 +41,7 @@ pub use dtm::DtmData;
 pub use mss::MssData;
 pub use stn::StnData;
 pub use vbw::VbwData;
+pub use zda::ZdaData;
 
 // -------------------------------------------------------------------------------------------------
 

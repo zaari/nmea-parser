@@ -31,7 +31,7 @@ extern crate num_traits;
 use bitvec::prelude::*;
 pub use chrono;
 use chrono::prelude::*;
-use chrono::DateTime;
+use chrono::{DateTime, TimeZone};
 use std::collections::HashMap;
 
 pub mod ais;
@@ -132,6 +132,9 @@ pub enum ParsedMessage {
 
     /// VBW
     Vbw(gnss::VbwData),
+
+    /// ZDA
+    Zda(gnss::ZdaData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -381,6 +384,13 @@ impl NmeaParser {
             // $xxVBW - MSK Receiver Signal
             "$VBW" => {
                 return gnss::vbw::handle(
+                    sentence.as_str(),
+                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                );
+            }
+            // $xxZDA - Date and time
+            "$ZDA" => {
+                return gnss::zda::handle(
                     sentence.as_str(),
                     nav_system.unwrap_or(gnss::NavigationSystem::Other),
                 );
