@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation for GNSS DTM parsing
 - Implementation for GNSS ALM parsing
 ### Changed
+- Forbade use of `unsafe` code
 ### Removed
 
 ## [0.5.0] - 2020-10-31
