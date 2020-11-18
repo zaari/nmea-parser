@@ -144,9 +144,7 @@ fn pick_eta_with_now(
             Ok(_) => {
                 unreachable!("This should never be reached");
             }
-            Err(e) => {
-                Err(e)
-            }
+            Err(e) => Err(e),
         }
     } else if res_this.is_err() {
         // Only next year results valid date
@@ -338,13 +336,11 @@ pub fn parse_valid_utc(
         chrono::LocalResult::Single(valid_utc) | chrono::LocalResult::Ambiguous(valid_utc, _) => {
             Ok(valid_utc)
         }
-        chrono::LocalResult::None => {
-            Err(format!(
-                "Failed to parse Utc Date from y:{} m:{} d:{} h:{} m:{} s:{}",
-                year, month, day, hour, min, sec
-            )
-            .into())
-        }
+        chrono::LocalResult::None => Err(format!(
+            "Failed to parse Utc Date from y:{} m:{} d:{} h:{} m:{} s:{}",
+            year, month, day, hour, min, sec
+        )
+        .into()),
     }
 }
 

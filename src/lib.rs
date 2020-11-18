@@ -317,90 +317,66 @@ impl NmeaParser {
         // Handle sentence types
         match sentence_type.as_str() {
             // $xxGGA - Global Positioning System Fix Data
-            "$GGA" => {
-                gnss::gga::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$GGA" => gnss::gga::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxRMC - Recommended minimum specific GPS/Transit data
-            "$RMC" => {
-                gnss::rmc::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$RMC" => gnss::rmc::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxGSA - GPS DOP and active satellites
-            "$GSA" => {
-                gnss::gsa::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$GSA" => gnss::gsa::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxGSV - GPS Satellites in view
-            "$GSV" => {
-                gnss::gsv::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                    self,
-                )
-            }
+            "$GSV" => gnss::gsv::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+                self,
+            ),
             // $xxVTG - Track made good and ground speed
-            "$VTG" => {
-                gnss::vtg::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$VTG" => gnss::vtg::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxGLL - Geographic position, latitude / longitude
-            "$GLL" => {
-                gnss::gll::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$GLL" => gnss::gll::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxALM - Almanac Data
-            "$ALM" => {
-                gnss::alm::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$ALM" => gnss::alm::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxDTM - Datum reference
-            "$DTM" => {
-                gnss::dtm::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$DTM" => gnss::dtm::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxMSS - MSK receiver signal
-            "$MSS" => {
-                gnss::mss::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$MSS" => gnss::mss::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxSTN - Multiple Data ID
-            "$STN" => {
-                gnss::stn::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$STN" => gnss::stn::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxVBW - MSK Receiver Signal
-            "$VBW" => {
-                gnss::vbw::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$VBW" => gnss::vbw::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
             // $xxZDA - Date and time
-            "$ZDA" => {
-                gnss::zda::handle(
-                    sentence.as_str(),
-                    nav_system.unwrap_or(gnss::NavigationSystem::Other),
-                )
-            }
+            "$ZDA" => gnss::zda::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
 
             // Received AIS data from other or own vessel
             "!VDM" | "!VDO" => {
@@ -514,37 +490,29 @@ impl NmeaParser {
                     let message_type = pick_u64(&bv, 0, 6);
                     match message_type {
                         // Position report with SOTDMA/ITDMA
-                        1 | 2 | 3 => {
-                            ais::vdm_t1t2t3::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        1 | 2 | 3 => ais::vdm_t1t2t3::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Base station report
-                        4 => {
-                            ais::vdm_t4::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        4 => ais::vdm_t4::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Ship static voyage related data
-                        5 => {
-                            ais::vdm_t5::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        5 => ais::vdm_t5::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Addressed binary message
-                        6 => {
-                            ais::vdm_t6::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        6 => ais::vdm_t6::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Binary acknowledge
                         7 => {
                             // TODO: implementation
@@ -562,93 +530,71 @@ impl NmeaParser {
                             )))
                         }
                         // Standard SAR aircraft position report
-                        9 => {
-                            ais::vdm_t9::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        9 => ais::vdm_t9::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // UTC and Date inquiry
-                        10 => {
-                            ais::vdm_t10::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        10 => ais::vdm_t10::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // UTC and date response
-                        11 => {
-                            ais::vdm_t11::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        11 => ais::vdm_t11::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Addressed safety related message
-                        12 => {
-                            ais::vdm_t12::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        12 => ais::vdm_t12::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Safety related acknowledge
-                        13 => {
-                            ais::vdm_t13::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        13 => ais::vdm_t13::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Safety related broadcast message
-                        14 => {
-                            ais::vdm_t14::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        14 => ais::vdm_t14::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Interrogation
-                        15 => {
-                            ais::vdm_t15::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        15 => ais::vdm_t15::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Assigned mode command
-                        16 => {
-                            ais::vdm_t16::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        16 => ais::vdm_t16::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // GNSS binary broadcast message
-                        17 => {
-                            ais::vdm_t17::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        17 => ais::vdm_t17::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Standard class B CS position report
-                        18 => {
-                            ais::vdm_t18::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        18 => ais::vdm_t18::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Extended class B equipment position report
-                        19 => {
-                            ais::vdm_t19::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        19 => ais::vdm_t19::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Data link management
                         20 => {
                             // TODO: implementation
@@ -658,13 +604,11 @@ impl NmeaParser {
                             )))
                         }
                         // Aids-to-navigation report
-                        21 => {
-                            ais::vdm_t21::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
+                        21 => ais::vdm_t21::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Channel management
                         22 => {
                             // TODO: implementation
@@ -682,14 +626,12 @@ impl NmeaParser {
                             )))
                         }
                         // Class B CS static data report
-                        24 => {
-                            ais::vdm_t24::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                self,
-                                own_vessel,
-                            )
-                        }
+                        24 => ais::vdm_t24::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            self,
+                            own_vessel,
+                        ),
                         // Single slot binary message
                         25 => {
                             // TODO: implementation
@@ -707,19 +649,15 @@ impl NmeaParser {
                             )))
                         }
                         // Long range AIS broadcast message
-                        27 => {
-                            ais::vdm_t27::handle(
-                                &bv,
-                                station.unwrap_or(ais::Station::Other),
-                                own_vessel,
-                            )
-                        }
-                        _ => {
-                            Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )))
-                        }
+                        27 => ais::vdm_t27::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
+                        _ => Err(ParseError::UnsupportedSentenceType(format!(
+                            "Unsupported {} message type: {}",
+                            sentence_type, message_type
+                        ))),
                     }
                 } else {
                     Ok(ParsedMessage::Incomplete)
