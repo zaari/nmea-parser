@@ -57,7 +57,7 @@ pub(crate) fn handle(
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Gll(GllData {
+    Ok(ParsedMessage::Gll(GllData {
         source: nav_system,
         latitude: parse_latitude_ddmm_mmm(
             split.get(1).unwrap_or(&""),
@@ -69,14 +69,14 @@ pub(crate) fn handle(
         )?,
         timestamp: parse_hhmmss(split.get(5).unwrap_or(&""), now).ok(),
         data_valid: {
-            match split.get(6).unwrap_or(&"") {
-                &"A" => Some(true),
-                &"V" => Some(false),
+            match *split.get(6).unwrap_or(&"") {
+                "A" => Some(true),
+                "V" => Some(false),
                 _ => None,
             }
         },
         faa_mode: FaaMode::new(split.get(7).unwrap_or(&"")).ok(),
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

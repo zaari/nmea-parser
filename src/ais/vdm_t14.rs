@@ -42,14 +42,14 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::SafetyRelatedBroadcastMessage(
+    Ok(ParsedMessage::SafetyRelatedBroadcastMessage(
         SafetyRelatedBroadcastMessage {
             own_vessel: { own_vessel },
             station: { station },
             mmsi: { pick_u64(&bv, 8, 30) as u32 },
             text: { pick_string(&bv, 40, 161) },
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

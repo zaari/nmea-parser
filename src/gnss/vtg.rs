@@ -46,14 +46,14 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Vtg(VtgData {
+    Ok(ParsedMessage::Vtg(VtgData {
         source: nav_system,
         cog_true: pick_number_field(&split, 1).ok().unwrap_or(None),
         cog_magnetic: pick_number_field(&split, 3).ok().unwrap_or(None),
         sog_knots: pick_number_field(&split, 5).ok().unwrap_or(None),
         sog_kph: pick_number_field(&split, 7).ok().unwrap_or(None),
         faa_mode: FaaMode::new(split.get(9).unwrap_or(&"")).ok(),
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

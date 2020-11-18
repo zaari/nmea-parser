@@ -22,7 +22,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::UtcDateResponse(BaseStationReport {
+    Ok(ParsedMessage::UtcDateResponse(BaseStationReport {
         own_vessel: { own_vessel },
         station: { station },
         mmsi: { pick_u64(&bv, 8, 30) as u32 },
@@ -66,7 +66,7 @@ pub(crate) fn handle(
         },
         raim_flag: { pick_u64(&bv, 148, 1) != 0 },
         radio_status: { pick_u64(&bv, 149, 19) as u32 },
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

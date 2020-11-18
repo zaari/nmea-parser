@@ -63,7 +63,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::SafetyRelatedAcknowledgement(
+    Ok(ParsedMessage::SafetyRelatedAcknowledgement(
         SafetyRelatedAcknowledgement {
             own_vessel: { own_vessel },
             station: { station },
@@ -77,7 +77,7 @@ pub(crate) fn handle(
             mmsi4: { pick_u64(&bv, 136, 30) as u32 },
             mmsi4_seq: { pick_u64(&bv, 166, 2) as u8 },
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

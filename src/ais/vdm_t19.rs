@@ -22,9 +22,9 @@ pub(crate) fn handle(
     _own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
     // TODO: implementation (Class B)
-    return Err(ParseError::UnsupportedSentenceType(
+    Err(ParseError::UnsupportedSentenceType(
         "Unsupported AIVDM message type: 19".into(),
-    ));
+    ))
 }
 
 #[cfg(test)]

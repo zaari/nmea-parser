@@ -122,7 +122,7 @@ pub(crate) fn handle(
     let now: DateTime<Utc> = Utc::now();
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Gga(GgaData {
+    Ok(ParsedMessage::Gga(GgaData {
         source: nav_system,
         timestamp: parse_hhmmss(split.get(1).unwrap_or(&""), now).ok(),
         latitude: parse_latitude_ddmm_mmm(
@@ -140,7 +140,7 @@ pub(crate) fn handle(
         geoid_separation: pick_number_field(&split, 11)?,
         age_of_dgps: pick_number_field(&split, 13)?,
         ref_station_id: pick_number_field(&split, 14)?,
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

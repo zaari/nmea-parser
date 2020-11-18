@@ -50,27 +50,27 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Vbw(VbwData {
+    Ok(ParsedMessage::Vbw(VbwData {
         source: nav_system,
         lon_water_speed_knots: pick_number_field(&split, 1)?,
         tr_water_speed_knots: pick_number_field(&split, 2)?,
         water_speed_valid: {
-            match split.get(3).unwrap_or(&"") {
-                &"A" => Some(true),
-                &"" => None,
+            match *split.get(3).unwrap_or(&"") {
+                "A" => Some(true),
+                "" => None,
                 _ => Some(false),
             }
         },
         lon_ground_speed_knots: pick_number_field(&split, 4)?,
         tr_ground_speed_knots: pick_number_field(&split, 5)?,
         ground_speed_valid: {
-            match split.get(6).unwrap_or(&"") {
-                &"A" => Some(true),
-                &"" => None,
+            match *split.get(6).unwrap_or(&"") {
+                "A" => Some(true),
+                "" => None,
                 _ => Some(false),
             }
         },
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

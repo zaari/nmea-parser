@@ -35,10 +35,10 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Stn(StnData {
+    Ok(ParsedMessage::Stn(StnData {
         source: nav_system,
         talker_id: pick_number_field(&split, 1)?,
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

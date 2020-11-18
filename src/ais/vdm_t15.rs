@@ -104,10 +104,10 @@ pub(crate) fn handle(
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
     let case = InterrogationCase::new(bv);
-    return Ok(ParsedMessage::Interrogation(Interrogation {
-        own_vessel: { own_vessel },
-        station: { station },
-        case: case,
+    Ok(ParsedMessage::Interrogation(Interrogation {
+        own_vessel,
+        station,
+        case,
         mmsi: { pick_u64(&bv, 8, 30) as u32 },
         mmsi1: { pick_u64(&bv, 40, 30) as u32 },
         type1_1: { pick_u64(&bv, 70, 6) as u8 },
@@ -136,7 +136,7 @@ pub(crate) fn handle(
             InterrogationCase::Case4 => Some(pick_u64(&bv, 146, 12) as u16),
             _ => None,
         },
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

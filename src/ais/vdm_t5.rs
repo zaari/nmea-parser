@@ -21,8 +21,8 @@ pub(crate) fn handle(
     _station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::VesselStaticData(VesselStaticData {
-        own_vessel: own_vessel,
+    Ok(ParsedMessage::VesselStaticData(VesselStaticData {
+        own_vessel,
         ais_type: AisClass::ClassB,
         mmsi: pick_u64(&bv, 8, 30) as u32,
         ais_version_indicator: pick_u64(&bv, 38, 2) as u8,
@@ -79,7 +79,7 @@ pub(crate) fn handle(
             }
         },
         mothership_mmsi: { None },
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

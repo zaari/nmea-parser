@@ -38,7 +38,7 @@ pub(crate) fn handle(
 
     // Pick the fields
     let vsd = VesselStaticData {
-        own_vessel: own_vessel,
+        own_vessel,
         ais_type: AisClass::ClassB,
         mmsi: pick_u64(&bv, 8, 30) as u32,
         ais_version_indicator: 0,
@@ -166,7 +166,7 @@ impl VesselStaticData {
             ))
         } else if self.imo_number != other.imo_number {
             Err(format!(
-                "Mismatching MMSI numbers: {} != {}",
+                "Mismatching IMO numbers: {} != {}",
                 self.mmsi, other.mmsi
             ))
         } else if self.ais_version_indicator != other.ais_version_indicator {
@@ -177,9 +177,9 @@ impl VesselStaticData {
         } else {
             Ok(VesselStaticData {
                 own_vessel: self.own_vessel,
-                ais_type: self.ais_type.clone(),
-                mmsi: self.mmsi.clone(),
-                ais_version_indicator: self.ais_version_indicator.clone(),
+                ais_type: self.ais_type,
+                mmsi: self.mmsi,
+                ais_version_indicator: self.ais_version_indicator,
                 imo_number: choose_some(self.imo_number, other.imo_number),
                 call_sign: choose_some_string(&self.call_sign, &other.call_sign),
                 name: choose_some_string(&self.name, &other.name),

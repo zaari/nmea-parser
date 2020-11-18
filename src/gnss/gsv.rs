@@ -62,7 +62,7 @@ pub(crate) fn handle(
             if let Some(sentence) = store.pull_string(make_gsv_key(msg_type, msg_count, i)) {
                 let split: Vec<&str> = sentence.split(',').collect();
                 for j in 0..4 {
-                    if let Some(prn) = pick_number_field(&split, 4 + 4 * j as usize + 0)
+                    if let Some(prn) = pick_number_field(&split, 4 + 4 * j as usize)
                         .ok()
                         .unwrap_or(None)
                     {
@@ -84,9 +84,9 @@ pub(crate) fn handle(
             }
         }
 
-        return Ok(ParsedMessage::Gsv(v));
+        Ok(ParsedMessage::Gsv(v))
     } else {
-        return Ok(ParsedMessage::Incomplete);
+        Ok(ParsedMessage::Incomplete)
     }
 }
 

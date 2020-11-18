@@ -66,7 +66,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::BinaryAddressedMessage(
+    Ok(ParsedMessage::BinaryAddressedMessage(
         BinaryAddressedMessage {
             own_vessel: { own_vessel },
             station: { station },
@@ -77,7 +77,7 @@ pub(crate) fn handle(
             dac: { pick_u64(&bv, 72, 10) as u16 },
             fid: { pick_u64(&bv, 82, 6) as u8 }, // TODO: data (depending on DAC and FID
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

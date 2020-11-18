@@ -51,7 +51,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::AddressedSafetyRelatedMessage(
+    Ok(ParsedMessage::AddressedSafetyRelatedMessage(
         AddressedSafetyRelatedMessage {
             own_vessel: { own_vessel },
             station: { station },
@@ -61,7 +61,7 @@ pub(crate) fn handle(
             retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
             text: { pick_string(&bv, 72, 156) },
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

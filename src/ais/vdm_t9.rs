@@ -89,7 +89,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::StandardSarAircraftPositionReport(
+    Ok(ParsedMessage::StandardSarAircraftPositionReport(
         StandardSarAircraftPositionReport {
             own_vessel: { own_vessel },
             station: { station },
@@ -142,7 +142,7 @@ pub(crate) fn handle(
             raim_flag: { pick_u64(&bv, 147, 1) != 0 },
             radio_status: { pick_u64(&bv, 148, 20) as u32 },
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

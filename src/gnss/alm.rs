@@ -71,7 +71,7 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Alm(AlmData {
+    Ok(ParsedMessage::Alm(AlmData {
         source: nav_system,
         prn: pick_hex_field(&split, 3)?,
         week_number: {
@@ -92,7 +92,7 @@ pub(crate) fn handle(
         mo: pick_hex_field(&split, 13)?,
         af0: pick_hex_field(&split, 14)?,
         af1: pick_hex_field(&split, 15)?,
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

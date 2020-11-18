@@ -62,16 +62,16 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Rmc(RmcData {
+    Ok(ParsedMessage::Rmc(RmcData {
         source: nav_system,
         timestamp: parse_yymmdd_hhmmss(split.get(9).unwrap_or(&""), split.get(1).unwrap_or(&""))
             .ok(),
         status_active: {
             let s = split.get(2).unwrap_or(&"");
-            match s {
-                &"A" => Some(true),
-                &"V" => Some(false),
-                &"" => None,
+            match *s {
+                "A" => Some(true),
+                "V" => Some(false),
+                "" => None,
                 _ => {
                     return Err(format!("Invalid RMC navigation receiver status: {}", s).into());
                 }
@@ -90,9 +90,9 @@ pub(crate) fn handle(
         variation: {
             if let Some(val) = pick_number_field::<f64>(&split, 10)? {
                 let side = split.get(11).unwrap_or(&"");
-                match side {
-                    &"E" => Some(val),
-                    &"W" => Some(-val),
+                match *side {
+                    "E" => Some(val),
+                    "W" => Some(-val),
                     _ => {
                         return Err(format!("Invalid RMC variation side: {}", side).into());
                     }
@@ -101,7 +101,7 @@ pub(crate) fn handle(
                 None
             }
         },
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

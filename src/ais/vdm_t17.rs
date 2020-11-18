@@ -48,7 +48,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::DgnssBroadcastBinaryMessage(
+    Ok(ParsedMessage::DgnssBroadcastBinaryMessage(
         DgnssBroadcastBinaryMessage {
             own_vessel: { own_vessel },
             station: { station },
@@ -71,7 +71,7 @@ pub(crate) fn handle(
             },
             payload: bv.iter().skip(80).collect(),
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

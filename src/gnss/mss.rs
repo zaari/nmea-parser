@@ -47,14 +47,14 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Mss(MssData {
+    Ok(ParsedMessage::Mss(MssData {
         source: nav_system,
         ss: pick_number_field(&split, 1)?,
         snr: pick_number_field(&split, 2)?,
         frequency: pick_number_field(&split, 3)?,
         bit_rate: pick_number_field(&split, 4)?,
         channel: pick_number_field(&split, 5)?,
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

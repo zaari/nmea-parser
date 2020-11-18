@@ -288,7 +288,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::AidToNavigationReport(
+    Ok(ParsedMessage::AidToNavigationReport(
         AidToNavigationReport {
             own_vessel: { own_vessel },
             station: { station },
@@ -332,7 +332,7 @@ pub(crate) fn handle(
             virtual_aid_flag: { pick_u64(&bv, 269, 1) != 0 },
             assigned_mode_flag: { pick_u64(&bv, 270, 1) != 0 },
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------

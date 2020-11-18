@@ -71,14 +71,14 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Gsa(GsaData {
+    Ok(ParsedMessage::Gsa(GsaData {
         source: nav_system,
         mode1_automatic: {
             let s = split.get(1).unwrap_or(&"");
-            match s {
-                &"M" => Some(false),
-                &"A" => Some(true),
-                &"" => None,
+            match *s {
+                "M" => Some(false),
+                "A" => Some(true),
+                "" => None,
                 _ => {
                     return Err(format!("Invalid GPGSA mode: {}", s).into());
                 }
@@ -86,11 +86,11 @@ pub(crate) fn handle(
         },
         mode2_3d: {
             let s = split.get(2).unwrap_or(&"");
-            match s {
-                &"1" => Some(GsaFixMode::NotAvailable),
-                &"2" => Some(GsaFixMode::Fix2D),
-                &"3" => Some(GsaFixMode::Fix3D),
-                &"" => None,
+            match *s {
+                "1" => Some(GsaFixMode::NotAvailable),
+                "2" => Some(GsaFixMode::Fix2D),
+                "3" => Some(GsaFixMode::Fix3D),
+                "" => None,
                 _ => {
                     return Err(format!("Invalid GPGSA fix type: {}", s).into());
                 }
@@ -110,7 +110,7 @@ pub(crate) fn handle(
         pdop: pick_number_field(&split, 15)?,
         hdop: pick_number_field(&split, 16)?,
         vdop: pick_number_field(&split, 17)?,
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

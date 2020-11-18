@@ -34,7 +34,7 @@ pub(crate) fn make_fragment_key(
 }
 
 /// Convert AIS VDM/VDO payload armored string into a `BitVec`.
-pub(crate) fn parse_payload(payload: &String) -> Result<BitVec, String> {
+pub(crate) fn parse_payload(payload: &str) -> Result<BitVec, String> {
     let mut bv = BitVec::<LocalBits, usize>::with_capacity(payload.len() * 6);
     for c in payload.chars() {
         let mut ci = (c as u8) - 48;
@@ -145,15 +145,15 @@ fn pick_eta_with_now(
                 unreachable!("This should never be reached");
             }
             Err(e) => {
-                return Err(e.into());
+                Err(e)
             }
         }
     } else if res_this.is_err() {
         // Only next year results valid date
-        return Ok(Some(res_next.unwrap()));
+        Ok(Some(res_next.unwrap()))
     } else if res_next.is_err() {
         // Only this year results valid date
-        return Ok(Some(res_this.unwrap()));
+        Ok(Some(res_this.unwrap()))
     } else {
         // Both years result a valid date
         // If the ETA is more than 180 days in past assume it's about next year
@@ -161,7 +161,7 @@ fn pick_eta_with_now(
         if now - Duration::days(180) <= this_year_eta {
             Ok(Some(this_year_eta))
         } else {
-            Ok(Some(res_next.unwrap()))
+            Ok(res_next.ok())
         }
     }
 }
@@ -199,7 +199,7 @@ pub(crate) fn pick_hex_field<T: num_traits::Num>(
 /// Pick field from a comma-separated sentence or `None` in case of an empty field.
 pub(crate) fn pick_string_field(split: &[&str], num: usize) -> Option<String> {
     let s = split.get(num).unwrap_or(&"");
-    if s.len() > 0 {
+    if !s.is_empty() {
         Some(s.to_string())
     } else {
         None
@@ -296,7 +296,7 @@ fn parse_time_with_fractions(hhmmss: &str) -> Result<(u32, u32, u32, u32), Parse
     let second = pick_s2(hhmmss, 4).parse::<u32>()?;
     let nano = {
         let nano_str = hhmmss.get(6..).unwrap_or(".0");
-        if nano_str.len() > 0 {
+        if !nano_str.is_empty() {
             (nano_str.parse::<f64>()? * 1000000000.0).round() as u32
         } else {
             0
@@ -335,11 +335,11 @@ pub fn parse_valid_utc(
             Ok(valid_utc)
         }
         chrono::LocalResult::None => {
-            return Err(format!(
+            Err(format!(
                 "Failed to parse Utc Date from y:{} m:{} d:{} h:{} m:{} s:{}",
                 year, month, day, hour, min, sec
             )
-            .into());
+            .into())
         }
     }
 }
@@ -443,7 +443,7 @@ pub(crate) fn parse_latitude_m_m(
     lat_string: &str,
     hemisphere: &str,
 ) -> Result<Option<f64>, ParseError> {
-    if lat_string.len() > 0 {
+    if !lat_string.is_empty() {
         match lat_string.parse::<f64>() {
             Ok(lat) => match hemisphere {
                 "N" => Ok(Some(lat / 60.0)),
@@ -465,14 +465,14 @@ pub(crate) fn parse_longitude_m_m(
     lon_string: &str,
     hemisphere: &str,
 ) -> Result<Option<f64>, String> {
-    if lon_string.len() > 0 {
+    if !lon_string.is_empty() {
         match lon_string.parse::<f64>() {
             Ok(lon) => match hemisphere {
                 "E" => Ok(Some(lon / 60.0)),
                 "W" => Ok(Some(-lon / 60.0)),
-                _ => Err(format!("Bad hemispehre: {}", hemisphere).into()),
+                _ => Err(format!("Bad hemispehre: {}", hemisphere)),
             },
-            Err(_) => Err(format!("Failed to parse float: {}", lon_string).into()),
+            Err(_) => Err(format!("Failed to parse float: {}", lon_string)),
         }
     } else {
         Ok(None)

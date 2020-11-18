@@ -50,7 +50,7 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    return Ok(ParsedMessage::Dtm(DtmData {
+    Ok(ParsedMessage::Dtm(DtmData {
         source: nav_system,
         datum_id: pick_string_field(&split, 1),
         datum_sub_id: pick_string_field(&split, 2),
@@ -58,7 +58,7 @@ pub(crate) fn handle(
         lon_offset: parse_longitude_m_m(split.get(5).unwrap_or(&""), split.get(6).unwrap_or(&""))?,
         alt_offset: pick_number_field(&split, 7)?,
         ref_datum_id: pick_string_field(&split, 8),
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

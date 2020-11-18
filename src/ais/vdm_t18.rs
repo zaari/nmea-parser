@@ -21,7 +21,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::VesselDynamicData(VesselDynamicData {
+    Ok(ParsedMessage::VesselDynamicData(VesselDynamicData {
         own_vessel: { own_vessel },
         station: { station },
         ais_type: { AisClass::ClassB },
@@ -83,7 +83,7 @@ pub(crate) fn handle(
         positioning_system_meta: None,
         current_gnss_position: None,
         special_manoeuvre: None,
-    }));
+    }))
 }
 
 #[cfg(test)]

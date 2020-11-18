@@ -22,7 +22,7 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    return Ok(ParsedMessage::VesselDynamicData(VesselDynamicData {
+    Ok(ParsedMessage::VesselDynamicData(VesselDynamicData {
         own_vessel: { own_vessel },
         station: { station },
         ais_type: { AisClass::ClassA },
@@ -127,7 +127,7 @@ pub(crate) fn handle(
         class_b_mode_flag: None,
         class_b_css_flag: None,
         radio_status: { Some(pick_u64(&bv, 149, 19) as u32) },
-    }));
+    }))
 }
 
 // -------------------------------------------------------------------------------------------------

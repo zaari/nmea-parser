@@ -62,7 +62,7 @@ pub(crate) fn handle(
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
     let single = bv.len() < 144;
-    return Ok(ParsedMessage::AssignmentModeCommand(
+    Ok(ParsedMessage::AssignmentModeCommand(
         AssignmentModeCommand {
             own_vessel: { own_vessel },
             station: { station },
@@ -93,7 +93,7 @@ pub(crate) fn handle(
                 }
             },
         },
-    ));
+    ))
 }
 
 // -------------------------------------------------------------------------------------------------
