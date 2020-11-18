@@ -42,7 +42,7 @@ pub(crate) fn handle(
         source: nav_system,
         timestamp_utc: parse_hhmmss_ss(
             split.get(1).unwrap_or(&""),
-            pick_date_with_fields(&split, 4, 3, 2)?,
+            pick_date_with_fields(&split, 4, 3, 2, 0, 0, 0, 0)?,
         )
         .ok(),
         timezone_local: pick_timezone_with_fields(&split, 5, 6).ok(),

@@ -241,20 +241,24 @@ pub(crate) fn parse_hhmmss_ss(
     )
 }
 
-/// Make date by picking the given field numbers. Set time part to midnight.
+/// Pick date by picking the given field numbers. Set time part to midnight.
 pub(crate) fn pick_date_with_fields(
     split: &[&str],
     year_field: usize,
     month_field: usize,
     day_field: usize,
+    hour: u32,
+    minute: u32,
+    second: u32,
+    nanos: u32,
 ) -> Result<DateTime<Utc>, ParseError> {
     let year = split.get(year_field).unwrap_or(&"").parse::<i32>()?;
     let month = split.get(month_field).unwrap_or(&"").parse::<u32>()?;
     let day = split.get(day_field).unwrap_or(&"").parse::<u32>()?;
-    parse_valid_utc(year, month, day, 0, 0, 0, 0)
+    parse_valid_utc(year, month, day, hour, minute, second, nanos)
 }
 
-/// Make time zone (`FixedOffset`) with the given field numbers.
+/// Pick time zone (`FixedOffset`) with the given field numbers.
 pub(crate) fn pick_timezone_with_fields(
     split: &[&str],
     hour_field: usize,
@@ -769,21 +773,21 @@ mod test {
     fn test_pick_date_with_fields() {
         let s: Vec<&str> = "$GPZDA,072914.00,31,05,2018,+02,00".split(',').collect();
         assert_eq!(
-            pick_date_with_fields(&s, 4, 3, 2).ok(),
+            pick_date_with_fields(&s, 4, 3, 2, 0, 0, 0, 0).ok(),
             Some(Utc.ymd(2018, 5, 31).and_hms(0, 0, 0))
         )
     }
 
     #[test]
     fn test_pick_timezone_with_fields() {
-        // Valid time positive zone
+        // Valid positive time zone
         let s: Vec<&str> = ",,,,,+4,30".split(',').collect();
         assert_eq!(
             pick_timezone_with_fields(&s, 5, 6).ok(),
             Some(FixedOffset::east(4 * 3600 + 30 * 60))
         );
 
-        // Valid time negative zone
+        // Valid negative time zone
         let s: Vec<&str> = ",,,,,-4,30".split(',').collect();
         assert_eq!(
             pick_timezone_with_fields(&s, 5, 6).ok(),
