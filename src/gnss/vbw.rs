@@ -16,7 +16,7 @@ limitations under the License.
 
 use super::*;
 
-/// VBW - MSK Receiver Signal
+/// VBW - Dual Ground/Water Speed
 #[derive(Clone, Debug, PartialEq)]
 pub struct VbwData {
     /// Navigation system
@@ -43,7 +43,7 @@ pub struct VbwData {
 
 // -------------------------------------------------------------------------------------------------
 
-/// xxVBW: MSK Receiver Signal
+/// xxVBW: Dual Ground/Water Speed
 pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,

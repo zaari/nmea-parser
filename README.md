@@ -17,7 +17,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.5.0"
+nmea-parser = "0.6.0"
 ```
 
 The following example code fragment uses the crate to parse the given NMEA sentences and to print 
@@ -91,7 +91,7 @@ history can be found from the [changelog].
 |Feature          |Description                                                |
 |-----------------|-----------------------------------------------------------|
 |AIS sentences    |VDM/VDO types 1-5, 9-19, 21, 24 and 27                     |
-|GNSS sentences   |GGA, RMC, GSA, GSV, VTG, GLL                               |
+|GNSS sentences   |ALM, DTM, GGA, GLL, GSA, GSV, RMC, VTG, MSS, STN, VBW, ZDA |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS              | 
 
 ## Roadmap
@@ -102,11 +102,10 @@ Until version 1.0 refactoring and renaming of code elements is likely to happen.
 
 |Version |Category    |Content                                                   |
 |--------|------------|----------------------------------------------------------|
-|0.6     |GNSS        |ALM, DTM, MSS, STN, VBW, ZDA, XTC, XTE                    |
 |0.7     |AIS         |VDM/VDO types 20, 22, 23, 25 and 26                       |
 |0.8     |AIS         |VDM/VDO types 6-8                                         |
 |1.0     |general     |Stable API, optimizations, documentation enhancements, even more unit tests|
-|1.1     |GNSS        |AAM, BOD, BWC, HDT, R00, RMB, ROT, RTE, WPL, ZTG, APB, GBS, RMA, GRS, GST, MSK, STN, VBW|
+|1.1     |GNSS        |AAM, BOD, BWC, HDT, R00, RMB, ROT, RTE, WPL, ZTG, APB, GBS, RMA, GRS, GST, MSK, STN, VBW, XTE, XTR|
 
 ## Minimum Rust version
 
