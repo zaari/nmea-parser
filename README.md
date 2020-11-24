@@ -2,11 +2,14 @@
 
 [![NMEA Parser on crates.io][cratesio-image]][cratesio]
 [![NMEA Parser on docs.rs][docsrs-image]][docsrs]
+[![GitHub last commit][ghcommit-image]][ghcommit]
 
 [cratesio-image]: https://img.shields.io/crates/v/nmea-parser.svg
 [cratesio]: https://crates.io/crates/nmea-parser
 [docsrs-image]: https://docs.rs/nmea-parser/badge.svg
 [docsrs]: https://docs.rs/nmea-parser
+[ghcommit-image]: https://img.shields.io/github/last-commit/zaari/nmea-parser
+[ghcommit]: https://github.com/zaari/nmea-parser/
 
 This [Rust] crate aims to cover all [AIS] sentences and the most important [GNSS] sentences used 
 with [NMEA 0183] standard. It supports both AIS class A and class B.
@@ -104,7 +107,7 @@ Until version 1.0 refactoring and renaming of code elements is likely to happen.
 |--------|------------|----------------------------------------------------------|
 |0.7     |AIS         |VDM/VDO types 20, 22, 23, 25 and 26                       |
 |0.8     |AIS         |VDM/VDO types 6-8                                         |
-|1.0     |general     |Stable API, optimizations, documentation enhancements, even more unit tests|
+|1.0     |general     |Stable API, optimizations, documentation enhancements, even more unit tests, examples|
 |1.1     |GNSS        |AAM, BOD, BWC, HDT, R00, RMB, ROT, RTE, WPL, ZTG, APB, GBS, RMA, GRS, GST, MSK, STN, VBW, XTE, XTR|
 
 ## Minimum Rust version
