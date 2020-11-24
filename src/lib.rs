@@ -97,6 +97,9 @@ pub enum ParsedMessage {
     // AIS VDM/VRO type 17
     DgnssBroadcastBinaryMessage(ais::DgnssBroadcastBinaryMessage),
 
+    // AIS VDM/VRO type 20
+    DataLinkManagementMessage(ais::DataLinkManagementMessage),
+
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
 
@@ -596,13 +599,11 @@ impl NmeaParser {
                             own_vessel,
                         ),
                         // Data link management
-                        20 => {
-                            // TODO: implementation
-                            Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )))
-                        }
+                        20 => ais::vdm_t20::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Aids-to-navigation report
                         21 => ais::vdm_t21::handle(
                             &bv,
