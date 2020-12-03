@@ -103,6 +103,9 @@ pub enum ParsedMessage {
     // AIS VDM/VDO type 21
     AidToNavigationReport(ais::AidToNavigationReport),
 
+    // AIS VDM/VDO type 22
+    ChannelManagement(ais::ChannelManagement),
+
     /// GGA
     Gga(gnss::GgaData),
 
@@ -611,13 +614,11 @@ impl NmeaParser {
                             own_vessel,
                         ),
                         // Channel management
-                        22 => {
-                            // TODO: implementation
-                            Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )))
-                        }
+                        22 => ais::vdm_t22::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Group assignment command
                         23 => {
                             // TODO: implementation

@@ -33,6 +33,7 @@ pub(crate) mod vdm_t18;
 pub(crate) mod vdm_t19;
 pub(crate) mod vdm_t20;
 pub(crate) mod vdm_t21;
+pub(crate) mod vdm_t22;
 pub(crate) mod vdm_t24;
 pub(crate) mod vdm_t27;
 
@@ -49,6 +50,7 @@ pub use vdm_t16::AssignmentModeCommand;
 pub use vdm_t17::DgnssBroadcastBinaryMessage;
 pub use vdm_t20::{DataLinkManagementMessage};
 pub use vdm_t21::{AidToNavigationReport, NavAidType};
+pub use vdm_t22::{ChannelManagement};
 
 // -------------------------------------------------------------------------------------------------
 
