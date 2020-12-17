@@ -261,7 +261,7 @@ pub(crate) fn handle(
             },
             interval: StationInterval::new(pick_u64(&bv, 146, 4) as u8)?,
             quiet: {
-                let val = pick_u64(&bv, 144, 4) as u8;
+                let val = pick_u64(&bv, 150, 4) as u8;
                 match val {
                     0 => None,
                     1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 => Some(val),
@@ -289,6 +289,16 @@ mod test {
                     // The expected result
                     ParsedMessage::GroupAssignmentCommand(gac) => {
                         assert_eq!(gac.mmsi, 2268120);
+                        assert::close(gac.ne_lat.unwrap_or(0.0), 30642.0 / 600.0, 0.1);
+                        assert::close(gac.ne_lon.unwrap_or(0.0), 1578.0 / 600.0, 0.1);
+                        assert::close(gac.sw_lat.unwrap_or(0.0), 30408.0 / 600.0, 0.1);
+                        assert::close(gac.sw_lon.unwrap_or(0.0), 1096.0 / 600.0, 0.1);
+                        assert_eq!(gac.station_type, StationType::Regional6);
+                        assert_eq!(gac.ship_type, ShipType::NotAvailable);
+                        assert_eq!(gac.cargo_type, CargoType::Undefined);
+                        assert_eq!(gac.txrx, 0);
+                        assert_eq!(gac.interval, StationInterval::NextShorterReportingInverval);
+                        assert_eq!(gac.quiet, None);
                     }
                     ParsedMessage::Incomplete => {
                         assert!(false);
