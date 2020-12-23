@@ -58,7 +58,7 @@ pub(crate) fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
         if let Some(b) = bv.get(pos) {
             res = (res << 1) | (*b as u64);
         } else {
-            res = res << 1;
+            res <<= 1;
         }
     }
     res
@@ -71,7 +71,7 @@ pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
         if let Some(b) = bv.get(pos) {
             res = (res << 1) | (*b as u64);
         } else {
-            res = res << 1;
+            res <<= 1;
         }
     }
 

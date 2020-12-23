@@ -90,9 +90,7 @@ pub(crate) fn handle(
                     }
                 }
             },
-            radio: {
-                pick_u64(&bv, bv.len() - 20, 20) as u32
-            }
+            radio: { pick_u64(&bv, bv.len() - 20, 20) as u32 },
         },
     ))
 }

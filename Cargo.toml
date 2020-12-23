@@ -1,7 +1,7 @@
 [package]
 name          = "nmea-parser"
-version       = "0.7.0-dev"
-publish       = false
+version       = "0.7.0"
+publish       = true
 description   = "NMEA 0183 parser for AIS and GNSS sentences"
 authors       = ["Timo Saarinen <zaari@mailbox.org>"]
 license       = "Apache-2.0"
@@ -11,7 +11,7 @@ keywords      = ["nmea", "ais", "gnss", "gps"]
 categories    = ["parsing"]
 readme        = "README.md"
 edition       = "2018"
-#rust-version  = "1.44"
+#rust-version  = "1.43"
 
 [dependencies]
 bitvec     = "0.20.0"
