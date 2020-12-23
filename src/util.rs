@@ -55,7 +55,11 @@ pub(crate) fn parse_payload(payload: &str) -> Result<BitVec, String> {
 pub(crate) fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
     let mut res = 0;
     for pos in index..(index + len) {
-        res = (res << 1) | (*bv.get(pos).unwrap_or(&false) as u64);
+        if let Some(b) = bv.get(pos) {
+            res = (res << 1) | (*b as u64);
+        } else {
+            res = res << 1;
+        }
     }
     res
 }
@@ -64,7 +68,11 @@ pub(crate) fn pick_u64(bv: &BitVec, index: usize, len: usize) -> u64 {
 pub(crate) fn pick_i64(bv: &BitVec, index: usize, len: usize) -> i64 {
     let mut res = 0;
     for pos in index..(index + len) {
-        res = (res << 1) | (*bv.get(pos).unwrap_or(&false) as u64);
+        if let Some(b) = bv.get(pos) {
+            res = (res << 1) | (*b as u64);
+        } else {
+            res = res << 1;
+        }
     }
 
     let sign_bit = 1 << (len - 1);
