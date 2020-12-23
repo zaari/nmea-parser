@@ -14,7 +14,7 @@ edition       = "2018"
 #rust-version  = "1.44"
 
 [dependencies]
-bitvec     = "0.19.3"
+bitvec     = "0.19.4"
 num-traits = "0.2.14"
 chrono     = "0.4.19"
 log        = "0.4.11"

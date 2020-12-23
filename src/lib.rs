@@ -109,6 +109,9 @@ pub enum ParsedMessage {
     // AIS VDM/VDO type 23
     GroupAssignmentCommand(ais::GroupAssignmentCommand),
 
+    // AIS VDM/VDO type 25
+    SingleSlotBinaryMessage(ais::SingleSlotBinaryMessage),
+
     /// GGA
     Gga(gnss::GgaData),
 
@@ -636,13 +639,11 @@ impl NmeaParser {
                             own_vessel,
                         ),
                         // Single slot binary message
-                        25 => {
-                            // TODO: implementation
-                            Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )))
-                        }
+                        25 => ais::vdm_t25::handle(
+                            &bv,
+                            station.unwrap_or(ais::Station::Other),
+                            own_vessel,
+                        ),
                         // Multiple slot binary message
                         26 => {
                             // TODO: implementation

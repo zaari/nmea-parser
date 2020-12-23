@@ -36,6 +36,7 @@ pub(crate) mod vdm_t21;
 pub(crate) mod vdm_t22;
 pub(crate) mod vdm_t23;
 pub(crate) mod vdm_t24;
+pub(crate) mod vdm_t25;
 pub(crate) mod vdm_t27;
 
 use super::*;
@@ -53,6 +54,7 @@ pub use vdm_t20::{DataLinkManagementMessage};
 pub use vdm_t21::{AidToNavigationReport, NavAidType};
 pub use vdm_t22::{ChannelManagement};
 pub use vdm_t23::{GroupAssignmentCommand};
+pub use vdm_t25::{SingleSlotBinaryMessage};
 
 // -------------------------------------------------------------------------------------------------
 
