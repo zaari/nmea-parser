@@ -17,7 +17,7 @@ edition       = "2018"
 bitvec     = "0.20.1"
 num-traits = "0.2.14"
 chrono     = "0.4.19"
-log        = "0.4.11"
+log        = "0.4.14"
 
 [dev-dependencies]
 assert     = "0.7.4"
