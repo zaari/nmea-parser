@@ -121,6 +121,9 @@ pub enum ParsedMessage {
     /// RMC
     Rmc(gnss::RmcData),
 
+    /// GNS
+    Gns(gnss::GnsData),
+
     /// GSA
     Gsa(gnss::GsaData),
 
@@ -338,6 +341,11 @@ impl NmeaParser {
             ),
             // $xxRMC - Recommended minimum specific GPS/Transit data
             "$RMC" => gnss::rmc::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
+            // $xxGNS - GNSS fix data
+            "$GNS" => gnss::gns::handle(
                 sentence.as_str(),
                 nav_system.unwrap_or(gnss::NavigationSystem::Other),
             ),

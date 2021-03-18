@@ -91,11 +91,11 @@ Longitude: 11.517°
 The following features are included in the published version of the crate. Details about version 
 history can be found from the [changelog].
 
-|Feature          |Description                                                |
-|-----------------|-----------------------------------------------------------|
-|AIS sentences    |VDM/VDO types 1-5, 9-27                                    |
-|GNSS sentences   |ALM, DTM, GGA, GLL, GSA, GSV, RMC, VTG, MSS, STN, VBW, ZDA |
-|Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS              | 
+|Feature          |Description                                                     |
+|-----------------|----------------------------------------------------------------|
+|AIS sentences    |VDM/VDO types 1-5, 9-27                                         |
+|GNSS sentences   |ALM, DTM, GGA, GLL, GNS, GSA, GSV, RMC, VTG, MSS, STN, VBW, ZDA |
+|Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS                   | 
 
 ## Roadmap
 
