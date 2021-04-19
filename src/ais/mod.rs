@@ -288,6 +288,31 @@ impl NavigationStatus {
     }
 }
 
+impl std::fmt::Display for NavigationStatus {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            NavigationStatus::UnderWayUsingEngine => write!(f, "under way using engine"),
+            NavigationStatus::AtAnchor => write!(f, "at anchor"),
+            NavigationStatus::NotUnderCommand => write!(f, "not under command"),
+            NavigationStatus::RestrictedManoeuverability => {
+                write!(f, "restricted manoeuverability")
+            }
+            NavigationStatus::ConstrainedByDraught => write!(f, "constrained by draught"),
+            NavigationStatus::Moored => write!(f, "moored"),
+            NavigationStatus::Aground => write!(f, "aground"),
+            NavigationStatus::EngagedInFishing => write!(f, "engaged in fishing"),
+            NavigationStatus::UnderWaySailing => write!(f, "under way sailing"),
+            NavigationStatus::Reserved9 => write!(f, "(reserved9)"),
+            NavigationStatus::Reserved10 => write!(f, "(reserved10)"),
+            NavigationStatus::Reserved11 => write!(f, "(reserved11)"),
+            NavigationStatus::Reserved12 => write!(f, "(reserved12)"),
+            NavigationStatus::Reserved13 => write!(f, "(reserved13)"),
+            NavigationStatus::AisSartIsActive => write!(f, "ais sart is active"),
+            NavigationStatus::NotDefined => write!(f, "(notDefined)"),
+        }
+    }
+}
+
 impl Default for NavigationStatus {
     fn default() -> NavigationStatus {
         NavigationStatus::NotDefined

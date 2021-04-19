@@ -5,6 +5,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- ...
+
+## [0.7.2] - 2021-04-19
+### Changed
+- Documentation fix
+
+## [0.7.1] - 2021-04-19
+### Added
+- Implementation for GNSS GNS parsing
 
 ## [0.7.0] - 2020-12-23
 ### Added

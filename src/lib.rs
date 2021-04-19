@@ -121,6 +121,9 @@ pub enum ParsedMessage {
     /// RMC
     Rmc(gnss::RmcData),
 
+    /// GNS
+    Gns(gnss::GnsData),
+
     /// GSA
     Gsa(gnss::GsaData),
 
@@ -228,7 +231,7 @@ impl NmeaParser {
         self.saved_vsds.remove(&mmsi)
     }
 
-    /// Return number of MMSI-to-VesselStaticData mappings in store.    
+    /// Return number of MMSI-to-VesselStaticData mappings in store.
     fn vsds_count(&self) -> usize {
         self.saved_vsds.len()
     }
@@ -338,6 +341,11 @@ impl NmeaParser {
             ),
             // $xxRMC - Recommended minimum specific GPS/Transit data
             "$RMC" => gnss::rmc::handle(
+                sentence.as_str(),
+                nav_system.unwrap_or(gnss::NavigationSystem::Other),
+            ),
+            // $xxGNS - GNSS fix data
+            "$GNS" => gnss::gns::handle(
                 sentence.as_str(),
                 nav_system.unwrap_or(gnss::NavigationSystem::Other),
             ),
