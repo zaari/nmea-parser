@@ -20,7 +20,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.7.0"
+nmea-parser = "0.7.1"
 ```
 
 The following example code fragment uses the crate to parse the given NMEA sentences and to print 
