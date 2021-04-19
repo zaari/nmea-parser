@@ -243,22 +243,22 @@ impl LatLon for VesselDynamicData {
 /// Navigation status for VesselDynamicData
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum NavigationStatus {
-    UnderWayUsingEngine,        // 0
-    AtAnchor,                   // 1
-    NotUnderCommand,            // 2
-    RestrictedManoeuverability, // 3
-    ConstrainedByDraught,       // 4
-    Moored,                     // 5
-    Aground,                    // 6
-    EngagedInFishing,           // 7
-    UnderWaySailing,            // 8
-    Reserved9,                  // 9, may be renamed in the future
-    Reserved10,                 // 10, may be renamed in the future
-    Reserved11,                 // 11, may be renamed in the future
-    Reserved12,                 // 12, may be renamed in the future
-    Reserved13,                 // 13, may be renamed in the future
-    AisSartIsActive,            // 14
-    NotDefined,                 // 15
+    UnderWayUsingEngine = 0,        // 0
+    AtAnchor = 1,                   // 1
+    NotUnderCommand = 2,            // 2
+    RestrictedManoeuverability = 3, // 3
+    ConstrainedByDraught = 4,       // 4
+    Moored = 5,                     // 5
+    Aground = 6,                    // 6
+    EngagedInFishing = 7,           // 7
+    UnderWaySailing = 8,            // 8
+    Reserved9 = 9,                  // 9, may be renamed in the future
+    Reserved10 = 10,                // 10, may be renamed in the future
+    Reserved11 = 11,                // 11, may be renamed in the future
+    Reserved12 = 12,                // 12, may be renamed in the future
+    Reserved13 = 13,                // 13, may be renamed in the future
+    AisSartIsActive = 14,           // 14
+    NotDefined = 15,                // 15
 }
 impl NavigationStatus {
     pub fn new(nav_status: u8) -> NavigationStatus {
@@ -282,6 +282,10 @@ impl NavigationStatus {
             _ => NavigationStatus::NotDefined,
         }
     }
+
+    pub fn get_value(&self) -> u8 {
+        *self as u8
+    }
 }
 
 impl Default for NavigationStatus {
@@ -289,6 +293,8 @@ impl Default for NavigationStatus {
         NavigationStatus::NotDefined
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// Location metadata about positioning system
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -309,6 +315,8 @@ impl std::fmt::Display for PositioningSystemMeta {
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------------
 
 /// Vessel rotation direction
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -405,37 +413,39 @@ pub struct VesselStaticData {
     pub mothership_mmsi: Option<u32>,
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// Ship type derived from combined ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ShipType {
-    NotAvailable,            // 0
-    Reserved1,               // 1x
-    WingInGround,            // 2x
-    Fishing,                 // 30
-    Towing,                  // 31
-    TowingLong,              // 32; Towing: length exceeds 200m or breadth exceeds 25m
-    DredgingOrUnderwaterOps, // 33
-    DivingOps,               // 34
-    MilitaryOps,             // 35
-    Sailing,                 // 36
-    PleasureCraft,           // 37
-    Reserved38,              // 38
-    Reserved39,              // 39
-    HighSpeedCraft,          // 4x
-    Pilot,                   // 50
-    SearchAndRescue,         // 51
-    Tug,                     // 52
-    PortTender,              // 53
-    AntiPollutionEquipment,  // 54
-    LawEnforcement,          // 55
-    SpareLocal56,            // 56
-    SpareLocal57,            // 57
-    MedicalTransport,        // 58
-    Noncombatant,            // 59; Noncombatant ship according to RR Resolution No. 18
-    Passenger,               // 6x
-    Cargo,                   // 7x
-    Tanker,                  // 8x
-    Other,                   // 9x
+    NotAvailable = 0,             // 0
+    Reserved1 = 10,               // 1x
+    WingInGround = 20,            // 2x
+    Fishing = 30,                 // 30
+    Towing = 31,                  // 31
+    TowingLong = 32,              // 32; Towing: length exceeds 200m or breadth exceeds 25m
+    DredgingOrUnderwaterOps = 33, // 33
+    DivingOps = 34,               // 34
+    MilitaryOps = 35,             // 35
+    Sailing = 36,                 // 36
+    PleasureCraft = 37,           // 37
+    Reserved38 = 38,              // 38
+    Reserved39 = 39,              // 39
+    HighSpeedCraft = 40,          // 4x
+    Pilot = 50,                   // 50
+    SearchAndRescue = 51,         // 51
+    Tug = 52,                     // 52
+    PortTender = 53,              // 53
+    AntiPollutionEquipment = 54,  // 54
+    LawEnforcement = 55,          // 55
+    SpareLocal56 = 56,            // 56
+    SpareLocal57 = 57,            // 57
+    MedicalTransport = 58,        // 58
+    Noncombatant = 59,            // 59; Noncombatant ship according to RR Resolution No. 18
+    Passenger = 60,               // 6x
+    Cargo = 70,                   // 7x
+    Tanker = 80,                  // 8x
+    Other = 90,                   // 9x
 }
 
 impl ShipType {
@@ -480,6 +490,10 @@ impl ShipType {
             }
         }
     }
+
+    pub fn get_value(&self) -> u8 {
+        *self as u8
+    }
 }
 
 impl Default for ShipType {
@@ -523,19 +537,21 @@ impl std::fmt::Display for ShipType {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// Cargo type derived from combined ship and cargo type field
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum CargoType {
-    Undefined,          // x0
-    HazardousCategoryA, // x1
-    HazardousCategoryB, // x2
-    HazardousCategoryC, // x3
-    HazardousCategoryD, // x4
-    Reserved5,          // x5
-    Reserved6,          // x6
-    Reserved7,          // x7
-    Reserved8,          // x8
-    Reserved9,          // x9
+    Undefined = 10,          // x0
+    HazardousCategoryA = 11, // x1
+    HazardousCategoryB = 12, // x2
+    HazardousCategoryC = 13, // x3
+    HazardousCategoryD = 14, // x4
+    Reserved5 = 15,          // x5
+    Reserved6 = 16,          // x6
+    Reserved7 = 17,          // x7
+    Reserved8 = 18,          // x8
+    Reserved9 = 19,          // x9
 }
 
 impl CargoType {
@@ -557,6 +573,10 @@ impl CargoType {
                 CargoType::Undefined
             }
         }
+    }
+
+    pub fn get_value(&self) -> u8 {
+        *self as u8
     }
 }
 
@@ -583,18 +603,20 @@ impl Default for CargoType {
     }
 }
 
+// -------------------------------------------------------------------------------------------------
+
 /// EPFD position fix types
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub enum PositionFixType {
-    Undefined,                  // 0
-    GPS,                        // 1
-    GLONASS,                    // 2
-    GPSGLONASS,                 // 3
-    LoranC,                     // 4
-    Chayka,                     // 5
-    IntegratedNavigationSystem, // 6
-    Surveyed,                   // 7
-    Galileo,                    // 8
+    Undefined = 0,                  // 0
+    GPS = 1,                        // 1
+    GLONASS = 2,                    // 2
+    GPSGLONASS = 3,                 // 3
+    LoranC = 4,                     // 4
+    Chayka = 5,                     // 5
+    IntegratedNavigationSystem = 6, // 6
+    Surveyed = 7,                   // 7
+    Galileo = 8,                    // 8
 }
 
 impl PositionFixType {
@@ -614,6 +636,10 @@ impl PositionFixType {
                 PositionFixType::Undefined
             }
         }
+    }
+
+    pub fn get_value(&self) -> u8 {
+        *self as u8
     }
 }
 
