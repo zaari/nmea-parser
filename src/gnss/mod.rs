@@ -18,6 +18,7 @@ limitations under the License.
 
 pub(crate) mod gga;
 pub(crate) mod gll;
+pub(crate) mod gns;
 pub(crate) mod gsa;
 pub(crate) mod gsv;
 pub(crate) mod rmc;
@@ -32,6 +33,7 @@ pub(crate) mod zda;
 use super::*;
 pub use gga::{GgaData, GgaQualityIndicator};
 pub use gll::GllData;
+pub use gns::GnsData;
 pub use gsa::{GsaData, GsaFixMode};
 pub use gsv::GsvData;
 pub use rmc::RmcData;

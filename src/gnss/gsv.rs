@@ -25,13 +25,13 @@ pub struct GsvData {
     pub prn_number: u8,
 
     /// Elevation in degrees (max 90°)
-    pub elevation: Option<u8>,
+    pub elevation: Option<f32>,
 
     /// Azimuth in degrees from True north (0°-359°)
-    pub azimuth: Option<u16>,
+    pub azimuth: Option<f32>,
 
     /// SNR, 0-99 dB, None when not tracking
-    pub snr: Option<u8>,
+    pub snr: Option<f32>,
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -148,21 +148,21 @@ mod test {
 
                         // 2nd satellite
                         let s2 = v.get(1).unwrap();
-                        assert_eq!(s2.elevation, Some(15));
-                        assert_eq!(s2.azimuth, Some(270));
-                        assert_eq!(s2.snr, Some(0));
+                        assert_eq!(s2.elevation, Some(15.0));
+                        assert_eq!(s2.azimuth, Some(270.0));
+                        assert_eq!(s2.snr, Some(0.0));
 
                         // 5th satellite
                         let s5 = v.get(4).unwrap();
-                        assert_eq!(s5.elevation, Some(25));
-                        assert_eq!(s5.azimuth, Some(170));
-                        assert_eq!(s5.snr, Some(0));
+                        assert_eq!(s5.elevation, Some(25.0));
+                        assert_eq!(s5.azimuth, Some(170.0));
+                        assert_eq!(s5.snr, Some(0.0));
 
                         // 11th satellite
                         let s11 = v.get(10).unwrap();
-                        assert_eq!(s11.elevation, Some(5));
-                        assert_eq!(s11.azimuth, Some(244));
-                        assert_eq!(s11.snr, Some(0));
+                        assert_eq!(s11.elevation, Some(5.0));
+                        assert_eq!(s11.azimuth, Some(244.0));
+                        assert_eq!(s11.snr, Some(0.0));
                     }
                     _ => {
                         assert_eq!(p.strings_count(), 3);
