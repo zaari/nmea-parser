@@ -1,6 +1,6 @@
 [package]
 name          = "nmea-parser"
-version       = "0.8.0-dev"
+version       = "0.7.1"
 publish       = false
 description   = "NMEA 0183 parser for AIS and GNSS sentences"
 authors       = ["Timo Saarinen <zaari@mailbox.org>"]
