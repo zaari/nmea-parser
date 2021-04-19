@@ -283,7 +283,7 @@ impl NavigationStatus {
         }
     }
 
-    pub fn get_value(&self) -> u8 {
+    pub fn to_value(&self) -> u8 {
         *self as u8
     }
 }
@@ -516,7 +516,7 @@ impl ShipType {
         }
     }
 
-    pub fn get_value(&self) -> u8 {
+    pub fn to_value(&self) -> u8 {
         *self as u8
     }
 }
@@ -600,7 +600,7 @@ impl CargoType {
         }
     }
 
-    pub fn get_value(&self) -> u8 {
+    pub fn to_value(&self) -> u8 {
         *self as u8
     }
 }
@@ -663,7 +663,7 @@ impl PositionFixType {
         }
     }
 
-    pub fn get_value(&self) -> u8 {
+    pub fn to_value(&self) -> u8 {
         *self as u8
     }
 }
