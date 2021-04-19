@@ -228,7 +228,7 @@ impl NmeaParser {
         self.saved_vsds.remove(&mmsi)
     }
 
-    /// Return number of MMSI-to-VesselStaticData mappings in store.    
+    /// Return number of MMSI-to-VesselStaticData mappings in store.
     fn vsds_count(&self) -> usize {
         self.saved_vsds.len()
     }
