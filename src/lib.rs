@@ -38,6 +38,7 @@ pub mod ais;
 mod error;
 pub mod gnss;
 mod util;
+mod boat;
 
 pub use error::ParseError;
 use util::*;
@@ -153,6 +154,9 @@ pub enum ParsedMessage {
 
     /// ZDA
     Zda(gnss::ZdaData),
+
+    /// DPT
+    Dpt(boat::DptData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -675,6 +679,11 @@ impl NmeaParser {
                 } else {
                     Ok(ParsedMessage::Incomplete)
                 }
+            },
+            "$DPT" => {
+                boat::dpt::handle(
+                    sentence.as_str()
+                )
             }
             _ => Err(ParseError::UnsupportedSentenceType(format!(
                 "Unsupported sentence type: {}",
