@@ -159,6 +159,9 @@ pub enum ParsedMessage {
 
     /// DBS
     Dbs(gnss::DbsData),
+
+    /// MTW
+    Mtw(gnss::MtwData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -689,6 +692,11 @@ impl NmeaParser {
             },
             "$DBS" => {
                 gnss::dbs::handle(
+                    sentence.as_str()
+                )
+            },
+            "$MTW" => {
+                gnss::mtw::handle(
                     sentence.as_str()
                 )
             },
