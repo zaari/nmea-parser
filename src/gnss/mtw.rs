@@ -1,9 +1,7 @@
 use super::*;
 
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct MtwData {
-
     /// Water temperature in degrees Celsius
     temperature: Option<f64>,
 }
@@ -11,16 +9,13 @@ pub struct MtwData {
 // -------------------------------------------------------------------------------------------------
 
 /// xxMTW: Mean Temperature of Water
-pub(crate) fn handle(
-    sentence: &str,
-) -> Result<ParsedMessage, ParseError> {
+pub(crate) fn handle(sentence: &str) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
     Ok(ParsedMessage::Mtw(MtwData {
-        temperature: pick_number_field(&split, 1)?
+        temperature: pick_number_field(&split, 1)?,
     }))
 }
-
 
 // -------------------------------------------------------------------------------------------------
 
@@ -31,10 +26,8 @@ mod test {
 
     #[test]
     fn test_parse_dpt() {
-        match NmeaParser::new().parse_sentence(
-            "$INMTW,17.9,C*1B"
-        ) {
-            Ok (ps) => match ps {
+        match NmeaParser::new().parse_sentence("$INMTW,17.9,C*1B") {
+            Ok(ps) => match ps {
                 ParsedMessage::Mtw(mtw) => {
                     assert_eq!(mtw.temperature, Some(17.9))
                 }

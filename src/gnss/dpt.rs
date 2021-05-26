@@ -1,6 +1,5 @@
 use super::*;
 
-
 #[derive(Clone, Debug, PartialEq)]
 pub struct DptData {
     /// Water depth relative to transducer, meters
@@ -8,15 +7,12 @@ pub struct DptData {
 
     /// Offset from transducer, meters positive means distance from transducer to water line negative means distance from transducer to keel
     pub transducer_offset: Option<f64>,
-
 }
 
 // -------------------------------------------------------------------------------------------------
 
 /// xxDPT: Depth of Water
-pub(crate) fn handle(
-    sentence: &str,
-) -> Result<ParsedMessage, ParseError> {
+pub(crate) fn handle(sentence: &str) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
     Ok(ParsedMessage::Dpt(DptData {
@@ -24,7 +20,6 @@ pub(crate) fn handle(
         transducer_offset: pick_number_field(&split, 2)?,
     }))
 }
-
 
 // -------------------------------------------------------------------------------------------------
 
@@ -35,10 +30,8 @@ mod test {
 
     #[test]
     fn test_parse_dpt() {
-        match NmeaParser::new().parse_sentence(
-            "$SDDPT,17.5,0.3*67"
-        ) {
-            Ok (ps) => match ps {
+        match NmeaParser::new().parse_sentence("$SDDPT,17.5,0.3*67") {
+            Ok(ps) => match ps {
                 ParsedMessage::Dpt(dpt) => {
                     assert_eq!(dpt.depth_relative_to_transducer, Some(17.5));
                     assert_eq!(dpt.transducer_offset, Some(0.3));

@@ -33,7 +33,6 @@ pub(crate) mod dpt;
 pub(crate) mod dbs;
 pub(crate) mod mtw;
 
-
 use super::*;
 pub use gga::{GgaData, GgaQualityIndicator};
 pub use gll::GllData;
