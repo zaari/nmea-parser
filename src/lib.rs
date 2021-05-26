@@ -38,7 +38,6 @@ pub mod ais;
 mod error;
 pub mod gnss;
 mod util;
-mod boat;
 
 pub use error::ParseError;
 use util::*;
@@ -156,7 +155,7 @@ pub enum ParsedMessage {
     Zda(gnss::ZdaData),
 
     /// DPT
-    Dpt(boat::DptData),
+    Dpt(gnss::DptData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -681,7 +680,7 @@ impl NmeaParser {
                 }
             },
             "$DPT" => {
-                boat::dpt::handle(
+                gnss::dpt::handle(
                     sentence.as_str()
                 )
             }
