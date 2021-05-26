@@ -2,26 +2,29 @@ use super::*;
 
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct DptData {
-    /// Water depth relative to transducer, meters
-    pub depth_relative_to_transducer: Option<f64>,
+pub struct DbsData {
+    /// Water depth below surface, meters
+    pub depth_meters: Option<f64>,
 
-    /// Offset from transducer, meters positive means distance from transducer to water line negative means distance from transducer to keel
-    pub transducer_offset: Option<f64>,
+    /// Water depth below surface, feet
+    pub depth_feet: Option<f64>,
 
+    /// Water depth below surface, Fathoms
+    pub depth_fathoms: Option<f64>,
 }
 
 // -------------------------------------------------------------------------------------------------
 
-/// xxDPT: Depth of Water
+/// xxDPT: Depth Below Surface
 pub(crate) fn handle(
     sentence: &str,
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    Ok(ParsedMessage::Dpt(DptData {
-        depth_relative_to_transducer: pick_number_field(&split, 1)?,
-        transducer_offset: pick_number_field(&split, 2)?,
+    Ok(ParsedMessage::Dbs(DbsData{
+        depth_meters: pick_number_field(&split, 3)?,
+        depth_feet: pick_number_field(&split, 1)?,
+        depth_fathoms: pick_number_field(&split, 5)?,
     }))
 }
 
@@ -36,12 +39,13 @@ mod test {
     #[test]
     fn test_parse_dpt() {
         match NmeaParser::new().parse_sentence(
-            "$SDDPT,17.5,0.3*67"
+            "$SDDBS,16.9,f,5.2,M,2.8,F*32"
         ) {
             Ok (ps) => match ps {
-                ParsedMessage::Dpt(dpt) => {
-                    assert_eq!(dpt.depth_relative_to_transducer, Some(17.5));
-                    assert_eq!(dpt.transducer_offset, Some(0.3));
+                ParsedMessage::Dbs(dbs) => {
+                    assert_eq!(dbs.depth_meters, Some(5.2));
+                    assert_eq!(dbs.depth_feet, Some(16.9));
+                    assert_eq!(dbs.depth_fathoms, Some(2.8))
                 }
                 ParsedMessage::Incomplete => {
                     assert!(false);

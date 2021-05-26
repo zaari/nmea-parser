@@ -30,6 +30,7 @@ pub(crate) mod stn;
 pub(crate) mod vbw;
 pub(crate) mod zda;
 pub(crate) mod dpt;
+pub(crate) mod dbs;
 
 
 use super::*;
@@ -47,6 +48,7 @@ pub use stn::StnData;
 pub use vbw::VbwData;
 pub use zda::ZdaData;
 pub use dpt::DptData;
+pub use dbs::DbsData;
 
 // -------------------------------------------------------------------------------------------------
 

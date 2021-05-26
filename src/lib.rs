@@ -156,6 +156,9 @@ pub enum ParsedMessage {
 
     /// DPT
     Dpt(gnss::DptData),
+
+    /// DBS
+    Dbs(gnss::DbsData),
 }
 
 // -------------------------------------------------------------------------------------------------
@@ -683,7 +686,12 @@ impl NmeaParser {
                 gnss::dpt::handle(
                     sentence.as_str()
                 )
-            }
+            },
+            "$DBS" => {
+                gnss::dbs::handle(
+                    sentence.as_str()
+                )
+            },
             _ => Err(ParseError::UnsupportedSentenceType(format!(
                 "Unsupported sentence type: {}",
                 sentence_type
