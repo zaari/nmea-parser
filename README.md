@@ -94,7 +94,7 @@ history can be found from the [changelog].
 |Feature          |Description                                                     |
 |-----------------|----------------------------------------------------------------|
 |AIS sentences    |VDM/VDO types 1-5, 9-27                                         |
-|GNSS sentences   |ALM, DBS, DPT, DTM, GGA, GLL, GNS, GSA, GSV, MTW, RMC, VTG, MSS, STN, VBW, ZDA |
+|GNSS sentences   |ALM, DBS, DPT, DTM, GGA, GLL, GNS, GSA, GSV, HDT, MTW, MWV, RMC, VTG, MSS, STN, VBW, VHW, ZDA |
 |Satellite systems|GPS, GLONASS, Galileo, BeiDou, NavIC and QZSS                   | 
 
 ## Roadmap
