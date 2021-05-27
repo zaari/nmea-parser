@@ -5,7 +5,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- ...
+- Implementation for GNSS VHW parsing
+- Implementation for GNSS MWV parsing
+- Implementation for GNSS HDT parsing
 
 ## [0.8.0] - 2021-05-26
 ### Added
