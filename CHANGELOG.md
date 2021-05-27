@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - ...
 
+## [0.8.0] - 2021-05-26
+### Added
+- Implementation for GNSS DBS parsing
+- Implementation for GNSS DPT parsing
+- Implementation for GNSS MTW parsing
+
 ## [0.7.2] - 2021-04-19
 ### Changed
 - Documentation fix
