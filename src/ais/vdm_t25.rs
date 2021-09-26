@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Timo Saarinen
+Copyright 2020-2021 Timo Saarinen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -78,12 +78,12 @@ pub(crate) fn handle(
             },
             data: {
                 if addressed {
-                    BitVec::from_bitslice(&bv[70..bv.len()])
+                    BitVec::from_bitslice(&bv[70..max(70, bv.len())])
                 } else {
                     if structured {
-                        BitVec::from_bitslice(&bv[86..bv.len()])
+                        BitVec::from_bitslice(&bv[86..max(86, bv.len())])
                     } else {
-                        BitVec::from_bitslice(&bv[40..bv.len()])
+                        BitVec::from_bitslice(&bv[40..max(40, bv.len())])
                     }
                 }
             },

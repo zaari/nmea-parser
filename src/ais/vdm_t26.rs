@@ -1,5 +1,5 @@
 /*
-Copyright 2020 Timo Saarinen
+Copyright 2020-2021 Timo Saarinen
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -81,12 +81,12 @@ pub(crate) fn handle(
             },
             data: {
                 if addressed {
-                    BitVec::from_bitslice(&bv[70..(bv.len() - 20)])
+                    BitVec::from_bitslice(&bv[70..max(70, bv.len() - 20)])
                 } else {
                     if structured {
-                        BitVec::from_bitslice(&bv[86..(bv.len() - 20)])
+                        BitVec::from_bitslice(&bv[86..max(86, bv.len() - 20)])
                     } else {
-                        BitVec::from_bitslice(&bv[40..(bv.len() - 20)])
+                        BitVec::from_bitslice(&bv[40..max(40, bv.len() - 20)])
                     }
                 }
             },
@@ -105,6 +105,7 @@ mod test {
     fn test_parse_vdm_type26() {
         let mut p = NmeaParser::new();
 
+        // Valid message
         match p.parse_sentence("!AIVDM,1,1,,A,JB3R0GO7p>vQL8tjw0b5hqpd0706kh9d3lR2vbl0400,2*40") {
             Ok(ps) => {
                 match ps {
@@ -113,6 +114,29 @@ mod test {
                         assert_eq!(msbm.mmsi, 137920605);
                         assert_eq!(msbm.dest_mmsi, Some(838351848));
                         assert_eq!(msbm.app_id, None);
+                    }
+                    ParsedMessage::Incomplete => {
+                        assert!(false);
+                    }
+                    _ => {
+                        assert!(false);
+                    }
+                }
+            }
+            Err(e) => {
+                assert_eq!(e.to_string(), "OK");
+            }
+        }
+
+        // Too short payload
+        match p.parse_sentence("!AIVDM,1,1,,,Jl@bhbmCU`:lwOd0,0*48") {
+            Ok(ps) => {
+                match ps {
+                    // The expected result
+                    ParsedMessage::MultipleSlotBinaryMessage(msbm) => {
+                        assert_eq!(msbm.mmsi, 285913259);
+                        assert_eq!(msbm.dest_mmsi, None);
+                        assert_eq!(msbm.app_id, Some(16254));
                     }
                     ParsedMessage::Incomplete => {
                         assert!(false);

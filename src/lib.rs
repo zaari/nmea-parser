@@ -33,6 +33,7 @@ pub use chrono;
 use chrono::prelude::*;
 use chrono::{DateTime, TimeZone};
 use std::collections::HashMap;
+use std::cmp::max;
 
 pub mod ais;
 mod error;
