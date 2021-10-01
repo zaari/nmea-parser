@@ -592,7 +592,7 @@ mod test {
 
     #[test]
     fn test_parse_proprietary() {
-        // Try a sentence with invalite utc
+        // Try a proprietary sentence
         let mut p = NmeaParser::new();
         assert_eq!(
             p.parse_sentence("$PGRME,15.0,M,45.0,M,25.0,M*1C"),
@@ -600,10 +600,35 @@ mod test {
                 "Unsupported sentence type: $RME"
             )))
         );
+        // Try a proprietary sentence with four characters
         assert_eq!(
             p.parse_sentence("$PGRM,00,1,,,*15"),
             Err(ParseError::UnsupportedSentenceType(String::from(
                 "Unsupported sentence type: $PGRM"
+            )))
+        );
+    }
+
+    #[test]
+    fn test_parse_invalid_talker() {
+        // Try parse malformed sentences
+        let mut p = NmeaParser::new();
+        assert_eq!(
+            p.parse_sentence("$QQ,*2C"),
+            Err(ParseError::UnsupportedSentenceType(String::from(
+                "Unsupported sentence type: $QQ"
+            )))
+        );
+        assert_eq!(
+            p.parse_sentence("$A,a0,*10"),
+            Err(ParseError::InvalidSentence(String::from(
+                "Invalid talker identifier"
+            )))
+        );
+        assert_eq!(
+            p.parse_sentence("$,0a,*51"),
+            Err(ParseError::InvalidSentence(String::from(
+                "Invalid talker identifier"
             )))
         );
     }
