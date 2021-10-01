@@ -96,6 +96,29 @@ impl std::fmt::Display for Station {
     }
 }
 
+impl std::str::FromStr for Station {
+    type Err = ParseError;
+
+    fn from_str(talker_id: &str) -> Result<Self, Self::Err> {
+        if talker_id.len() < 2 {
+            return Err(ParseError::InvalidSentence(
+                "Invalid station identifier".to_string(),
+            ));
+        }
+        match &talker_id[0..2] {
+            "AB" => Ok(Self::BaseStation),
+            "AD" => Ok(Self::DependentAisBaseStation),
+            "AI" => Ok(Self::MobileStation),
+            "AN" => Ok(Self::AidToNavigationStation),
+            "AR" => Ok(Self::AisReceivingStation),
+            "AS" => Ok(Self::LimitedBaseStation),
+            "AT" => Ok(Self::AisTransmittingStation),
+            "AX" => Ok(Self::RepeaterStation),
+            _ => Ok(Self::Other),
+        }
+    }
+}
+
 // -------------------------------------------------------------------------------------------------
 
 /// Types 1, 2, 3 and 18: Position Report Class A, and Long Range AIS Broadcast message
