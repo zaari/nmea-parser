@@ -8,8 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation for GNSS VHW parsing
 - Implementation for GNSS MWV parsing
 - Implementation for GNSS HDT parsing
+- Test for bad talker ids
 ### Changed
 - Fixed a payload boundary issue for AIS message types 26 and 27"
+- Fixed panic on propriatary messages
 
 ## [0.8.0] - 2021-05-26
 ### Added
