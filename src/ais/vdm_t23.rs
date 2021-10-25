@@ -243,25 +243,25 @@ pub(crate) fn handle(
         GroupAssignmentCommand {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
-            ne_lat: { Some(pick_i64(&bv, 58, 17) as f64 / 600.0) },
-            ne_lon: { Some(pick_i64(&bv, 40, 18) as f64 / 600.0) },
-            sw_lat: { Some(pick_i64(&bv, 93, 17) as f64 / 600.0) },
-            sw_lon: { Some(pick_i64(&bv, 75, 18) as f64 / 600.0) },
-            station_type: StationType::new(pick_u64(&bv, 110, 4) as u8)?,
-            ship_type: ShipType::new(pick_u64(&bv, 114, 8) as u8),
-            cargo_type: CargoType::new(pick_u64(&bv, 114, 8) as u8),
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
+            ne_lat: { Some(pick_i64(bv, 58, 17) as f64 / 600.0) },
+            ne_lon: { Some(pick_i64(bv, 40, 18) as f64 / 600.0) },
+            sw_lat: { Some(pick_i64(bv, 93, 17) as f64 / 600.0) },
+            sw_lon: { Some(pick_i64(bv, 75, 18) as f64 / 600.0) },
+            station_type: StationType::new(pick_u64(bv, 110, 4) as u8)?,
+            ship_type: ShipType::new(pick_u64(bv, 114, 8) as u8),
+            cargo_type: CargoType::new(pick_u64(bv, 114, 8) as u8),
             txrx: {
-                let val = pick_u64(&bv, 144, 2) as u8;
+                let val = pick_u64(bv, 144, 2) as u8;
                 if val < 4 {
                     val
                 } else {
                     return Err(format!("Tx/Tr mode field out of range: {}", val).into());
                 }
             },
-            interval: StationInterval::new(pick_u64(&bv, 146, 4) as u8)?,
+            interval: StationInterval::new(pick_u64(bv, 146, 4) as u8)?,
             quiet: {
-                let val = pick_u64(&bv, 150, 4) as u8;
+                let val = pick_u64(bv, 150, 4) as u8;
                 match val {
                     0 => None,
                     1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13 | 14 | 15 => Some(val),

@@ -284,7 +284,7 @@ impl NmeaParser {
             checksum ^= c as u8;
         }
         let checksum_hex_calculated = format!("{:02X?}", checksum);
-        if checksum_hex_calculated != checksum_hex_given && checksum_hex_given != "" {
+        if checksum_hex_calculated != checksum_hex_given && !checksum_hex_given.is_empty() {
             return Err(ParseError::CorruptedSentence(format!(
                 "Corrupted NMEA sentence: {:02X?} != {:02X?}",
                 checksum_hex_calculated, checksum_hex_given

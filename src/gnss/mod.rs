@@ -110,7 +110,7 @@ impl std::str::FromStr for NavigationSystem {
     type Err = ParseError;
 
     fn from_str(talker_id: &str) -> Result<Self, Self::Err> {
-        if talker_id.len() < 1 {
+        if talker_id.is_empty() {
             return Err(ParseError::InvalidSentence(
                 "Invalid talker identifier".to_string(),
             ));

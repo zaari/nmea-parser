@@ -45,8 +45,8 @@ pub(crate) fn handle(
     Ok(ParsedMessage::UtcDateInquiry(UtcDateInquiry {
         own_vessel: { own_vessel },
         station: { station },
-        source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
+        source_mmsi: { pick_u64(bv, 8, 30) as u32 },
+        destination_mmsi: { pick_u64(bv, 40, 30) as u32 },
     }))
 }
 

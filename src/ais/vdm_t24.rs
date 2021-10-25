@@ -24,13 +24,13 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     // Check whether the message bit layout follows part A or part B format
     // We use two complementary booleans to make the code more readable.
-    let (part_a, part_b) = match pick_u64(&bv, 38, 2) {
+    let (part_a, part_b) = match pick_u64(bv, 38, 2) {
         0 => (true, false),
         1 => (false, true),
         _ => {
             return Err(format!(
                 "AIVDM type 24 part number has unexpected value: {}",
-                pick_u64(&bv, 38, 2)
+                pick_u64(bv, 38, 2)
             )
             .into());
         }
@@ -40,12 +40,12 @@ pub(crate) fn handle(
     let vsd = VesselStaticData {
         own_vessel,
         ais_type: AisClass::ClassB,
-        mmsi: pick_u64(&bv, 8, 30) as u32,
+        mmsi: pick_u64(bv, 8, 30) as u32,
         ais_version_indicator: 0,
         imo_number: None,
         call_sign: {
             if part_b {
-                let raw = pick_string(&bv, 90, 7);
+                let raw = pick_string(bv, 90, 7);
                 match raw.as_str() {
                     "" => None,
                     _ => Some(raw),
@@ -56,7 +56,7 @@ pub(crate) fn handle(
         },
         name: {
             if part_a {
-                let raw = pick_string(&bv, 40, 120);
+                let raw = pick_string(bv, 40, 120);
                 match raw.as_str() {
                     "" => None,
                     _ => Some(raw),
@@ -67,63 +67,63 @@ pub(crate) fn handle(
         },
         ship_type: {
             if part_b {
-                ShipType::new(pick_u64(&bv, 40, 8) as u8)
+                ShipType::new(pick_u64(bv, 40, 8) as u8)
             } else {
                 ShipType::NotAvailable
             }
         },
         cargo_type: {
             if part_b {
-                CargoType::new(pick_u64(&bv, 40, 8) as u8)
+                CargoType::new(pick_u64(bv, 40, 8) as u8)
             } else {
                 CargoType::Undefined
             }
         },
         equipment_vendor_id: {
             if part_b {
-                Some(pick_string(&bv, 48, 3))
+                Some(pick_string(bv, 48, 3))
             } else {
                 None
             }
         },
         equipment_model: {
             if part_b {
-                Some(pick_u64(&bv, 66, 4) as u8)
+                Some(pick_u64(bv, 66, 4) as u8)
             } else {
                 None
             }
         },
         equipment_serial_number: {
             if part_b {
-                Some(pick_u64(&bv, 70, 20) as u32)
+                Some(pick_u64(bv, 70, 20) as u32)
             } else {
                 None
             }
         },
         dimension_to_bow: {
             if part_b {
-                Some(pick_u64(&bv, 132, 9) as u16)
+                Some(pick_u64(bv, 132, 9) as u16)
             } else {
                 None
             }
         },
         dimension_to_stern: {
             if part_b {
-                Some(pick_u64(&bv, 141, 9) as u16)
+                Some(pick_u64(bv, 141, 9) as u16)
             } else {
                 None
             }
         },
         dimension_to_port: {
             if part_b {
-                Some(pick_u64(&bv, 150, 6) as u16)
+                Some(pick_u64(bv, 150, 6) as u16)
             } else {
                 None
             }
         },
         dimension_to_starboard: {
             if part_b {
-                Some(pick_u64(&bv, 156, 6) as u16)
+                Some(pick_u64(bv, 156, 6) as u16)
             } else {
                 None
             }
@@ -134,7 +134,7 @@ pub(crate) fn handle(
         destination: None,
         mothership_mmsi: {
             if part_b {
-                Some(pick_u64(&bv, 132, 30) as u32)
+                Some(pick_u64(bv, 132, 30) as u32)
             } else {
                 None
             }

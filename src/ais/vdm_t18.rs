@@ -25,18 +25,18 @@ pub(crate) fn handle(
         own_vessel: { own_vessel },
         station: { station },
         ais_type: { AisClass::ClassB },
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
+        mmsi: { pick_u64(bv, 8, 30) as u32 },
         sog_knots: {
-            let raw = pick_u64(&bv, 46, 10);
+            let raw = pick_u64(bv, 46, 10);
             if raw < 1023 {
                 Some((raw as f64) * 0.1)
             } else {
                 None
             }
         },
-        high_position_accuracy: pick_u64(&bv, 56, 1) != 0,
+        high_position_accuracy: pick_u64(bv, 56, 1) != 0,
         longitude: {
-            let lon_raw = pick_i64(&bv, 57, 28) as i32;
+            let lon_raw = pick_i64(bv, 57, 28) as i32;
             if lon_raw != 0x6791AC0 {
                 Some((lon_raw as f64) / 600000.0)
             } else {
@@ -44,7 +44,7 @@ pub(crate) fn handle(
             }
         },
         latitude: {
-            let lat_raw = pick_i64(&bv, 85, 27) as i32;
+            let lat_raw = pick_i64(bv, 85, 27) as i32;
             if lat_raw != 0x3412140 {
                 Some((lat_raw as f64) / 600000.0)
             } else {
@@ -52,7 +52,7 @@ pub(crate) fn handle(
             }
         },
         cog: {
-            let cog_raw = pick_u64(&bv, 112, 12);
+            let cog_raw = pick_u64(bv, 112, 12);
             if cog_raw != 0xE10 {
                 Some(cog_raw as f64 * 0.1)
             } else {
@@ -60,23 +60,23 @@ pub(crate) fn handle(
             }
         },
         heading_true: {
-            let th_raw = pick_u64(&bv, 124, 9);
+            let th_raw = pick_u64(bv, 124, 9);
             if th_raw != 511 {
                 Some(th_raw as f64)
             } else {
                 None
             }
         },
-        timestamp_seconds: pick_u64(&bv, 133, 6) as u8,
+        timestamp_seconds: pick_u64(bv, 133, 6) as u8,
         class_b_unit_flag: { None },
-        class_b_display: Some(pick_u64(&bv, 141, 1) != 0),
-        class_b_dsc: Some(pick_u64(&bv, 142, 1) != 0),
-        class_b_band_flag: Some(pick_u64(&bv, 143, 1) != 0),
-        class_b_msg22_flag: Some(pick_u64(&bv, 144, 1) != 0),
-        class_b_mode_flag: Some(pick_u64(&bv, 145, 1) != 0),
-        raim_flag: pick_u64(&bv, 141, 1) != 0,
+        class_b_display: Some(pick_u64(bv, 141, 1) != 0),
+        class_b_dsc: Some(pick_u64(bv, 142, 1) != 0),
+        class_b_band_flag: Some(pick_u64(bv, 143, 1) != 0),
+        class_b_msg22_flag: Some(pick_u64(bv, 144, 1) != 0),
+        class_b_mode_flag: Some(pick_u64(bv, 145, 1) != 0),
+        raim_flag: pick_u64(bv, 141, 1) != 0,
         class_b_css_flag: { None },
-        radio_status: Some(pick_u64(&bv, 149, 19) as u32),
+        radio_status: Some(pick_u64(bv, 149, 19) as u32),
         nav_status: NavigationStatus::NotDefined,
         rot: None,
         rot_direction: None,

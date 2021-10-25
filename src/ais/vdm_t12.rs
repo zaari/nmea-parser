@@ -55,11 +55,11 @@ pub(crate) fn handle(
         AddressedSafetyRelatedMessage {
             own_vessel: { own_vessel },
             station: { station },
-            source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
-            sequence_number: { pick_u64(&bv, 38, 2) as u8 },
-            destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
-            retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
-            text: { pick_string(&bv, 72, 156) },
+            source_mmsi: { pick_u64(bv, 8, 30) as u32 },
+            sequence_number: { pick_u64(bv, 38, 2) as u8 },
+            destination_mmsi: { pick_u64(bv, 40, 30) as u32 },
+            retransmit_flag: { pick_u64(bv, 70, 1) != 0 },
+            text: { pick_string(bv, 72, 156) },
         },
     ))
 }
