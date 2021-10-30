@@ -52,7 +52,7 @@ pub struct BaseStationReport {
 
     /// Communication state
     /// Diagnostic information for the radio system.
-    /// https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1371-1-200108-S!!PDF-E.pdf
+    /// <https://www.itu.int/dms_pubrec/itu-r/rec/m/R-REC-M.1371-1-200108-S!!PDF-E.pdf>
     pub radio_status: u32,
 }
 
