@@ -113,8 +113,8 @@ impl GnsModeIndicator {
     }
 }
 
-impl std::fmt::Display for GnsModeIndicator {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GnsModeIndicator {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             GnsModeIndicator::Invalid => write!(f, "invalid"),
             GnsModeIndicator::Autonomous => write!(f, "autonomous fix"),

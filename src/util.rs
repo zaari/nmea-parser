@@ -93,8 +93,8 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
         // 6-bits from the BitVec.
         match pick_u64(bv, index + i * AIS_CHAR_BITS, AIS_CHAR_BITS) as u32 {
             0 => break,
-            ch if ch < 32 => res.push(std::char::from_u32(64 + ch).unwrap()),
-            ch if ch < 64 => res.push(std::char::from_u32(ch).unwrap()),
+            ch if ch < 32 => res.push(core::char::from_u32(64 + ch).unwrap()),
+            ch if ch < 64 => res.push(core::char::from_u32(ch).unwrap()),
             ch => unreachable!("6-bit AIS character expected but value {} encountered!", ch),
         }
     }
@@ -173,7 +173,7 @@ fn pick_eta_with_now(
 }
 
 /// Pick number field from a comma-separated sentence or `None` in case of an empty field.
-pub(crate) fn pick_number_field<T: std::str::FromStr>(
+pub(crate) fn pick_number_field<T: core::str::FromStr>(
     split: &[&str],
     num: usize,
 ) -> Result<Option<T>, String> {

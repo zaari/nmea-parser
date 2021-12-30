@@ -52,8 +52,8 @@ pub enum GsaFixMode {
     Fix3D,
 }
 
-impl std::fmt::Display for GsaFixMode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GsaFixMode {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             GsaFixMode::NotAvailable => write!(f, "no available"),
             GsaFixMode::Fix2D => write!(f, "2D fix"),

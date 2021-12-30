@@ -80,8 +80,8 @@ impl Default for Station {
     }
 }
 
-impl std::fmt::Display for Station {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for Station {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Station::BaseStation => write!(f, "base station"),
             Station::DependentAisBaseStation => write!(f, "dependent AIS base station"),
@@ -96,7 +96,7 @@ impl std::fmt::Display for Station {
     }
 }
 
-impl std::str::FromStr for Station {
+impl core::str::FromStr for Station {
     type Err = ParseError;
 
     fn from_str(talker_id: &str) -> Result<Self, Self::Err> {
@@ -243,8 +243,8 @@ impl Default for AisClass {
     }
 }
 
-impl std::fmt::Display for AisClass {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for AisClass {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             AisClass::Unknown => write!(f, "unknown"),
             AisClass::ClassA => write!(f, "Class A"),
@@ -311,8 +311,8 @@ impl NavigationStatus {
     }
 }
 
-impl std::fmt::Display for NavigationStatus {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for NavigationStatus {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             NavigationStatus::UnderWayUsingEngine => write!(f, "under way using engine"),
             NavigationStatus::AtAnchor => write!(f, "at anchor"),
@@ -353,8 +353,8 @@ pub enum PositioningSystemMeta {
     Inoperative,
 }
 
-impl std::fmt::Display for PositioningSystemMeta {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for PositioningSystemMeta {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             PositioningSystemMeta::Operative => write!(f, "operative"),
             PositioningSystemMeta::ManualInputMode => write!(f, "manual input mode"),
@@ -385,8 +385,8 @@ impl Default for RotDirection {
     }
 }
 
-impl std::fmt::Display for RotDirection {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for RotDirection {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             RotDirection::Port => write!(f, "port"),
             RotDirection::Center => write!(f, "center"),
@@ -550,8 +550,8 @@ impl Default for ShipType {
     }
 }
 
-impl std::fmt::Display for ShipType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for ShipType {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             ShipType::NotAvailable => write!(f, "(not available)"),
             ShipType::Reserved1 => write!(f, "(reserved)"),
@@ -628,8 +628,8 @@ impl CargoType {
     }
 }
 
-impl std::fmt::Display for CargoType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for CargoType {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             CargoType::Undefined => write!(f, "undefined"),
             CargoType::HazardousCategoryA => write!(f, "hazardous category A"),
@@ -691,8 +691,8 @@ impl PositionFixType {
     }
 }
 
-impl std::fmt::Display for PositionFixType {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for PositionFixType {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             PositionFixType::Undefined => write!(f, "undefined"),
             PositionFixType::GPS => write!(f, "GPS"),

@@ -14,8 +14,8 @@ edition       = "2018"
 #rust-version  = "1.43"
 
 [dependencies]
-bitvec     = "0.22.3"
-num-traits = "0.2.14"
+bitvec     = { version = "0.22.3", default-features = false, features = ["alloc"] }
+num-traits = { version = "0.2.14", default-features = false }
 chrono     = "0.4.19"
 log        = "0.4.14"
 
