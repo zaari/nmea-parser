@@ -32,7 +32,7 @@ use bitvec::prelude::*;
 pub use chrono;
 use chrono::prelude::*;
 use chrono::{DateTime, TimeZone};
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use core::cmp::max;
 use core::str::FromStr;
 
