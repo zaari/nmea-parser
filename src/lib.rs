@@ -22,12 +22,18 @@ limitations under the License.
 
 #![forbid(unsafe_code)]
 #![allow(dead_code)]
+#![cfg_attr(not(test), no_std)]
 
 #[macro_use]
 extern crate log;
 
 extern crate num_traits;
 
+#[macro_use]
+extern crate alloc;
+
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use bitvec::prelude::*;
 pub use chrono;
 use chrono::prelude::*;
@@ -35,6 +41,9 @@ use chrono::{DateTime, TimeZone};
 use hashbrown::HashMap;
 use core::cmp::max;
 use core::str::FromStr;
+
+#[cfg(not(test))]
+use num_traits::float::FloatCore;
 
 pub mod ais;
 mod error;
