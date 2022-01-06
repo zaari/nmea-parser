@@ -93,8 +93,8 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
         // 6-bits from the BitVec.
         match pick_u64(bv, index + i * AIS_CHAR_BITS, AIS_CHAR_BITS) as u32 {
             0 => break,
-            ch if ch < 32 => res.push(std::char::from_u32(64 + ch).unwrap()),
-            ch if ch < 64 => res.push(std::char::from_u32(ch).unwrap()),
+            ch if ch < 32 => res.push(core::char::from_u32(64 + ch).unwrap()),
+            ch if ch < 64 => res.push(core::char::from_u32(ch).unwrap()),
             ch => unreachable!("6-bit AIS character expected but value {} encountered!", ch),
         }
     }
@@ -106,7 +106,7 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
 
 /// Pick ETA based on UTC month, day, hour and minute.
 pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Result<Option<DateTime<Utc>>, ParseError> {
-    pick_eta_with_now(bv, index, Utc::now())
+    pick_eta_with_now(bv, index, Utc.ymd(2000, 1, 1).and_hms(0, 0, 0))
 }
 
 /// Pick ETA based on UTC month, day, hour and minute. Define also 'now'. This function is needed
@@ -173,7 +173,7 @@ fn pick_eta_with_now(
 }
 
 /// Pick number field from a comma-separated sentence or `None` in case of an empty field.
-pub(crate) fn pick_number_field<T: std::str::FromStr>(
+pub(crate) fn pick_number_field<T: core::str::FromStr>(
     split: &[&str],
     num: usize,
 ) -> Result<Option<T>, String> {
@@ -221,7 +221,8 @@ pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to `DateTime<Utc>`.
 pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, ParseError> {
-    let century = (Utc::now().year() / 100) * 100;
+    let now = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+    let century = (now.year() / 100) * 100;
     let (day, month, year) =
         parse_date(yymmdd).map_err(|_| format!("Invalid date format: {}", yymmdd))?;
     let (hour, minute, second) =

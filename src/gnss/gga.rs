@@ -94,8 +94,8 @@ impl GgaQualityIndicator {
     }
 }
 
-impl std::fmt::Display for GgaQualityIndicator {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GgaQualityIndicator {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             GgaQualityIndicator::Invalid => write!(f, "invalid"),
             GgaQualityIndicator::GpsFix => write!(f, "GPS fix"),
@@ -119,7 +119,7 @@ pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
 ) -> Result<ParsedMessage, ParseError> {
-    let now: DateTime<Utc> = Utc::now();
+    let now: DateTime<Utc> = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
     let split: Vec<&str> = sentence.split(',').collect();
 
     Ok(ParsedMessage::Gga(GgaData {
@@ -160,11 +160,7 @@ mod test {
                     // The expected result
                     ParsedMessage::Gga(gga) => {
                         assert_eq!(gga.timestamp, {
-                            let now: DateTime<Utc> = Utc::now();
-                            Some(
-                                Utc.ymd(now.year(), now.month(), now.day())
-                                    .and_hms(12, 35, 19),
-                            )
+                            Some(Utc.ymd(2000, 01, 01).and_hms(12, 35, 19))
                         });
                         assert::close(gga.latitude.unwrap_or(0.0), 48.117, 0.001);
                         assert::close(gga.longitude.unwrap_or(0.0), 11.517, 0.001);
@@ -226,11 +222,7 @@ mod test {
                     // The expected result
                     ParsedMessage::Gga(gga) => {
                         assert_eq!(gga.timestamp, {
-                            let now: DateTime<Utc> = Utc::now();
-                            Some(
-                                Utc.ymd(now.year(), now.month(), now.day())
-                                    .and_hms(12, 35, 19),
-                            )
+                            Some(Utc.ymd(2000, 01, 01).and_hms(12, 35, 19))
                         });
                         assert_eq!(gga.latitude, None);
                         assert_eq!(gga.longitude, None);

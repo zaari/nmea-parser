@@ -14,8 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-use std::fmt;
-use std::num::{ParseIntError, ParseFloatError};
+use core::fmt;
+use core::num::{ParseIntError, ParseFloatError};
+use alloc::string::String;
 
 /// Parse error returned by `NmeaParser::parse_sentence()`. `String` data type is used instead of
 /// `static &str` because the error messages are expected to contain context-specific details.

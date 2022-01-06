@@ -9,9 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Implementation for GNSS MWV parsing
 - Implementation for GNSS HDT parsing
 - Test for bad talker ids
+- Support for no_std use-cases, although an allocator is still required
 ### Changed
 - Fixed a payload boundary issue for AIS message types 26 and 27"
 - Fixed panic on propriatary messages
+- For messages without a date, use 2000-01-01 instead of the current date
+  (applies to GGA, GLL, GNS and AIVDM type 5)
 
 ## [0.8.0] - 2021-05-26
 ### Added

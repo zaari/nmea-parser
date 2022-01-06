@@ -90,8 +90,8 @@ pub enum NavigationSystem {
     Other,
 }
 
-impl std::fmt::Display for NavigationSystem {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for NavigationSystem {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             NavigationSystem::Combination => write!(f, "combination"),
             NavigationSystem::Gps => write!(f, "GPS"),
@@ -106,7 +106,7 @@ impl std::fmt::Display for NavigationSystem {
     }
 }
 
-impl std::str::FromStr for NavigationSystem {
+impl core::str::FromStr for NavigationSystem {
     type Err = ParseError;
 
     fn from_str(talker_id: &str) -> Result<Self, Self::Err> {
@@ -169,8 +169,8 @@ impl FaaMode {
     }
 }
 
-impl std::fmt::Display for FaaMode {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for FaaMode {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             FaaMode::Autonomous => write!(f, "A"),
             FaaMode::Differential => write!(f, "D"),

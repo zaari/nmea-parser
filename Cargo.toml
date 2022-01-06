@@ -7,17 +7,18 @@ authors       = ["Timo Saarinen <zaari@mailbox.org>"]
 license       = "Apache-2.0"
 repository    = "https://github.com/zaari/nmea-parser"
 documentation = "https://docs.rs/nmea-parser"
-keywords      = ["nmea", "ais", "gnss", "gps"]
+keywords      = ["nmea", "ais", "gnss", "gps", "no_std"]
 categories    = ["parsing"]
 readme        = "README.md"
 edition       = "2018"
 #rust-version  = "1.43"
 
 [dependencies]
-bitvec     = "0.22.3"
-num-traits = "0.2.14"
-chrono     = "0.4.19"
+bitvec     = { version = "0.22.3", default-features = false, features = ["alloc"] }
+num-traits = { version = "0.2.14", default-features = false }
+chrono     = { version = "0.4.19", default-features = false }
 log        = "0.4.14"
+hashbrown  = "0.11"
 
 [dev-dependencies]
 assert     = "0.7.4"

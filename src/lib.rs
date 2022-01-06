@@ -19,22 +19,33 @@ limitations under the License.
 //! This crate aims to cover all AIS sentences and the most important GNSS sentences used with
 //! NMEA 0183 standard. The parser supports AIS class A and B types. It also identifies GPS,
 //! GLONASS, Galileo, BeiDou, NavIC and QZSS satellite systems.
+//!
+//! Usage in a `#[no_std]` environment is also possible though an allocator is required
 
 #![forbid(unsafe_code)]
 #![allow(dead_code)]
+#![cfg_attr(not(test), no_std)]
 
 #[macro_use]
 extern crate log;
 
 extern crate num_traits;
 
+#[macro_use]
+extern crate alloc;
+
+use alloc::string::{String, ToString};
+use alloc::vec::Vec;
 use bitvec::prelude::*;
 pub use chrono;
 use chrono::prelude::*;
 use chrono::{DateTime, TimeZone};
-use std::collections::HashMap;
-use std::cmp::max;
-use std::str::FromStr;
+use hashbrown::HashMap;
+use core::cmp::max;
+use core::str::FromStr;
+
+#[cfg(not(test))]
+use num_traits::float::FloatCore;
 
 pub mod ais;
 mod error;

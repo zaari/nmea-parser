@@ -113,8 +113,8 @@ impl GnsModeIndicator {
     }
 }
 
-impl std::fmt::Display for GnsModeIndicator {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+impl core::fmt::Display for GnsModeIndicator {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             GnsModeIndicator::Invalid => write!(f, "invalid"),
             GnsModeIndicator::Autonomous => write!(f, "autonomous fix"),
@@ -138,7 +138,7 @@ pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
 ) -> Result<ParsedMessage, ParseError> {
-    let now: DateTime<Utc> = Utc::now();
+    let now: DateTime<Utc> = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
     let split: Vec<&str> = sentence.split(',').collect();
     let modes: Vec<char> = split.get(6).unwrap_or(&"").chars().collect();
 
@@ -187,11 +187,7 @@ mod test {
                     // The expected result
                     ParsedMessage::Gns(gns) => {
                         assert_eq!(gns.timestamp, {
-                            let now: DateTime<Utc> = Utc::now();
-                            Some(
-                                Utc.ymd(now.year(), now.month(), now.day())
-                                    .and_hms(09, 03, 10),
-                            )
+                            Some(Utc.ymd(2000, 01, 01).and_hms(09, 03, 10))
                         });
                         assert::close(gns.latitude.unwrap_or(0.0), 48.114, 0.001);
                         assert::close(gns.longitude.unwrap_or(0.0), 11.569, 0.001);
@@ -226,11 +222,7 @@ mod test {
                     // The expected result
                     ParsedMessage::Gns(gns) => {
                         assert_eq!(gns.timestamp, {
-                            let now: DateTime<Utc> = Utc::now();
-                            Some(
-                                Utc.ymd(now.year(), now.month(), now.day())
-                                    .and_hms(12, 35, 19),
-                            )
+                            Some(Utc.ymd(2000, 1, 1).and_hms(12, 35, 19))
                         });
                         assert_eq!(gns.latitude, None);
                         assert_eq!(gns.longitude, None);
