@@ -530,8 +530,8 @@ impl ShipType {
 
             60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 => ShipType::Passenger,
             70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 => ShipType::Cargo,
-            80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 => ShipType::Cargo,
-            90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99 => ShipType::Cargo,
+            80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 => ShipType::Tanker,
+            90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99 => ShipType::Other,
             _ => {
                 warn!("Unexpected ship and cargo type: {}", raw);
                 ShipType::NotAvailable
