@@ -487,60 +487,60 @@ impl NmeaParser {
                         // Ship static voyage related data
                         5 => ais::vdm_t5::handle(&bv, station, own_vessel),
                         // Addressed binary message
-                        6 => ais::vdm_t6::handle(&bv, station, own_vessel),
-                        // Binary acknowledge
-                        7 => {
-                            // TODO: implementation
-                            Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )))
-                        }
-                        // Binary broadcast message
-                        8 => {
-                            // TODO: implementation
-                            Err(ParseError::UnsupportedSentenceType(format!(
-                                "Unsupported {} message type: {}",
-                                sentence_type, message_type
-                            )))
-                        }
-                        // Standard SAR aircraft position report
-                        9 => ais::vdm_t9::handle(&bv, station, own_vessel),
-                        // UTC and Date inquiry
-                        10 => ais::vdm_t10::handle(&bv, station, own_vessel),
-                        // UTC and date response
-                        11 => ais::vdm_t11::handle(&bv, station, own_vessel),
-                        // Addressed safety related message
-                        12 => ais::vdm_t12::handle(&bv, station, own_vessel),
-                        // Safety related acknowledge
-                        13 => ais::vdm_t13::handle(&bv, station, own_vessel),
-                        // Safety related broadcast message
-                        14 => ais::vdm_t14::handle(&bv, station, own_vessel),
-                        // Interrogation
-                        15 => ais::vdm_t15::handle(&bv, station, own_vessel),
-                        // Assigned mode command
-                        16 => ais::vdm_t16::handle(&bv, station, own_vessel),
-                        // GNSS binary broadcast message
-                        17 => ais::vdm_t17::handle(&bv, station, own_vessel),
+                        // 6 => ais::vdm_t6::handle(&bv, station, own_vessel),
+                        // // Binary acknowledge
+                        // 7 => {
+                        //     // TODO: implementation
+                        //     Err(ParseError::UnsupportedSentenceType(format!(
+                        //         "Unsupported {} message type: {}",
+                        //         sentence_type, message_type
+                        //     )))
+                        // }
+                        // // Binary broadcast message
+                        // 8 => {
+                        //     // TODO: implementation
+                        //     Err(ParseError::UnsupportedSentenceType(format!(
+                        //         "Unsupported {} message type: {}",
+                        //         sentence_type, message_type
+                        //     )))
+                        // }
+                        // // Standard SAR aircraft position report
+                        // 9 => ais::vdm_t9::handle(&bv, station, own_vessel),
+                        // // UTC and Date inquiry
+                        // 10 => ais::vdm_t10::handle(&bv, station, own_vessel),
+                        // // UTC and date response
+                        // 11 => ais::vdm_t11::handle(&bv, station, own_vessel),
+                        // // Addressed safety related message
+                        // 12 => ais::vdm_t12::handle(&bv, station, own_vessel),
+                        // // Safety related acknowledge
+                        // 13 => ais::vdm_t13::handle(&bv, station, own_vessel),
+                        // // Safety related broadcast message
+                        // 14 => ais::vdm_t14::handle(&bv, station, own_vessel),
+                        // // Interrogation
+                        // 15 => ais::vdm_t15::handle(&bv, station, own_vessel),
+                        // // Assigned mode command
+                        // 16 => ais::vdm_t16::handle(&bv, station, own_vessel),
+                        // // GNSS binary broadcast message
+                        // 17 => ais::vdm_t17::handle(&bv, station, own_vessel),
                         // Standard class B CS position report
                         18 => ais::vdm_t18::handle(&bv, station, own_vessel),
-                        // Extended class B equipment position report
-                        19 => ais::vdm_t19::handle(&bv, station, own_vessel),
-                        // Data link management
-                        20 => ais::vdm_t20::handle(&bv, station, own_vessel),
-                        // Aids-to-navigation report
-                        21 => ais::vdm_t21::handle(&bv, station, own_vessel),
-                        // Channel management
-                        22 => ais::vdm_t22::handle(&bv, station, own_vessel),
-                        // Group assignment command
-                        23 => ais::vdm_t23::handle(&bv, station, own_vessel),
+                        // // Extended class B equipment position report
+                        // 19 => ais::vdm_t19::handle(&bv, station, own_vessel),
+                        // // Data link management
+                        // 20 => ais::vdm_t20::handle(&bv, station, own_vessel),
+                        // // Aids-to-navigation report
+                        // 21 => ais::vdm_t21::handle(&bv, station, own_vessel),
+                        // // Channel management
+                        // 22 => ais::vdm_t22::handle(&bv, station, own_vessel),
+                        // // Group assignment command
+                        // 23 => ais::vdm_t23::handle(&bv, station, own_vessel),
                         // Class B CS static data report
                         24 => ais::vdm_t24::handle(&bv, station, self, own_vessel),
                         // Single slot binary message
-                        25 => ais::vdm_t25::handle(&bv, station, own_vessel),
-                        // Multiple slot binary message
-                        26 => ais::vdm_t26::handle(&bv, station, own_vessel),
-                        // Long range AIS broadcast message
+                        // 25 => ais::vdm_t25::handle(&bv, station, own_vessel),
+                        // // Multiple slot binary message
+                        // 26 => ais::vdm_t26::handle(&bv, station, own_vessel),
+                        // // Long range AIS broadcast message
                         27 => ais::vdm_t27::handle(&bv, station, own_vessel),
                         _ => Err(ParseError::UnsupportedSentenceType(format!(
                             "Unsupported {} message type: {}",
