@@ -40,7 +40,7 @@ pub(crate) fn handle(
         },
         high_position_accuracy: { pick_u64(&bv, 38, 1) != 0 },
         latitude: {
-            let lat_raw = pick_i64(&bv, 44, 18) as i32;
+            let lat_raw = pick_i64(&bv, 62, 17) as i32;
             if lat_raw != 181000 {
                 Some((lat_raw as f64) / 600.0)
             } else {
@@ -48,7 +48,7 @@ pub(crate) fn handle(
             }
         },
         longitude: {
-            let lon_raw = pick_i64(&bv, 62, 17) as i32;
+            let lon_raw = pick_i64(&bv, 44, 18) as i32;
             if lon_raw != 181000 {
                 Some((lon_raw as f64) / 600.0)
             } else {
@@ -100,8 +100,8 @@ mod test {
                         assert_eq!(vdd.rot_direction, None);
                         assert_eq!(vdd.sog_knots, Some(1.0));
                         assert_eq!(vdd.high_position_accuracy, false);
-                        assert::close(vdd.latitude.unwrap_or(0.0), 137.0, 0.1);
-                        assert::close(vdd.longitude.unwrap_or(0.0), 4.8, 0.1);
+                        assert::close(vdd.latitude.unwrap_or(0.0), 4.8, 0.1);
+                        assert::close(vdd.longitude.unwrap_or(0.0), 137.0, 0.1);
                         assert::close(vdd.cog.unwrap_or(0.0), 290.0, 1.0);
                         assert_eq!(vdd.timestamp_seconds, 0);
                         assert_eq!(vdd.current_gnss_position, Some(true));
