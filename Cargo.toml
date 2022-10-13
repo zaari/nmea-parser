@@ -1,25 +1,24 @@
 [package]
-name          = "nmea-parser"
-version       = "0.10.0-dev"
-publish       = false
-description   = "NMEA 0183 parser for AIS and GNSS sentences"
-authors       = ["Timo Saarinen <zaari@mailbox.org>"]
-license       = "Apache-2.0"
-repository    = "https://github.com/zaari/nmea-parser"
+name = "nmea-parser"
+version = "0.10.0-dev"
+publish = false
+description = "NMEA 0183 parser for AIS and GNSS sentences"
+authors = ["Timo Saarinen <zaari@mailbox.org>"]
+license = "Apache-2.0"
+repository = "https://github.com/zaari/nmea-parser"
 documentation = "https://docs.rs/nmea-parser"
-keywords      = ["nmea", "ais", "gnss", "gps", "no_std"]
-categories    = ["parsing"]
-readme        = "README.md"
-edition       = "2018"
+keywords = ["nmea", "ais", "gnss", "gps", "no_std"]
+categories = ["parsing"]
+readme = "README.md"
+edition = "2018"
 #rust-version  = "1.43"
 
 [dependencies]
-bitvec     = { version = "0.22.3", default-features = false, features = ["alloc"] }
+bitvec = { version = "1.0.0", default-features = false, features = ["alloc"] }
 num-traits = { version = "0.2.14", default-features = false }
-chrono     = { version = "0.4.19", default-features = false }
-log        = "0.4.14"
-hashbrown  = "0.11"
+chrono = { version = "0.4.19", default-features = false }
+log = "0.4.14"
+hashbrown = "0.11"
 
 [dev-dependencies]
-assert     = "0.7.4"
-
+assert = "0.7.4"

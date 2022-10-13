@@ -35,7 +35,7 @@ pub(crate) fn make_fragment_key(
 
 /// Convert AIS VDM/VDO payload armored string into a `BitVec`.
 pub(crate) fn parse_payload(payload: &str) -> Result<BitVec, String> {
-    let mut bv = BitVec::<LocalBits, usize>::with_capacity(payload.len() * 6);
+    let mut bv = BitVec::<usize, LocalBits>::with_capacity(payload.len() * 6);
     for c in payload.chars() {
         let mut ci = (c as u8) - 48;
         if ci > 40 {
