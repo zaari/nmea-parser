@@ -20,7 +20,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct HdtData {
     /// Heading - true
-    heading_true: Option<f64>,
+    pub heading_true: Option<f64>,
 }
 
 // -------------------------------------------------------------------------------------------------

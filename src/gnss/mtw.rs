@@ -19,7 +19,7 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct MtwData {
     /// Water temperature in degrees Celsius
-    temperature: Option<f64>,
+    pub temperature: Option<f64>,
 }
 
 // -------------------------------------------------------------------------------------------------

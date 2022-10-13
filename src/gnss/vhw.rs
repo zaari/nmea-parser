@@ -20,16 +20,16 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct VhwData {
     /// Heading - true
-    heading_true: Option<f64>,
+    pub heading_true: Option<f64>,
 
     /// Heading - magnetic
-    heading_magnetic: Option<f64>,
+    pub heading_magnetic: Option<f64>,
 
     /// Velocity relative to water - knots
-    speed_through_water_knots: Option<f64>,
+    pub speed_through_water_knots: Option<f64>,
 
     /// Velocity relative to water - km/h
-    speed_through_water_kmh: Option<f64>,
+    pub speed_through_water_kmh: Option<f64>,
 }
 
 // -------------------------------------------------------------------------------------------------

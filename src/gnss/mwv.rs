@@ -20,16 +20,16 @@ use super::*;
 #[derive(Clone, Debug, PartialEq)]
 pub struct MwvData {
     /// wind angle, 0 to 359 degrees
-    wind_angle: Option<f64>,
+    pub wind_angle: Option<f64>,
 
     /// Reference, True/Relative (true = relative, false = true, None = unknown)
-    relative: Option<bool>,
+    pub relative: Option<bool>,
 
     /// Wind speed - knots
-    wind_speed_knots: Option<f64>,
+    pub wind_speed_knots: Option<f64>,
 
     /// Wind speed - km/h
-    wind_speed_kmh: Option<f64>,
+    pub wind_speed_kmh: Option<f64>,
 }
 
 // -------------------------------------------------------------------------------------------------
