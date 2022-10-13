@@ -107,7 +107,7 @@ Until version 1.0 refactoring and renaming of code elements is likely to happen.
 |--------|------------|----------------------------------------------------------|
 |0.11    |AIS         |VDM/VDO types 6-8                                         |
 |1.0     |general     |Stable API, optimizations, documentation enhancements, even more unit tests, examples|
-|1.1     |GNSS        |AAM, BOD, BWC, HDT, R00, RMB, ROT, RTE, WPL, ZTG, APB, GBS, RMA, GRS, GST, MSK, STN, VBW, XTE, XTR|
+|1.1     |GNSS        |AAM, BOD, BWC, R00, RMB, ROT, RTE, WPL, ZTG, APB, GBS, RMA, GRS, GST, MSK, STN, VBW, XTE, XTR|
 
 ## Minimum Rust version
 
