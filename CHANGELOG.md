@@ -8,8 +8,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Fixed incorrect shiptype on parse for Tanker and Other
 - Fixed lon lat inversion in AIS VMD type 27
-- Dependency `bitvec` upgraded to version 1.0.0
+- Dependency `bitvec` upgraded to version 1.0.1
 - Fixed visibility of fields in GNSS HDT, MTW, VHW and MWV (Issue #30)
+- Dependency `hashbrown` upgrade to version 0.12.3
 
 ## [0.9.0] - 2022-01-06
 ### Added
