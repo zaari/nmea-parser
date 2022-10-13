@@ -16,6 +16,7 @@ limitations under the License.
 
 use super::*;
 
+/// DPT - Depth of Water
 #[derive(Clone, Debug, PartialEq)]
 pub struct DptData {
     /// Water depth relative to transducer, meters

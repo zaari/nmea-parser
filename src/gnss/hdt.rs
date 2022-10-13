@@ -26,7 +26,6 @@ pub struct HdtData {
 // -------------------------------------------------------------------------------------------------
 
 /// xxHDT: Heading, true
-
 pub(crate) fn handle(sentence: &str) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 

@@ -3,7 +3,7 @@
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.10.0] - 2022-10-13
 ### Added
 ### Changed
 - Fixed incorrect shiptype on parse for Tanker and Other
@@ -11,6 +11,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dependency `bitvec` upgraded to version 1.0.1
 - Fixed visibility of fields in GNSS HDT, MTW, VHW and MWV (Issue #30)
 - Dependency `hashbrown` upgrade to version 0.12.3
+- Introduced `rust-version` field in Cargo.toml
+- Documentation fixes
 
 ## [0.9.0] - 2022-01-06
 ### Added
