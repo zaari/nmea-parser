@@ -317,7 +317,7 @@ impl NmeaParser {
         let (nav_system, station, sentence_type) = if &sentence_type[0..1] == "$" {
             // Identify GNSS system by talker ID.
             let nav_system = gnss::NavigationSystem::from_str(&sentence_type[1..])?;
-            let sentence_type = if sentence_type.len() == 6 {
+            let sentence_type = if !sentence_type.starts_with('P') && sentence_type.len() == 6 {
                 format!("${}", &sentence_type[3..6])
             } else {
                 String::from(sentence_type)
@@ -608,7 +608,7 @@ mod test {
         assert_eq!(
             p.parse_sentence("$PGRME,15.0,M,45.0,M,25.0,M*1C"),
             Err(ParseError::UnsupportedSentenceType(String::from(
-                "Unsupported sentence type: $RME"
+                "Unsupported sentence type: $PGRME"
             )))
         );
         // Try a proprietary sentence with four characters
