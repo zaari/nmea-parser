@@ -272,7 +272,19 @@ impl NmeaParser {
     /// `ParsedMessage::Incomplete` is returned. The actual result is returned when all the parts
     /// have been sent to the parser.
     pub fn parse_sentence(&mut self, sentence: &str) -> Result<ParsedMessage, ParseError> {
-        // Calculace NMEA checksum and compare it to the given one. Also, remove the checksum part
+        // Shed characters prefixing the message if they exist
+        let sentence = {
+            if let Some(start_idx) = sentence.find(&['$', '!']) {
+                &sentence[start_idx..]
+            } else {
+                return Err(ParseError::InvalidSentence(format!(
+                    "Invalid NMEA sentence: {}",
+                    sentence
+                )));
+            }
+        };
+
+        // Calculate NMEA checksum and compare it to the given one. Also, remove the checksum part
         // from the sentence to simplify next processing steps.
         let mut checksum = 0;
         let (sentence, checksum_hex_given) = {
@@ -568,6 +580,16 @@ impl NmeaParser {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_parse_prefix_chars() {
+        // Try a sentence with prefix characters
+        let mut p = NmeaParser::new();
+        assert!(p
+            .parse_sentence(",1277,-106*35\r\n!AIVDM,1,1,,A,152IS=iP?w<tSF0l4Q@>4?wp0H:;,0*2")
+            .ok()
+            .is_some());
+    }
 
     #[test]
     fn test_parse_corrupted() {
