@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// DBS - Depth Below Surface
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct DbsData {
     /// Water depth below surface, meters
     pub depth_meters: Option<f64>,

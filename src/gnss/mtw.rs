@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// MTW - Mean Temperature of Water
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct MtwData {
     /// Water temperature in degrees Celsius
     pub temperature: Option<f64>,

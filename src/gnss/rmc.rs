@@ -16,12 +16,13 @@ limitations under the License.
 use super::*;
 
 /// RMC - position, velocity, and time (Recommended Minimum sentence C)
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct RmcData {
     /// Navigation system
     pub source: NavigationSystem,
 
     /// Fix datetime based on HHMMSS and DDMMYY
+    #[serde(with = "json_date_time_utc")]
     pub timestamp: Option<DateTime<Utc>>,
 
     /// Status: true = active, false = void.
