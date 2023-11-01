@@ -70,12 +70,12 @@ pub(crate) fn handle(
         BinaryAddressedMessage {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
-            sequence_number: { pick_u64(&bv, 38, 2) as u8 },
-            destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
-            retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
-            dac: { pick_u64(&bv, 72, 10) as u16 },
-            fid: { pick_u64(&bv, 82, 6) as u8 }, // TODO: data (depending on DAC and FID
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
+            sequence_number: { pick_u64(bv, 38, 2) as u8 },
+            destination_mmsi: { pick_u64(bv, 40, 30) as u32 },
+            retransmit_flag: { pick_u64(bv, 70, 1) != 0 },
+            dac: { pick_u64(bv, 72, 10) as u16 },
+            fid: { pick_u64(bv, 82, 6) as u8 }, // TODO: data (depending on DAC and FID
         },
     ))
 }
@@ -97,7 +97,7 @@ mod test {
                         assert_eq!(bam.mmsi, 150834090);
                         assert_eq!(bam.sequence_number, 3);
                         assert_eq!(bam.destination_mmsi, 313240222);
-                        assert_eq!(bam.retransmit_flag, false);
+                        assert!(!bam.retransmit_flag);
                         assert_eq!(bam.dac, 669);
                         assert_eq!(bam.fid, 11);
                         // TODO: check data

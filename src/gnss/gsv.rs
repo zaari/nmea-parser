@@ -44,7 +44,7 @@ pub(crate) fn handle(
 ) -> Result<ParsedMessage, ParseError> {
     let split: Vec<&str> = sentence.split(',').collect();
 
-    let msg_type = split.get(0).unwrap_or(&"");
+    let msg_type = split.first().unwrap_or(&"");
     let msg_count = pick_number_field(&split, 1)?.unwrap_or(0);
     let msg_num = pick_number_field(&split, 2)?.unwrap_or(0);
     store.push_string(make_gsv_key(msg_type, msg_count, msg_num), sentence.into());

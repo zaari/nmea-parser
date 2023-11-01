@@ -153,7 +153,7 @@ pub(crate) fn handle(
             split.get(4).unwrap_or(&""),
             split.get(5).unwrap_or(&""),
         )?,
-        gps_mode: GnsModeIndicator::new(*modes.get(0).unwrap_or(&' ')),
+        gps_mode: GnsModeIndicator::new(*modes.first().unwrap_or(&' ')),
         glonass_mode: GnsModeIndicator::new(*modes.get(1).unwrap_or(&' ')),
         other_modes: modes
             .into_iter()

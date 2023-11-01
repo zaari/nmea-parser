@@ -292,20 +292,20 @@ pub(crate) fn handle(
         AidToNavigationReport {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
             aid_type: {
-                NavAidType::new(pick_u64(&bv, 38, 5) as u8)
+                NavAidType::new(pick_u64(bv, 38, 5) as u8)
                     .ok()
                     .unwrap_or(NavAidType::NotSpecified)
             },
             name: {
-                let mut s = pick_string(&bv, 43, 20);
-                s.push_str(&pick_string(&bv, 272, 14));
+                let mut s = pick_string(bv, 43, 20);
+                s.push_str(&pick_string(bv, 272, 14));
                 s
             },
-            high_position_accuracy: { pick_u64(&bv, 163, 1) != 0 },
+            high_position_accuracy: { pick_u64(bv, 163, 1) != 0 },
             latitude: {
-                let lat_raw = pick_i64(&bv, 192, 27) as i32;
+                let lat_raw = pick_i64(bv, 192, 27) as i32;
                 if lat_raw != 0x3412140 {
                     Some((lat_raw as f64) / 600000.0)
                 } else {
@@ -313,24 +313,24 @@ pub(crate) fn handle(
                 }
             },
             longitude: {
-                let lon_raw = pick_i64(&bv, 164, 28) as i32;
+                let lon_raw = pick_i64(bv, 164, 28) as i32;
                 if lon_raw != 0x6791AC0 {
                     Some((lon_raw as f64) / 600000.0)
                 } else {
                     None
                 }
             },
-            dimension_to_bow: { Some(pick_u64(&bv, 219, 9) as u16) },
-            dimension_to_stern: { Some(pick_u64(&bv, 228, 9) as u16) },
-            dimension_to_port: { Some(pick_u64(&bv, 237, 6) as u16) },
-            dimension_to_starboard: { Some(pick_u64(&bv, 243, 6) as u16) },
-            position_fix_type: { Some(PositionFixType::new(pick_u64(&bv, 249, 4) as u8)) },
-            timestamp_seconds: { pick_u64(&bv, 253, 6) as u8 },
-            off_position_indicator: { pick_u64(&bv, 243, 1) != 0 },
-            regional: { pick_u64(&bv, 260, 8) as u8 },
-            raim_flag: { pick_u64(&bv, 268, 1) != 0 },
-            virtual_aid_flag: { pick_u64(&bv, 269, 1) != 0 },
-            assigned_mode_flag: { pick_u64(&bv, 270, 1) != 0 },
+            dimension_to_bow: { Some(pick_u64(bv, 219, 9) as u16) },
+            dimension_to_stern: { Some(pick_u64(bv, 228, 9) as u16) },
+            dimension_to_port: { Some(pick_u64(bv, 237, 6) as u16) },
+            dimension_to_starboard: { Some(pick_u64(bv, 243, 6) as u16) },
+            position_fix_type: { Some(PositionFixType::new(pick_u64(bv, 249, 4) as u8)) },
+            timestamp_seconds: { pick_u64(bv, 253, 6) as u8 },
+            off_position_indicator: { pick_u64(bv, 243, 1) != 0 },
+            regional: { pick_u64(bv, 260, 8) as u8 },
+            raim_flag: { pick_u64(bv, 268, 1) != 0 },
+            virtual_aid_flag: { pick_u64(bv, 269, 1) != 0 },
+            assigned_mode_flag: { pick_u64(bv, 270, 1) != 0 },
         },
     ))
 }
@@ -366,7 +366,7 @@ mod test {
                         assert_eq!(atnr.mmsi, 123456789);
                         assert_eq!(atnr.aid_type, NavAidType::CardinalMarkNorth);
                         assert_eq!(atnr.name, "CHINA ROSE MURPHY EXPRESS ALERT");
-                        assert_eq!(atnr.high_position_accuracy, false);
+                        assert!(!atnr.high_position_accuracy);
                         assert::close(atnr.latitude.unwrap_or(0.0), 47.9206183333, 0.00000001);
                         assert::close(atnr.longitude.unwrap_or(0.0), -122.698591667, 0.00000001);
                         assert_eq!(atnr.dimension_to_bow, Some(5));
@@ -375,11 +375,11 @@ mod test {
                         assert_eq!(atnr.dimension_to_starboard, Some(5));
                         assert_eq!(atnr.position_fix_type, Some(PositionFixType::GPS));
                         assert_eq!(atnr.timestamp_seconds, 50);
-                        assert_eq!(atnr.off_position_indicator, false);
+                        assert!(!atnr.off_position_indicator);
                         assert_eq!(atnr.regional, 165);
-                        assert_eq!(atnr.raim_flag, false);
-                        assert_eq!(atnr.virtual_aid_flag, false);
-                        assert_eq!(atnr.assigned_mode_flag, false);
+                        assert!(!atnr.raim_flag);
+                        assert!(!atnr.virtual_aid_flag);
+                        assert!(!atnr.assigned_mode_flag);
                     }
                     ParsedMessage::Incomplete => {
                         assert!(false);

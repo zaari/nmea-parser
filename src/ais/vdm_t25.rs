@@ -50,17 +50,17 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    let addressed = pick_u64(&bv, 38, 1) != 0;
-    let structured = pick_u64(&bv, 39, 1) != 0;
+    let addressed = pick_u64(bv, 38, 1) != 0;
+    let structured = pick_u64(bv, 39, 1) != 0;
 
     Ok(ParsedMessage::SingleSlotBinaryMessage(
         SingleSlotBinaryMessage {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
             dest_mmsi: {
                 if addressed {
-                    Some(pick_u64(&bv, 40, 30) as u32)
+                    Some(pick_u64(bv, 40, 30) as u32)
                 } else {
                     None
                 }
@@ -68,23 +68,19 @@ pub(crate) fn handle(
             app_id: {
                 if addressed {
                     None
+                } else if structured {
+                    Some(pick_u64(bv, 70, 16) as u16)
                 } else {
-                    if structured {
-                        Some(pick_u64(&bv, 70, 16) as u16)
-                    } else {
-                        None
-                    }
+                    None
                 }
             },
             data: {
                 if addressed {
                     BitVec::from_bitslice(&bv[70..max(70, bv.len())])
+                } else if structured {
+                    BitVec::from_bitslice(&bv[86..max(86, bv.len())])
                 } else {
-                    if structured {
-                        BitVec::from_bitslice(&bv[86..max(86, bv.len())])
-                    } else {
-                        BitVec::from_bitslice(&bv[40..max(40, bv.len())])
-                    }
+                    BitVec::from_bitslice(&bv[40..max(40, bv.len())])
                 }
             },
         },

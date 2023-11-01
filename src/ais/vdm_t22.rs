@@ -93,61 +93,61 @@ pub(crate) fn handle(
     station: Station,
     own_vessel: bool,
 ) -> Result<ParsedMessage, ParseError> {
-    let addressed = pick_u64(&bv, 139, 1) != 0;
+    let addressed = pick_u64(bv, 139, 1) != 0;
     Ok(ParsedMessage::ChannelManagement(ChannelManagement {
         own_vessel: { own_vessel },
         station: { station },
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        channel_a: { pick_u64(&bv, 40, 12) as u16 },
-        channel_b: { pick_u64(&bv, 52, 12) as u16 },
-        txrx: { pick_u64(&bv, 64, 4) as u8 },
-        power: { pick_u64(&bv, 68, 1) != 0 },
+        mmsi: { pick_u64(bv, 8, 30) as u32 },
+        channel_a: { pick_u64(bv, 40, 12) as u16 },
+        channel_b: { pick_u64(bv, 52, 12) as u16 },
+        txrx: { pick_u64(bv, 64, 4) as u8 },
+        power: { pick_u64(bv, 68, 1) != 0 },
         ne_lat: {
             if !addressed {
-                Some(pick_i64(&bv, 87, 17) as f64 / 600.0)
+                Some(pick_i64(bv, 87, 17) as f64 / 600.0)
             } else {
                 None
             }
         },
         ne_lon: {
             if !addressed {
-                Some(pick_i64(&bv, 69, 18) as f64 / 600.0)
+                Some(pick_i64(bv, 69, 18) as f64 / 600.0)
             } else {
                 None
             }
         },
         sw_lat: {
             if !addressed {
-                Some(pick_i64(&bv, 122, 17) as f64 / 600.0)
+                Some(pick_i64(bv, 122, 17) as f64 / 600.0)
             } else {
                 None
             }
         },
         sw_lon: {
             if !addressed {
-                Some(pick_i64(&bv, 104, 18) as f64 / 600.0)
+                Some(pick_i64(bv, 104, 18) as f64 / 600.0)
             } else {
                 None
             }
         },
         dest1_mmsi: {
             if addressed {
-                Some(pick_u64(&bv, 69, 30) as u32)
+                Some(pick_u64(bv, 69, 30) as u32)
             } else {
                 None
             }
         },
         dest2_mmsi: {
             if addressed {
-                Some(pick_u64(&bv, 104, 30) as u32)
+                Some(pick_u64(bv, 104, 30) as u32)
             } else {
                 None
             }
         },
-        addressed: { pick_u64(&bv, 139, 1) != 0 },
-        channel_a_band: { pick_u64(&bv, 140, 1) != 0 },
-        channel_b_band: { pick_u64(&bv, 141, 1) != 0 },
-        zonesize: { pick_u64(&bv, 142, 3) as u8 },
+        addressed: { pick_u64(bv, 139, 1) != 0 },
+        channel_a_band: { pick_u64(bv, 140, 1) != 0 },
+        channel_b_band: { pick_u64(bv, 141, 1) != 0 },
+        zonesize: { pick_u64(bv, 142, 3) as u8 },
     }))
 }
 
@@ -169,14 +169,14 @@ mod test {
                         assert_eq!(cm.channel_a, 2087);
                         assert_eq!(cm.channel_b, 2088);
                         assert_eq!(cm.txrx, 0);
-                        assert_eq!(cm.power, false);
+                        assert!(!cm.power);
                         assert::close(cm.ne_lat.unwrap_or(0.0), 45.55, 0.01);
                         assert::close(cm.ne_lon.unwrap_or(0.0), -73.50, 0.01);
                         assert::close(cm.sw_lat.unwrap_or(0.0), 42.33, 0.01);
                         assert::close(cm.sw_lon.unwrap_or(0.0), -80.17, 0.01);
-                        assert_eq!(cm.addressed, false);
-                        assert_eq!(cm.channel_a_band, false);
-                        assert_eq!(cm.channel_b_band, false);
+                        assert!(!cm.addressed);
+                        assert!(!cm.channel_a_band);
+                        assert!(!cm.channel_b_band);
                         assert_eq!(cm.zonesize, 4);
                     }
                     ParsedMessage::Incomplete => {

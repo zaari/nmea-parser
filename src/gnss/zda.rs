@@ -67,7 +67,7 @@ mod test {
                     );
                     assert_eq!(
                         zda.timezone_local,
-                        Some(FixedOffset::east(-3 * 3600 - 0 * 60))
+                        Some(FixedOffset::east(-3 * 3600))
                     );
                 }
                 ParsedMessage::Incomplete => {

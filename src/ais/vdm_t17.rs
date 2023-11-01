@@ -52,9 +52,9 @@ pub(crate) fn handle(
         DgnssBroadcastBinaryMessage {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
             latitude: {
-                let lat_raw = pick_i64(&bv, 58, 17) as i32;
+                let lat_raw = pick_i64(bv, 58, 17) as i32;
                 if lat_raw != 0xd548 {
                     Some((lat_raw as f64) / 600.0)
                 } else {
@@ -62,7 +62,7 @@ pub(crate) fn handle(
                 }
             },
             longitude: {
-                let lon_raw = pick_i64(&bv, 40, 18) as i32;
+                let lon_raw = pick_i64(bv, 40, 18) as i32;
                 if lon_raw != 0x1a838 {
                     Some((lon_raw as f64) / 600.0)
                 } else {

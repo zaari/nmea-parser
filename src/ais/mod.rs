@@ -500,9 +500,9 @@ impl ShipType {
     /// Construct a new `ShipType` using the higher bits of the ship and cargo type field of NMEA.
     pub fn new(raw: u8) -> ShipType {
         match raw {
-            0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 => ShipType::NotAvailable,
-            10 | 11 | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 => ShipType::Reserved1,
-            20 | 21 | 22 | 23 | 24 | 25 | 26 | 27 | 28 | 29 => ShipType::WingInGround,
+            0..=9 => ShipType::NotAvailable,
+            10..=19 => ShipType::Reserved1,
+            20..=29 => ShipType::WingInGround,
 
             30 => ShipType::Fishing,
             31 => ShipType::Towing,
@@ -515,7 +515,7 @@ impl ShipType {
             38 => ShipType::Reserved38,
             39 => ShipType::Reserved39,
 
-            40 | 41 | 42 | 43 | 44 | 45 | 46 | 47 | 48 | 49 => ShipType::HighSpeedCraft,
+            40..=49 => ShipType::HighSpeedCraft,
 
             50 => ShipType::Pilot,
             51 => ShipType::SearchAndRescue,
@@ -528,10 +528,10 @@ impl ShipType {
             58 => ShipType::MedicalTransport,
             59 => ShipType::Noncombatant,
 
-            60 | 61 | 62 | 63 | 64 | 65 | 66 | 67 | 68 | 69 => ShipType::Passenger,
-            70 | 71 | 72 | 73 | 74 | 75 | 76 | 77 | 78 | 79 => ShipType::Cargo,
-            80 | 81 | 82 | 83 | 84 | 85 | 86 | 87 | 88 | 89 => ShipType::Tanker,
-            90 | 91 | 92 | 93 | 94 | 95 | 96 | 97 | 98 | 99 => ShipType::Other,
+            60..=69 => ShipType::Passenger,
+            70..=79 => ShipType::Cargo,
+            80..=89 => ShipType::Tanker,
+            90..=99 => ShipType::Other,
             _ => {
                 warn!("Unexpected ship and cargo type: {}", raw);
                 ShipType::NotAvailable

@@ -274,7 +274,7 @@ impl NmeaParser {
     pub fn parse_sentence(&mut self, sentence: &str) -> Result<ParsedMessage, ParseError> {
         // Shed characters prefixing the message if they exist
         let sentence = {
-            if let Some(start_idx) = sentence.find(&['$', '!']) {
+            if let Some(start_idx) = sentence.find(['$', '!']) {
                 &sentence[start_idx..]
             } else {
                 return Err(ParseError::InvalidSentence(format!(
@@ -307,7 +307,7 @@ impl NmeaParser {
             checksum ^= c as u8;
         }
         let checksum_hex_calculated = format!("{:02X?}", checksum);
-        if checksum_hex_calculated != checksum_hex_given && checksum_hex_given != "" {
+        if checksum_hex_calculated != checksum_hex_given && !checksum_hex_given.is_empty() {
             return Err(ParseError::CorruptedSentence(format!(
                 "Corrupted NMEA sentence: {:02X?} != {:02X?}",
                 checksum_hex_calculated, checksum_hex_given
@@ -493,7 +493,7 @@ impl NmeaParser {
                     let message_type = pick_u64(&bv, 0, 6);
                     match message_type {
                         // Position report with SOTDMA/ITDMA
-                        1 | 2 | 3 => ais::vdm_t1t2t3::handle(&bv, station, own_vessel),
+                        1..=3 => ais::vdm_t1t2t3::handle(&bv, station, own_vessel),
                         // Base station report
                         4 => ais::vdm_t4::handle(&bv, station, own_vessel),
                         // Ship static voyage related data

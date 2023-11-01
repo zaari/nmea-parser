@@ -46,8 +46,8 @@ pub(crate) fn handle(
         SafetyRelatedBroadcastMessage {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
-            text: { pick_string(&bv, 40, 161) },
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
+            text: { pick_string(bv, 40, 161) },
         },
     ))
 }
