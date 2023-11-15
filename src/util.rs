@@ -106,7 +106,11 @@ pub(crate) fn pick_string(bv: &BitVec, index: usize, char_count: usize) -> Strin
 
 /// Pick ETA based on UTC month, day, hour and minute.
 pub(crate) fn pick_eta(bv: &BitVec, index: usize) -> Result<Option<DateTime<Utc>>, ParseError> {
-    pick_eta_with_now(bv, index, Utc.ymd(2000, 1, 1).and_hms(0, 0, 0))
+    pick_eta_with_now(
+        bv,
+        index,
+        Utc.with_ymd_and_hms(2000, 1, 1, 0, 0, 0).single().unwrap(),
+    )
 }
 
 /// Pick ETA based on UTC month, day, hour and minute. Define also 'now'. This function is needed
@@ -221,7 +225,7 @@ pub(crate) fn parse_hhmmss(hhmmss: &str, now: DateTime<Utc>) -> Result<DateTime<
 
 /// Parse time fields of formats YYMMDD and HHMMSS and convert them to `DateTime<Utc>`.
 pub(crate) fn parse_yymmdd_hhmmss(yymmdd: &str, hhmmss: &str) -> Result<DateTime<Utc>, ParseError> {
-    let now = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+    let now = Utc.with_ymd_and_hms(2020, 1, 1, 0, 0, 0).unwrap();
     let century = (now.year() / 100) * 100;
     let (day, month, year) =
         parse_date(yymmdd).map_err(|_| format!("Invalid date format: {}", yymmdd))?;
@@ -564,7 +568,8 @@ mod test {
         let eta = pick_eta(&bv, 0).ok().unwrap();
         assert_eq!(
             eta,
-            Some(Utc.ymd(eta.unwrap().year(), 10, 11).and_hms(22, 57, 30))
+            Utc.with_ymd_and_hms(eta.unwrap().year(), 10, 11, 22, 57, 30)
+                .single()
         );
 
         // Invalid month
@@ -623,39 +628,51 @@ mod test {
         ];
 
         // Leap day case
-        let then = Utc.ymd(2020, 12, 31).and_hms(0, 0, 0);
+        let then = Utc
+            .with_ymd_and_hms(2020, 12, 31, 0, 0, 0)
+            .single()
+            .unwrap();
         assert_eq!(
             pick_eta_with_now(&feb29, 0, then).ok().unwrap(),
-            Some(Utc.ymd(2020, 2, 29).and_hms(0, 0, 30))
+            Utc.with_ymd_and_hms(2020, 2, 29, 0, 0, 30).single()
         );
 
         // Non leap day case
-        let then = Utc.ymd(2020, 12, 31).and_hms(0, 0, 0);
+        let then = Utc
+            .with_ymd_and_hms(2020, 12, 31, 0, 0, 0)
+            .single()
+            .unwrap();
         assert_eq!(
             pick_eta_with_now(&feb28, 0, then).ok().unwrap(),
-            Some(Utc.ymd(2021, 2, 28).and_hms(0, 0, 30))
+            Utc.with_ymd_and_hms(2021, 2, 28, 0, 0, 30).single()
         );
 
         // Non leap year invalid case
-        let then = Utc.ymd(2021, 12, 31).and_hms(0, 0, 0);
+        let then = Utc
+            .with_ymd_and_hms(2021, 12, 31, 0, 0, 0)
+            .single()
+            .unwrap();
         assert_eq!(pick_eta_with_now(&feb29, 0, then).is_ok(), false);
 
         // Non leap year valid case
-        let then = Utc.ymd(2021, 12, 31).and_hms(0, 0, 0);
+        let then = Utc
+            .with_ymd_and_hms(2021, 12, 31, 0, 0, 0)
+            .single()
+            .unwrap();
         assert_eq!(pick_eta_with_now(&feb28, 0, then).is_ok(), true);
 
         // One day late
-        let then = Utc.ymd(2021, 3, 1).and_hms(0, 0, 0);
+        let then = Utc.with_ymd_and_hms(2021, 3, 1, 0, 0, 0).single().unwrap();
         assert_eq!(
             pick_eta_with_now(&feb28, 0, then).ok().unwrap(),
-            Some(Utc.ymd(2021, 2, 28).and_hms(0, 0, 30))
+            Utc.with_ymd_and_hms(2021, 2, 28, 0, 0, 30).single()
         );
 
         // Six months late
-        let then = Utc.ymd(2021, 8, 31).and_hms(0, 0, 0);
+        let then = Utc.with_ymd_and_hms(2021, 8, 31, 0, 0, 0).single().unwrap();
         assert_eq!(
             pick_eta_with_now(&feb28, 0, then).ok().unwrap(),
-            Some(Utc.ymd(2022, 2, 28).and_hms(0, 0, 30))
+            Utc.with_ymd_and_hms(2022, 2, 28, 0, 0, 30).single()
         );
     }
 
@@ -757,14 +774,14 @@ mod test {
     #[test]
     fn test_parse_hhmmss_ss() {
         // Valid case with fractions
-        let then = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+        let then = Utc.with_ymd_and_hms(2000, 1, 1, 0, 0, 0).single().unwrap();
         assert_eq!(
             parse_hhmmss_ss("123456.987", then).ok(),
             Some(Utc.ymd(2000, 1, 1).and_hms_nano(12, 34, 56, 987000000))
         );
 
         // Valid case without fractions
-        let then = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+        let then = Utc.with_ymd_and_hms(2000, 1, 1, 0, 0, 0).single().unwrap();
         assert_eq!(
             parse_hhmmss_ss("123456", then).ok(),
             Some(Utc.ymd(2000, 1, 1).and_hms_nano(12, 34, 56, 0))
@@ -779,7 +796,7 @@ mod test {
         let s: Vec<&str> = "$GPZDA,072914.00,31,05,2018,+02,00".split(',').collect();
         assert_eq!(
             pick_date_with_fields(&s, 4, 3, 2, 0, 0, 0, 0).ok(),
-            Some(Utc.ymd(2018, 5, 31).and_hms(0, 0, 0))
+            Utc.with_ymd_and_hms(2018, 5, 31, 0, 0, 0).single()
         )
     }
 
@@ -796,7 +813,7 @@ mod test {
         let s: Vec<&str> = ",,,,,-4,30".split(',').collect();
         assert_eq!(
             pick_timezone_with_fields(&s, 5, 6).ok(),
-            Some(FixedOffset::east(-4 * 3600 - 30 * 60))
+            FixedOffset::east_opt(-4 * 3600 - 30 * 60)
         );
 
         // Invalid time zone

@@ -63,12 +63,9 @@ mod test {
                     assert_eq!(zda.source, NavigationSystem::Gps);
                     assert_eq!(
                         zda.timestamp_utc,
-                        Some(Utc.ymd(2018, 5, 31).and_hms(7, 29, 14))
+                        Utc.with_ymd_and_hms(2018, 5, 31, 7, 29, 14).single()
                     );
-                    assert_eq!(
-                        zda.timezone_local,
-                        Some(FixedOffset::east(-3 * 3600 - 0 * 60))
-                    );
+                    assert_eq!(zda.timezone_local, FixedOffset::east_opt(-3 * 3600));
                 }
                 ParsedMessage::Incomplete => {
                     assert!(false);

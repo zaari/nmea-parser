@@ -119,7 +119,7 @@ pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
 ) -> Result<ParsedMessage, ParseError> {
-    let now: DateTime<Utc> = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+    let now: DateTime<Utc> = Utc.with_ymd_and_hms(2000, 1, 1, 0, 0, 0).single().unwrap();
     let split: Vec<&str> = sentence.split(',').collect();
 
     Ok(ParsedMessage::Gga(GgaData {
@@ -160,7 +160,7 @@ mod test {
                     // The expected result
                     ParsedMessage::Gga(gga) => {
                         assert_eq!(gga.timestamp, {
-                            Some(Utc.ymd(2000, 01, 01).and_hms(12, 35, 19))
+                            Utc.with_ymd_and_hms(2000, 01, 01, 12, 35, 19).single()
                         });
                         assert::close(gga.latitude.unwrap_or(0.0), 48.117, 0.001);
                         assert::close(gga.longitude.unwrap_or(0.0), 11.517, 0.001);
@@ -222,7 +222,7 @@ mod test {
                     // The expected result
                     ParsedMessage::Gga(gga) => {
                         assert_eq!(gga.timestamp, {
-                            Some(Utc.ymd(2000, 01, 01).and_hms(12, 35, 19))
+                            Utc.with_ymd_and_hms(2000, 01, 01, 12, 35, 19).single()
                         });
                         assert_eq!(gga.latitude, None);
                         assert_eq!(gga.longitude, None);

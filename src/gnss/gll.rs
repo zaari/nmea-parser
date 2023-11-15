@@ -54,7 +54,7 @@ pub(crate) fn handle(
     sentence: &str,
     nav_system: NavigationSystem,
 ) -> Result<ParsedMessage, ParseError> {
-    let now: DateTime<Utc> = Utc.ymd(2000, 1, 1).and_hms(0, 0, 0);
+    let now: DateTime<Utc> = Utc.with_ymd_and_hms(2000, 1, 1, 0, 0, 0).single().unwrap();
     let split: Vec<&str> = sentence.split(',').collect();
 
     Ok(ParsedMessage::Gll(GllData {
@@ -97,7 +97,7 @@ mod test {
                         assert::close(gll.latitude.unwrap_or(0.0), 49.3, 0.1);
                         assert::close(gll.longitude.unwrap_or(0.0), -123.2, 0.1);
                         assert_eq!(gll.timestamp, {
-                            Some(Utc.ymd(2000, 01, 01).and_hms(22, 54, 44))
+                            Utc.with_ymd_and_hms(2000, 01, 01, 22, 54, 44).single()
                         });
                         assert_eq!(gll.data_valid, Some(true));
                         assert_eq!(gll.faa_mode, Some(FaaMode::Differential));

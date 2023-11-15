@@ -80,8 +80,8 @@ mod test {
                     // The expected result
                     ParsedMessage::UtcDateResponse(bsr) => {
                         assert_eq!(bsr.mmsi, 304137000);
-                        assert_eq!(bsr.timestamp, Some(Utc.ymd(2009, 5, 22).and_hms(2, 22, 40)));
-                        assert_eq!(bsr.high_position_accuracy, true);
+                        assert_eq!(bsr.timestamp, Utc.with_ymd_and_hms(2009, 5, 22,2, 22, 40).single());
+                        assert!(bsr.high_position_accuracy);
                         assert::close(bsr.latitude.unwrap_or(0.0), 28.409, 0.001);
                         assert::close(bsr.longitude.unwrap_or(0.0), -94.407, 0.001);
                         assert_eq!(bsr.position_fix_type, Some(PositionFixType::GPS));
