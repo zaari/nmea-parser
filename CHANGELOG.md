@@ -7,7 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added logic to avoid problems with proprietary sentence types
 ### Changed
-- Fixed panic on messages with characters prefixing the start delimiter (#37)
+- Fixed panic on messages with characters prefixing the start delimiter (PR #37)
 
 ## [0.10.0] - 2022-10-13
 ### Added

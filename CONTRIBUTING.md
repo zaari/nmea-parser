@@ -13,4 +13,5 @@ There following rules have to be taken into account before sending a pull reques
   - run `cargo test` to ensure that the unit tests pass
   - run `cargo fmt` to keep the coding style of the crate consistent
   - use of `unsafe` code is forbidden
+  - add notes to CHANGELOG.md if the change is significant
 
