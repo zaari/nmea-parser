@@ -14,10 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+use serde::Serialize;
+
 use super::*;
 
 /// ALM - GPS Almanac Data
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct AlmData {
     /// Navigation system
     pub source: NavigationSystem,

@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// MWV - Wind speed and angle
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct MwvData {
     /// wind angle, 0 to 359 degrees
     pub wind_angle: Option<f64>,

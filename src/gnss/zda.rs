@@ -17,15 +17,17 @@ limitations under the License.
 use super::*;
 
 /// ZDA - Time and date
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct ZdaData {
     /// Navigation system
     pub source: NavigationSystem,
 
     /// UTC
+    #[serde(with = "json_date_time_utc")]
     pub timestamp_utc: Option<DateTime<Utc>>,
 
     /// Local time zone offset
+    #[serde(with = "json_fixed_offset")]
     pub timezone_local: Option<FixedOffset>,
 }
 

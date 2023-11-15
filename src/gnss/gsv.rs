@@ -16,7 +16,7 @@ limitations under the License.
 use super::*;
 
 /// GSV - satellite information
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct GsvData {
     /// Navigation system
     pub source: NavigationSystem,

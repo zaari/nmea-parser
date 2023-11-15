@@ -51,6 +51,8 @@ pub mod ais;
 mod error;
 pub mod gnss;
 mod util;
+mod json_date_time_utc;
+mod json_fixed_offset;
 
 pub use error::ParseError;
 use util::*;

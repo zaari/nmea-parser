@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// VHW - Water speed and heading
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct VhwData {
     /// Heading - true
     pub heading_true: Option<f64>,

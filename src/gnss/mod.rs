@@ -43,6 +43,7 @@ pub use gns::GnsData;
 pub use gsa::{GsaData, GsaFixMode};
 pub use gsv::GsvData;
 pub use rmc::RmcData;
+use serde::Serialize;
 pub use vtg::VtgData;
 pub use alm::AlmData;
 pub use dtm::DtmData;
@@ -60,7 +61,7 @@ pub use mwv::MwvData;
 // -------------------------------------------------------------------------------------------------
 
 /// Navigation system, identified with NMEA GNSS sentence prefix (e.g. $BDGGA)
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
 pub enum NavigationSystem {
     /// Combination of several satellite systems
     Combination, // GNxxx
@@ -139,7 +140,7 @@ impl core::str::FromStr for NavigationSystem {
 
 // -------------------------------------------------------------------------------------------------
 /// VTG/GLL FAA mode (NMEA 2.3 standard has this information)
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
 pub enum FaaMode {
     /// Autonomous mode (automatic 2D/3D)
     Autonomous,

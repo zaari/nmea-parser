@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// VBW - Dual Ground/Water Speed
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct VbwData {
     /// Navigation system
     pub source: NavigationSystem,

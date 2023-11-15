@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// MSS - Multiple Data ID
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct MssData {
     /// Navigation system
     pub source: NavigationSystem,

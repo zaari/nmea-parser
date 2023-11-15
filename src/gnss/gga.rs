@@ -17,12 +17,13 @@ limitations under the License.
 use super::*;
 
 /// GGA - time, position, and fix related data
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct GgaData {
     /// Navigation system
     pub source: NavigationSystem,
 
     /// UTC of position fix
+    #[serde(with = "json_date_time_utc")]
     pub timestamp: Option<DateTime<Utc>>,
 
     /// Latitude in degrees
@@ -64,7 +65,7 @@ impl LatLon for GgaData {
 }
 
 /// GGA GPS quality indicator
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
 pub enum GgaQualityIndicator {
     Invalid,                // 0
     GpsFix,                 // 1

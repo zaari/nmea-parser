@@ -17,7 +17,7 @@ limitations under the License.
 use super::*;
 
 /// HDT - Heading, true
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize)]
 pub struct HdtData {
     /// Heading - true
     pub heading_true: Option<f64>,
