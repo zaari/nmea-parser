@@ -26,21 +26,21 @@ pub(crate) fn handle(
         own_vessel: { own_vessel },
         station: { station },
         ais_type: { AisClass::ClassA },
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        nav_status: { NavigationStatus::new(pick_u64(&bv, 40, 4) as u8) },
+        mmsi: { pick_u64(bv, 8, 30) as u32 },
+        nav_status: { NavigationStatus::new(pick_u64(bv, 40, 4) as u8) },
         rot: { None },
         rot_direction: { None },
         sog_knots: {
-            let sog_raw = pick_u64(&bv, 62, 6);
+            let sog_raw = pick_u64(bv, 62, 6);
             if sog_raw != 63 {
                 Some(sog_raw as f64)
             } else {
                 None
             }
         },
-        high_position_accuracy: { pick_u64(&bv, 38, 1) != 0 },
+        high_position_accuracy: { pick_u64(bv, 38, 1) != 0 },
         latitude: {
-            let lat_raw = pick_i64(&bv, 62, 17) as i32;
+            let lat_raw = pick_i64(bv, 62, 17) as i32;
             if lat_raw != 181000 {
                 Some((lat_raw as f64) / 600.0)
             } else {
@@ -48,7 +48,7 @@ pub(crate) fn handle(
             }
         },
         longitude: {
-            let lon_raw = pick_i64(&bv, 44, 18) as i32;
+            let lon_raw = pick_i64(bv, 44, 18) as i32;
             if lon_raw != 181000 {
                 Some((lon_raw as f64) / 600.0)
             } else {
@@ -56,7 +56,7 @@ pub(crate) fn handle(
             }
         },
         cog: {
-            let cog_raw = pick_u64(&bv, 62, 17);
+            let cog_raw = pick_u64(bv, 62, 17);
             if cog_raw != 91000 {
                 Some(cog_raw as f64 * 0.1)
             } else {
@@ -66,9 +66,9 @@ pub(crate) fn handle(
         heading_true: None,
         timestamp_seconds: 0,
         positioning_system_meta: None,
-        current_gnss_position: Some(pick_u64(&bv, 62, 1) == 0),
+        current_gnss_position: Some(pick_u64(bv, 62, 1) == 0),
         special_manoeuvre: None,
-        raim_flag: pick_u64(&bv, 39, 1) != 0,
+        raim_flag: pick_u64(bv, 39, 1) != 0,
         class_b_unit_flag: None,
         class_b_display: None,
         class_b_dsc: None,
@@ -99,13 +99,13 @@ mod test {
                         assert_eq!(vdd.rot, None);
                         assert_eq!(vdd.rot_direction, None);
                         assert_eq!(vdd.sog_knots, Some(1.0));
-                        assert_eq!(vdd.high_position_accuracy, false);
+                        assert!(!vdd.high_position_accuracy);
                         assert::close(vdd.latitude.unwrap_or(0.0), 4.8, 0.1);
                         assert::close(vdd.longitude.unwrap_or(0.0), 137.0, 0.1);
                         assert::close(vdd.cog.unwrap_or(0.0), 290.0, 1.0);
                         assert_eq!(vdd.timestamp_seconds, 0);
                         assert_eq!(vdd.current_gnss_position, Some(true));
-                        assert_eq!(vdd.raim_flag, false);
+                        assert!(!vdd.raim_flag);
                     }
                     ParsedMessage::Incomplete => {
                         assert!(false);

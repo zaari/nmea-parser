@@ -25,20 +25,20 @@ pub(crate) fn handle(
     Ok(ParsedMessage::UtcDateResponse(BaseStationReport {
         own_vessel: { own_vessel },
         station: { station },
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
+        mmsi: { pick_u64(bv, 8, 30) as u32 },
         timestamp: {
             Some(parse_ymdhs(
-                pick_u64(&bv, 38, 14) as i32,
-                pick_u64(&bv, 52, 4) as u32,
-                pick_u64(&bv, 56, 5) as u32,
-                pick_u64(&bv, 61, 5) as u32,
-                pick_u64(&bv, 66, 6) as u32,
-                pick_u64(&bv, 72, 6) as u32,
+                pick_u64(bv, 38, 14) as i32,
+                pick_u64(bv, 52, 4) as u32,
+                pick_u64(bv, 56, 5) as u32,
+                pick_u64(bv, 61, 5) as u32,
+                pick_u64(bv, 66, 6) as u32,
+                pick_u64(bv, 72, 6) as u32,
             )?)
         },
-        high_position_accuracy: { pick_u64(&bv, 78, 1) != 0 },
+        high_position_accuracy: { pick_u64(bv, 78, 1) != 0 },
         latitude: {
-            let lat_raw = pick_i64(&bv, 107, 27) as i32;
+            let lat_raw = pick_i64(bv, 107, 27) as i32;
             if lat_raw != 0x3412140 {
                 Some((lat_raw as f64) / 600000.0)
             } else {
@@ -46,7 +46,7 @@ pub(crate) fn handle(
             }
         },
         longitude: {
-            let lon_raw = pick_i64(&bv, 79, 28) as i32;
+            let lon_raw = pick_i64(bv, 79, 28) as i32;
             if lon_raw != 0x6791AC0 {
                 Some((lon_raw as f64) / 600000.0)
             } else {
@@ -54,14 +54,14 @@ pub(crate) fn handle(
             }
         },
         position_fix_type: {
-            let raw = pick_u64(&bv, 134, 4) as u8;
+            let raw = pick_u64(bv, 134, 4) as u8;
             match raw {
                 0 => None,
                 _ => Some(PositionFixType::new(raw)),
             }
         },
-        raim_flag: { pick_u64(&bv, 148, 1) != 0 },
-        radio_status: { pick_u64(&bv, 149, 19) as u32 },
+        raim_flag: { pick_u64(bv, 148, 1) != 0 },
+        radio_status: { pick_u64(bv, 149, 19) as u32 },
     }))
 }
 
@@ -85,7 +85,7 @@ mod test {
                         assert::close(bsr.latitude.unwrap_or(0.0), 28.409, 0.001);
                         assert::close(bsr.longitude.unwrap_or(0.0), -94.407, 0.001);
                         assert_eq!(bsr.position_fix_type, Some(PositionFixType::GPS));
-                        assert_eq!(bsr.raim_flag, false);
+                        assert!(!bsr.raim_flag);
                         assert_eq!(bsr.radio_status, 0);
                     },
                     ParsedMessage::Incomplete => {

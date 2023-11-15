@@ -55,11 +55,11 @@ pub(crate) fn handle(
         AddressedSafetyRelatedMessage {
             own_vessel: { own_vessel },
             station: { station },
-            source_mmsi: { pick_u64(&bv, 8, 30) as u32 },
-            sequence_number: { pick_u64(&bv, 38, 2) as u8 },
-            destination_mmsi: { pick_u64(&bv, 40, 30) as u32 },
-            retransmit_flag: { pick_u64(&bv, 70, 1) != 0 },
-            text: { pick_string(&bv, 72, 156) },
+            source_mmsi: { pick_u64(bv, 8, 30) as u32 },
+            sequence_number: { pick_u64(bv, 38, 2) as u8 },
+            destination_mmsi: { pick_u64(bv, 40, 30) as u32 },
+            retransmit_flag: { pick_u64(bv, 70, 1) != 0 },
+            text: { pick_string(bv, 72, 156) },
         },
     ))
 }
@@ -84,7 +84,7 @@ mod test {
                         assert_eq!(asrm.source_mmsi, 2275200);
                         assert_eq!(asrm.sequence_number, 0);
                         assert_eq!(asrm.destination_mmsi, 215724000);
-                        assert_eq!(asrm.retransmit_flag, false);
+                        assert!(!asrm.retransmit_flag);
                         assert_eq!(asrm.text, "PLEASE REPORT TO JOBOURG TRAFFIC CHANNEL 13");
                     }
                     ParsedMessage::Incomplete => {
@@ -111,7 +111,7 @@ mod test {
                         assert_eq!(asrm.source_mmsi, 237032000);
                         assert_eq!(asrm.sequence_number, 3);
                         assert_eq!(asrm.destination_mmsi, 2391100);
-                        assert_eq!(asrm.retransmit_flag, true);
+                        assert!(asrm.retransmit_flag);
                         assert_eq!(asrm.text, "EP 531 CARS 80 TRACKS 103 MOTO 5 CREW 86");
                     }
                     ParsedMessage::Incomplete => {

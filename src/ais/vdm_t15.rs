@@ -78,7 +78,7 @@ impl InterrogationCase {
     pub fn new(bv: &BitVec) -> InterrogationCase {
         let len = bv.len();
         if len >= 160 {
-            if pick_u64(&bv, 90, 18) == 0 {
+            if pick_u64(bv, 90, 18) == 0 {
                 // Case 3 (160 bits but without second type and second slot)
                 InterrogationCase::Case3
             } else {
@@ -108,32 +108,32 @@ pub(crate) fn handle(
         own_vessel,
         station,
         case,
-        mmsi: { pick_u64(&bv, 8, 30) as u32 },
-        mmsi1: { pick_u64(&bv, 40, 30) as u32 },
-        type1_1: { pick_u64(&bv, 70, 6) as u8 },
-        offset1_1: { pick_u64(&bv, 76, 12) as u16 },
+        mmsi: { pick_u64(bv, 8, 30) as u32 },
+        mmsi1: { pick_u64(bv, 40, 30) as u32 },
+        type1_1: { pick_u64(bv, 70, 6) as u8 },
+        offset1_1: { pick_u64(bv, 76, 12) as u16 },
         type1_2: match case {
-            InterrogationCase::Case2 | InterrogationCase::Case4 => Some(pick_u64(&bv, 90, 6) as u8),
+            InterrogationCase::Case2 | InterrogationCase::Case4 => Some(pick_u64(bv, 90, 6) as u8),
             _ => None,
         },
         offset1_2: match case {
             InterrogationCase::Case2 | InterrogationCase::Case4 => {
-                Some(pick_u64(&bv, 96, 12) as u16)
+                Some(pick_u64(bv, 96, 12) as u16)
             }
             _ => None,
         },
         mmsi2: match case {
             InterrogationCase::Case3 | InterrogationCase::Case4 => {
-                Some(pick_u64(&bv, 110, 30) as u32)
+                Some(pick_u64(bv, 110, 30) as u32)
             }
             _ => None,
         },
         type2_1: match case {
-            InterrogationCase::Case4 => Some(pick_u64(&bv, 140, 6) as u8),
+            InterrogationCase::Case4 => Some(pick_u64(bv, 140, 6) as u8),
             _ => None,
         },
         offset2_1: match case {
-            InterrogationCase::Case4 => Some(pick_u64(&bv, 146, 12) as u16),
+            InterrogationCase::Case4 => Some(pick_u64(bv, 146, 12) as u16),
             _ => None,
         },
     }))

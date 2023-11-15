@@ -24,31 +24,31 @@ pub(crate) fn handle(
     Ok(ParsedMessage::VesselStaticData(VesselStaticData {
         own_vessel,
         ais_type: AisClass::ClassB,
-        mmsi: pick_u64(&bv, 8, 30) as u32,
-        ais_version_indicator: pick_u64(&bv, 38, 2) as u8,
+        mmsi: pick_u64(bv, 8, 30) as u32,
+        ais_version_indicator: pick_u64(bv, 38, 2) as u8,
         imo_number: {
-            let raw = pick_u64(&bv, 40, 30) as u32;
+            let raw = pick_u64(bv, 40, 30) as u32;
             match raw {
                 0 => None,
                 _ => Some(raw),
             }
         },
         call_sign: {
-            let raw = pick_string(&bv, 70, 7);
+            let raw = pick_string(bv, 70, 7);
             match raw.as_str() {
                 "" => None,
                 _ => Some(raw),
             }
         },
         name: {
-            let raw = pick_string(&bv, 112, 20);
+            let raw = pick_string(bv, 112, 20);
             match raw.as_str() {
                 "" => None,
                 _ => Some(raw),
             }
         },
-        ship_type: { ShipType::new(pick_u64(&bv, 232, 8) as u8) },
-        cargo_type: { CargoType::new(pick_u64(&bv, 232, 8) as u8) },
+        ship_type: { ShipType::new(pick_u64(bv, 232, 8) as u8) },
+        cargo_type: { CargoType::new(pick_u64(bv, 232, 8) as u8) },
         equipment_vendor_id: {
             None // part of AIS class B
         },
@@ -58,21 +58,21 @@ pub(crate) fn handle(
         equipment_serial_number: {
             None // part of AIS class B
         },
-        dimension_to_bow: { Some(pick_u64(&bv, 240, 9) as u16) },
-        dimension_to_stern: { Some(pick_u64(&bv, 249, 9) as u16) },
-        dimension_to_port: { Some(pick_u64(&bv, 258, 6) as u16) },
-        dimension_to_starboard: { Some(pick_u64(&bv, 264, 6) as u16) },
+        dimension_to_bow: { Some(pick_u64(bv, 240, 9) as u16) },
+        dimension_to_stern: { Some(pick_u64(bv, 249, 9) as u16) },
+        dimension_to_port: { Some(pick_u64(bv, 258, 6) as u16) },
+        dimension_to_starboard: { Some(pick_u64(bv, 264, 6) as u16) },
         position_fix_type: {
-            let raw = pick_u64(&bv, 270, 4) as u8;
+            let raw = pick_u64(bv, 270, 4) as u8;
             match raw {
                 0 => None,
                 _ => Some(PositionFixType::new(raw)),
             }
         },
-        eta: pick_eta(&bv, 274)?,
-        draught10: Some(pick_u64(&bv, 294, 8) as u8),
+        eta: pick_eta(bv, 274)?,
+        draught10: Some(pick_u64(bv, 294, 8) as u8),
         destination: {
-            let raw = pick_string(&bv, 302, 20);
+            let raw = pick_string(bv, 302, 20);
             match raw.as_str() {
                 "" => None,
                 _ => Some(raw),

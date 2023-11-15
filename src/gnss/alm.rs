@@ -75,11 +75,7 @@ pub(crate) fn handle(
         source: nav_system,
         prn: pick_hex_field(&split, 3)?,
         week_number: {
-            if let Some(wk) = pick_hex_field::<u16>(&split, 4)? {
-                Some(wk & 0x3ff)
-            } else {
-                None
-            }
+            pick_hex_field::<u16>(&split, 4)?.map(|wk| wk & 0x3ff)
         },
         health_bits: pick_hex_field(&split, 5)?,
         eccentricity: pick_hex_field(&split, 6)?,

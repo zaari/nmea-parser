@@ -500,7 +500,7 @@ mod test {
 
     #[test]
     fn test_parse_payload() {
-        match parse_payload(&"w7b0P1".to_string()) {
+        match parse_payload("w7b0P1") {
             Ok(bv) => {
                 assert_eq!(
                     bv,
@@ -579,7 +579,7 @@ mod test {
             1, 0, 1, 1, 0, // 22
             1, 1, 1, 0, 0, 1, // 57
         ];
-        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+        assert!(!pick_eta(&bv, 0).is_ok());
 
         // Invalid day
         let bv = bitvec![
@@ -588,7 +588,7 @@ mod test {
             1, 0, 1, 1, 0, // 22
             1, 1, 1, 0, 0, 1, // 57
         ];
-        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+        assert!(!pick_eta(&bv, 0).is_ok());
 
         // Invalid hour
         let bv = bitvec![
@@ -597,7 +597,7 @@ mod test {
             1, 1, 0, 0, 1, // 25
             1, 1, 1, 0, 0, 1, // 57
         ];
-        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+        assert!(!pick_eta(&bv, 0).is_ok());
 
         // Invalid minute
         let bv = bitvec![
@@ -606,7 +606,7 @@ mod test {
             1, 0, 1, 1, 0, // 22
             1, 1, 1, 1, 0, 1, // 61
         ];
-        assert_eq!(pick_eta(&bv, 0).is_ok(), false);
+        assert!(!pick_eta(&bv, 0).is_ok());
     }
 
     #[test]
@@ -678,8 +678,8 @@ mod test {
 
     #[test]
     fn test_parse_valid_utc() {
-        assert_eq!(parse_valid_utc(2020, 2, 29, 0, 0, 0, 0).is_ok(), true);
-        assert_eq!(parse_valid_utc(2021, 2, 29, 0, 0, 0, 0).is_ok(), false);
+        assert!(parse_valid_utc(2020, 2, 29, 0, 0, 0, 0).is_ok());
+        assert!(!parse_valid_utc(2021, 2, 29, 0, 0, 0, 0).is_ok());
     }
 
     #[test]
@@ -689,13 +689,13 @@ mod test {
         assert_eq!(pick_number_field::<u8>(&s, 1).ok().unwrap().unwrap(), 0);
         assert_eq!(pick_number_field::<f64>(&s, 2).ok().unwrap().unwrap(), 8.0);
         assert_eq!(pick_number_field::<u16>(&s, 3).ok().unwrap(), None);
-        assert_eq!(pick_number_field::<u32>(&s, 4).is_ok(), false);
+        assert!(!pick_number_field::<u32>(&s, 4).is_ok());
         assert_eq!(pick_number_field::<u32>(&s, 5).ok().unwrap(), None);
     }
 
     #[test]
     fn test_pick_hex_field() {
-        let s: Vec<&str> = "ff,0,,FFFF,8080808080808080".split(",").collect();
+        let s: Vec<&str> = "ff,0,,FFFF,8080808080808080".split(',').collect();
         assert_eq!(pick_hex_field::<u8>(&s, 0).unwrap().unwrap(), 255);
         assert_eq!(pick_hex_field::<u8>(&s, 1).unwrap().unwrap(), 0);
         assert_eq!(pick_hex_field::<u8>(&s, 2).unwrap(), None);
@@ -718,9 +718,9 @@ mod test {
             -58.0,
             0.1,
         );
-        assert_eq!(parse_latitude_m_m("3480", "X").is_ok(), false);
-        assert_eq!(parse_latitude_m_m("ABCD", "N").is_ok(), false);
-        assert_eq!(parse_latitude_m_m("", "N").is_ok(), true);
+        assert!(!parse_latitude_m_m("3480", "X").is_ok());
+        assert!(!parse_latitude_m_m("ABCD", "N").is_ok());
+        assert!(parse_latitude_m_m("", "N").is_ok());
         assert_eq!(parse_latitude_m_m("", "N").ok().unwrap(), None);
     }
 
@@ -742,15 +742,15 @@ mod test {
             -19.0,
             0.1,
         );
-        assert_eq!(parse_longitude_m_m("1140", "X").is_ok(), false);
-        assert_eq!(parse_longitude_m_m("ABCD", "E").is_ok(), false);
-        assert_eq!(parse_longitude_m_m("", "E").is_ok(), true);
+        assert!(!parse_longitude_m_m("1140", "X").is_ok());
+        assert!(!parse_longitude_m_m("ABCD", "E").is_ok());
+        assert!(parse_longitude_m_m("", "E").is_ok());
         assert_eq!(parse_longitude_m_m("", "E").ok().unwrap(), None);
     }
 
     #[test]
     fn test_pick_string_field() {
-        let s: Vec<&str> = "a,b,,dd,e".split(",").collect();
+        let s: Vec<&str> = "a,b,,dd,e".split(',').collect();
         assert_eq!(pick_string_field(&s, 0), Some("a".into()));
         assert_eq!(pick_string_field(&s, 1), Some("b".into()));
         assert_eq!(pick_string_field(&s, 2), None);
@@ -818,6 +818,6 @@ mod test {
 
         // Invalid time zone
         let s: Vec<&str> = ",,,,,+25,00".split(',').collect();
-        assert_eq!(pick_timezone_with_fields(&s, 5, 6).is_ok(), false);
+        assert!(!pick_timezone_with_fields(&s, 5, 6).is_ok());
     }
 }

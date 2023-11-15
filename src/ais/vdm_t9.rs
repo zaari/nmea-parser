@@ -93,9 +93,9 @@ pub(crate) fn handle(
         StandardSarAircraftPositionReport {
             own_vessel: { own_vessel },
             station: { station },
-            mmsi: { pick_u64(&bv, 8, 30) as u32 },
+            mmsi: { pick_u64(bv, 8, 30) as u32 },
             altitude: {
-                let raw = pick_u64(&bv, 38, 12) as u16;
+                let raw = pick_u64(bv, 38, 12) as u16;
                 if raw != 4095 {
                     Some(raw)
                 } else {
@@ -103,16 +103,16 @@ pub(crate) fn handle(
                 }
             },
             sog_knots: {
-                let raw = pick_u64(&bv, 50, 10) as u16;
+                let raw = pick_u64(bv, 50, 10) as u16;
                 if raw != 1023 {
                     Some(raw)
                 } else {
                     None
                 }
             },
-            high_position_accuracy: { pick_u64(&bv, 60, 1) != 0 },
+            high_position_accuracy: { pick_u64(bv, 60, 1) != 0 },
             latitude: {
-                let lat_raw = pick_i64(&bv, 89, 27) as i32;
+                let lat_raw = pick_i64(bv, 89, 27) as i32;
                 if lat_raw != 0x3412140 {
                     Some((lat_raw as f64) / 600000.0)
                 } else {
@@ -120,7 +120,7 @@ pub(crate) fn handle(
                 }
             },
             longitude: {
-                let lon_raw = pick_i64(&bv, 61, 28) as i32;
+                let lon_raw = pick_i64(bv, 61, 28) as i32;
                 if lon_raw != 0x6791AC0 {
                     Some((lon_raw as f64) / 600000.0)
                 } else {
@@ -128,19 +128,19 @@ pub(crate) fn handle(
                 }
             },
             cog: {
-                let cog_raw = pick_u64(&bv, 116, 12);
+                let cog_raw = pick_u64(bv, 116, 12);
                 if cog_raw != 0xE10 {
                     Some(cog_raw as f64 * 0.1)
                 } else {
                     None
                 }
             },
-            timestamp_seconds: pick_u64(&bv, 128, 6) as u8,
-            regional: { pick_u64(&bv, 134, 8) as u8 },
-            dte: { pick_u64(&bv, 142, 1) == 0 },
-            assigned: { pick_u64(&bv, 146, 1) != 0 },
-            raim_flag: { pick_u64(&bv, 147, 1) != 0 },
-            radio_status: { pick_u64(&bv, 148, 20) as u32 },
+            timestamp_seconds: pick_u64(bv, 128, 6) as u8,
+            regional: { pick_u64(bv, 134, 8) as u8 },
+            dte: { pick_u64(bv, 142, 1) == 0 },
+            assigned: { pick_u64(bv, 146, 1) != 0 },
+            raim_flag: { pick_u64(bv, 147, 1) != 0 },
+            radio_status: { pick_u64(bv, 148, 20) as u32 },
         },
     ))
 }
@@ -162,15 +162,15 @@ mod test {
                         assert_eq!(sapr.mmsi, 111232511);
                         assert_eq!(sapr.altitude, Some(303));
                         assert_eq!(sapr.sog_knots, Some(42));
-                        assert_eq!(sapr.high_position_accuracy, false);
+                        assert!(!sapr.high_position_accuracy);
                         assert::close(sapr.longitude.unwrap_or(0.0), -6.27884, 0.00001);
                         assert::close(sapr.latitude.unwrap_or(0.0), 58.144, 0.00001);
                         assert_eq!(sapr.cog, Some(154.5));
                         assert_eq!(sapr.timestamp_seconds, 15);
                         assert_eq!(sapr.regional, 0);
-                        assert_eq!(sapr.dte, false);
-                        assert_eq!(sapr.assigned, false);
-                        assert_eq!(sapr.raim_flag, false);
+                        assert!(!sapr.dte);
+                        assert!(!sapr.assigned);
+                        assert!(!sapr.raim_flag);
                         assert_eq!(sapr.radio_status, 33392);
                     }
                     ParsedMessage::Incomplete => {
