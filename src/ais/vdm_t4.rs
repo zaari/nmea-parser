@@ -134,7 +134,7 @@ mod test {
                         assert_eq!(bsr.mmsi, 3669702);
                         assert_eq!(
                             bsr.timestamp,
-                            Some(Utc.ymd(2007, 5, 14).and_hms(19, 57, 39))
+                            Utc.with_ymd_and_hms(2007, 5, 14, 19, 57, 39).single()
                         );
                         assert!(bsr.high_position_accuracy);
                         assert::close(bsr.latitude.unwrap_or(0.0), 36.884, 0.001);

@@ -130,7 +130,11 @@ mod test {
                         assert_eq!(vsd.dimension_to_starboard, Some(31));
                         assert_eq!(vsd.position_fix_type, Some(PositionFixType::GPS));
                         assert_eq!(vsd.eta, {
-                            vsd.eta.map(|dt| Utc.ymd(dt.year(), 5, 15).and_hms(14, 0, 30))
+                            vsd.eta.map(|dt| {
+                                Utc.with_ymd_and_hms(dt.year(), 5, 15, 14, 0, 30)
+                                    .single()
+                                    .unwrap()
+                            })
                         });
                         assert_eq!(vsd.draught10, Some(122));
                         assert_eq!(vsd.destination, Some("NEW YORK".into()));

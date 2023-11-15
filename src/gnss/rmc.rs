@@ -27,10 +27,10 @@ pub struct RmcData {
     /// Status: true = active, false = void.
     pub status_active: Option<bool>,
 
-    /// Latitude in degrees    
+    /// Latitude in degrees
     pub latitude: Option<f64>,
 
-    /// Longitude in degrees    
+    /// Longitude in degrees
     pub longitude: Option<f64>,
 
     /// Speed over ground in knots
@@ -122,7 +122,7 @@ mod test {
                     ParsedMessage::Rmc(rmc) => {
                         assert_eq!(rmc.status_active, Some(true));
                         assert_eq!(rmc.timestamp, {
-                            Some(Utc.ymd(2020, 11, 19).and_hms(22, 54, 46))
+                            Utc.with_ymd_and_hms(2020, 11, 19, 22, 54, 46).single()
                         });
                         assert_eq!(rmc.sog_knots.unwrap(), 0.5);
                         assert::close(rmc.bearing.unwrap_or(0.0), 54.7, 0.1);
@@ -150,7 +150,7 @@ mod test {
                     ParsedMessage::Rmc(rmc) => {
                         assert_eq!(rmc.status_active, Some(true));
                         assert_eq!(rmc.timestamp, {
-                            Some(Utc.ymd(2009, 8, 7).and_hms(22, 54, 46))
+                            Utc.with_ymd_and_hms(2009, 8, 7, 22, 54, 46).single()
                         });
                         assert_eq!(rmc.sog_knots, None);
                         assert_eq!(rmc.bearing, None);
