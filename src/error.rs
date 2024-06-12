@@ -30,6 +30,9 @@ pub enum ParseError {
 
     /// The sentence format isn't what expected
     InvalidSentence(String),
+
+    /// An empty string occures, which wasn't expected.
+    EmptyString,
 }
 
 impl From<String> for ParseError {
@@ -58,6 +61,7 @@ impl fmt::Display for ParseError {
             }
             ParseError::CorruptedSentence(s) => write!(f, "Corrupted NMEA sentence: {}", s),
             ParseError::InvalidSentence(s) => write!(f, "Invalid NMEA sentence: {}", s),
+            ParseError::EmptyString => write!(f, "Empty String occures."),
         }
     }
 }
