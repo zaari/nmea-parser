@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added logic to avoid problems with proprietary sentence types
 - Added serialization for GNSS structures
+- Added error handling for `parse_sentence`
 ### Changed
 - Fixed panic on messages with characters prefixing the start delimiter (PR #37)
 
