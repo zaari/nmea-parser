@@ -328,20 +328,53 @@ impl NmeaParser {
             }
         };
 
-        let (nav_system, station, sentence_type) = if &sentence_type[0..1] == "$" {
+        // Validate sentence type characters
+        if !sentence_type
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '$' || c == '!')
+        {
+            return Err(ParseError::InvalidSentence(format!(
+                "Invalid characters in sentence type: {}",
+                sentence_type
+            )));
+        }
+
+        let (nav_system, station, sentence_type) = if sentence_type.starts_with('$') {
             // Identify GNSS system by talker ID.
-            let nav_system = gnss::NavigationSystem::from_str(&sentence_type[1..])?;
+            let nav_system = gnss::NavigationSystem::from_str(
+                sentence_type
+                    .get(1..)
+                    .ok_or(ParseError::CorruptedSentence("Empty String".to_string()))?,
+            )?;
             let sentence_type = if !sentence_type.starts_with('P') && sentence_type.len() == 6 {
-                format!("${}", &sentence_type[3..6])
+                format!(
+                    "${}",
+                    sentence_type
+                        .get(3..6)
+                        .ok_or(ParseError::InvalidSentence(format!(
+                            "{sentence_type} is too short."
+                        )))?
+                )
             } else {
                 String::from(sentence_type)
             };
             (nav_system, ais::Station::Other, sentence_type)
-        } else if &sentence_type[0..1] == "!" {
+        } else if sentence_type.starts_with('!') {
             // Identify AIS station
-            let station = ais::Station::from_str(&sentence_type[1..])?;
+            let station = ais::Station::from_str(
+                sentence_type
+                    .get(1..)
+                    .ok_or(ParseError::CorruptedSentence("Empty String".to_string()))?,
+            )?;
             let sentence_type = if sentence_type.len() == 6 {
-                format!("!{}", &sentence_type[3..6])
+                format!(
+                    "!{}",
+                    sentence_type
+                        .get(3..6)
+                        .ok_or(ParseError::InvalidSentence(format!(
+                            "{sentence_type} is too short."
+                        )))?
+                )
             } else {
                 String::from(sentence_type)
             };
@@ -438,57 +471,63 @@ impl NmeaParser {
 
                 // Try parse the payload
                 let mut bv: Option<BitVec> = None;
-                if fragment_count == 1 {
-                    bv = parse_payload(&payload_string).ok();
-                } else if fragment_count == 2 {
-                    if let Some(msg_id) = message_id {
-                        let key1 = make_fragment_key(
-                            &sentence_type.to_string(),
-                            msg_id,
-                            fragment_count,
-                            1,
-                            radio_channel_code.unwrap_or(""),
-                        );
-                        let key2 = make_fragment_key(
-                            &sentence_type.to_string(),
-                            msg_id,
-                            fragment_count,
-                            2,
-                            radio_channel_code.unwrap_or(""),
-                        );
-                        if fragment_number == 1 {
-                            if let Some(p) = self.pull_string(key2) {
-                                let mut payload_string_combined = payload_string;
-                                payload_string_combined.push_str(p.as_str());
-                                bv = parse_payload(&payload_string_combined).ok();
-                            } else {
-                                self.push_string(key1, payload_string);
-                            }
-                        } else if fragment_number == 2 {
-                            if let Some(p) = self.pull_string(key1) {
-                                let mut payload_string_combined = p;
-                                payload_string_combined.push_str(payload_string.as_str());
-                                bv = parse_payload(&payload_string_combined).ok();
-                            } else {
-                                self.push_string(key2, payload_string);
+                match fragment_count {
+                    1 => bv = parse_payload(&payload_string).ok(),
+                    2 => {
+                        if let Some(msg_id) = message_id {
+                            let key1 = make_fragment_key(
+                                &sentence_type.to_string(),
+                                msg_id,
+                                fragment_count,
+                                1,
+                                radio_channel_code.unwrap_or(""),
+                            );
+                            let key2 = make_fragment_key(
+                                &sentence_type.to_string(),
+                                msg_id,
+                                fragment_count,
+                                2,
+                                radio_channel_code.unwrap_or(""),
+                            );
+                            match fragment_number {
+                                1 => {
+                                    if let Some(p) = self.pull_string(key2) {
+                                        let mut payload_string_combined = payload_string;
+                                        payload_string_combined.push_str(p.as_str());
+                                        bv = parse_payload(&payload_string_combined).ok();
+                                    } else {
+                                        self.push_string(key1, payload_string);
+                                    }
+                                }
+                                2 => {
+                                    if let Some(p) = self.pull_string(key1) {
+                                        let mut payload_string_combined = p;
+                                        payload_string_combined.push_str(payload_string.as_str());
+                                        bv = parse_payload(&payload_string_combined).ok();
+                                    } else {
+                                        self.push_string(key2, payload_string);
+                                    }
+                                }
+                                _ => {
+                                    warn!(
+                                        "Unexpected NMEA fragment number: {}/{}",
+                                        fragment_number, fragment_count
+                                    );
+                                }
                             }
                         } else {
                             warn!(
-                                "Unexpected NMEA fragment number: {}/{}",
-                                fragment_number, fragment_count
+                                "NMEA message_id missing from {} than supported 2",
+                                sentence_type
                             );
                         }
-                    } else {
+                    }
+                    _ => {
                         warn!(
-                            "NMEA message_id missing from {} than supported 2",
-                            sentence_type
+                            "NMEA sentence fragment count greater ({}) than supported 2",
+                            fragment_count
                         );
                     }
-                } else {
-                    warn!(
-                        "NMEA sentence fragment count greater ({}) than supported 2",
-                        fragment_count
-                    );
                 }
 
                 if let Some(bv) = bv {
@@ -582,7 +621,34 @@ impl NmeaParser {
 #[cfg(test)]
 mod test {
     use super::*;
-
+    #[test]
+    fn test_parse_invalid_sentence() {
+        let mut p = NmeaParser::new();
+        assert_eq!(
+            p.parse_sentence("$޴GAGSV,,"),
+            Err(ParseError::InvalidSentence(
+                "Invalid characters in sentence type: $\u{7b4}GAGSV".to_string()
+            ))
+        );
+        assert_eq!(
+            p.parse_sentence("$WIMWV,295.4,T,"),
+            Err(ParseError::CorruptedSentence(
+                "pick string for \"wind_speed_knots\" was None".to_string()
+            ))
+        );
+        assert_eq!(
+            p.parse_sentence("!AIVDM,not,a,valid,nmea,string,0*00"),
+            Err(ParseError::CorruptedSentence(
+                "Corrupted NMEA sentence: \"17\" != \"00\"".to_string()
+            ))
+        );
+        assert_eq!(
+            p.parse_sentence("!"),
+            Err(ParseError::InvalidSentence(
+                "Invalid NMEA sentence: !".to_string()
+            ))
+        );
+    }
     #[test]
     fn test_parse_prefix_chars() {
         // Try a sentence with prefix characters
@@ -627,23 +693,23 @@ mod test {
 
     #[test]
     fn test_parse_proprietary() {
-/* FIXME: The test fails    
-        // Try a proprietary sentence
-        let mut p = NmeaParser::new();
-        assert_eq!(
-            p.parse_sentence("$PGRME,15.0,M,45.0,M,25.0,M*1C"),
-            Err(ParseError::UnsupportedSentenceType(String::from(
-                "Unsupported sentence type: $PGRME"
-            )))
-        );
-        // Try a proprietary sentence with four characters
-        assert_eq!(
-            p.parse_sentence("$PGRM,00,1,,,*15"),
-            Err(ParseError::UnsupportedSentenceType(String::from(
-                "Unsupported sentence type: $PGRM"
-            )))
-        );
-*/        
+        /* FIXME: The test fails
+                // Try a proprietary sentence
+                let mut p = NmeaParser::new();
+                assert_eq!(
+                    p.parse_sentence("$PGRME,15.0,M,45.0,M,25.0,M*1C"),
+                    Err(ParseError::UnsupportedSentenceType(String::from(
+                        "Unsupported sentence type: $PGRME"
+                    )))
+                );
+                // Try a proprietary sentence with four characters
+                assert_eq!(
+                    p.parse_sentence("$PGRM,00,1,,,*15"),
+                    Err(ParseError::UnsupportedSentenceType(String::from(
+                        "Unsupported sentence type: $PGRM"
+                    )))
+                );
+        */
     }
 
     #[test]
