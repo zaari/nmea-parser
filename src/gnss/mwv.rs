@@ -42,7 +42,9 @@ pub(crate) fn handle(sentence: &str) -> Result<ParsedMessage, ParseError> {
     Ok(ParsedMessage::Mwv(MwvData {
         wind_angle: pick_number_field(&split, 1)?,
         relative: match pick_string_field(&split, 2)
-            .ok_or(ParseError::EmptyString)?
+            .ok_or(ParseError::CorruptedSentence(
+                "pick string for \"relative\" was None".to_string(),
+            ))?
             .as_str()
         {
             "R" => Some(true),
@@ -50,26 +52,40 @@ pub(crate) fn handle(sentence: &str) -> Result<ParsedMessage, ParseError> {
             _ => None,
         },
         wind_speed_knots: match pick_string_field(&split, 4)
-            .ok_or(ParseError::EmptyString)?
+            .ok_or(ParseError::CorruptedSentence(
+                "pick string for \"wind_speed_knots\" was None".to_string(),
+            ))?
             .as_str()
         {
             "N" => pick_number_field(&split, 3)?,
             "M" => Some(
-                pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::EmptyString)? * 1.943844,
+                pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::CorruptedSentence(
+                    "pick string for \"wind_speed_knots M\" was None".to_string(),
+                ))? * 1.943844,
             ),
             "K" => Some(
-                pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::EmptyString)? * 0.539957,
+                pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::CorruptedSentence(
+                    "pick string for \"wind_speed_knots K\" was None".to_string(),
+                ))? * 0.539957,
             ),
             _ => None,
         },
         wind_speed_kmh: match pick_string_field(&split, 4)
-            .ok_or(ParseError::EmptyString)?
+            .ok_or(ParseError::CorruptedSentence(
+                "pick string for \"wind_speed_kmh\" was None".to_string(),
+            ))?
             .as_str()
         {
-            "N" => {
-                Some(pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::EmptyString)? * 1.852)
-            }
-            "M" => Some(pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::EmptyString)? * 3.6),
+            "N" => Some(
+                pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::CorruptedSentence(
+                    "pick string for \"wind_speed_kmh N\" was None".to_string(),
+                ))? * 1.852,
+            ),
+            "M" => Some(
+                pick_number_field::<f64>(&split, 3)?.ok_or(ParseError::CorruptedSentence(
+                    "pick string for \"wind_speed_kmh M\" was None".to_string(),
+                ))? * 3.6,
+            ),
             "K" => pick_number_field(&split, 3)?,
             _ => None,
         },

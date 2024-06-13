@@ -293,24 +293,12 @@ impl NmeaParser {
             if let Some(pos) = sentence.rfind('*') {
                 if pos + 3 <= sentence.len() {
                     (
-                        sentence
-                            .get(0..pos)
-                            .ok_or(ParseError::EmptyString)?
-                            .to_string(),
-                        sentence
-                            .get((pos + 1)..(pos + 3))
-                            .ok_or(ParseError::CorruptedSentence(format!("{sentence}")))?
-                            .to_string(),
+                        sentence[0..pos].to_string(),
+                        sentence[(pos + 1)..(pos + 3)].to_string(),
                     )
                 } else {
                     debug!("Invalid checksum found for sentence: {}", sentence);
-                    (
-                        sentence
-                            .get(0..pos)
-                            .ok_or(ParseError::EmptyString)?
-                            .to_string(),
-                        "".to_string(),
-                    )
+                    (sentence[0..pos].to_string(), "".to_string())
                 }
             } else {
                 debug!("No checksum found for sentence: {}", sentence);
@@ -331,7 +319,7 @@ impl NmeaParser {
         // Pick sentence type
         let sentence_type = {
             if let Some(i) = sentence.find(',') {
-                sentence.get(0..i).ok_or(ParseError::EmptyString)?
+                &sentence[0..i]
             } else {
                 return Err(ParseError::InvalidSentence(format!(
                     "Invalid NMEA sentence: {}",
@@ -351,13 +339,12 @@ impl NmeaParser {
             )));
         }
 
-        if sentence_type.len() < 1 {
-            return Err(ParseError::EmptyString);
-        }
         let (nav_system, station, sentence_type) = if sentence_type.starts_with('$') {
             // Identify GNSS system by talker ID.
             let nav_system = gnss::NavigationSystem::from_str(
-                sentence_type.get(1..).ok_or(ParseError::EmptyString)?,
+                sentence_type
+                    .get(1..)
+                    .ok_or(ParseError::CorruptedSentence("Empty String".to_string()))?,
             )?;
             let sentence_type = if !sentence_type.starts_with('P') && sentence_type.len() == 6 {
                 format!(
@@ -374,8 +361,11 @@ impl NmeaParser {
             (nav_system, ais::Station::Other, sentence_type)
         } else if sentence_type.starts_with('!') {
             // Identify AIS station
-            let station =
-                ais::Station::from_str(sentence_type.get(1..).ok_or(ParseError::EmptyString)?)?;
+            let station = ais::Station::from_str(
+                sentence_type
+                    .get(1..)
+                    .ok_or(ParseError::CorruptedSentence("Empty String".to_string()))?,
+            )?;
             let sentence_type = if sentence_type.len() == 6 {
                 format!(
                     "!{}",
@@ -642,7 +632,9 @@ mod test {
         );
         assert_eq!(
             p.parse_sentence("$WIMWV,295.4,T,"),
-            Err(ParseError::EmptyString)
+            Err(ParseError::CorruptedSentence(
+                "pick string for \"wind_speed_knots\" was None".to_string()
+            ))
         );
         assert_eq!(
             p.parse_sentence("!AIVDM,not,a,valid,nmea,string,0*00"),
