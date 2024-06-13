@@ -20,7 +20,7 @@ Include the following fragment in your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-nmea-parser = "0.10.0"
+nmea-parser = "0.11.0"
 ```
 
 The following example code fragment uses the crate to parse the given NMEA sentences and to print 
@@ -108,10 +108,6 @@ Until version 1.0 refactoring and renaming of code elements is likely to happen.
 |0.11    |AIS         |VDM/VDO types 6-8                                         |
 |1.0     |general     |Stable API, optimizations, documentation enhancements, even more unit tests, examples|
 |1.1     |GNSS        |AAM, BOD, BWC, R00, RMB, ROT, RTE, WPL, ZTG, APB, GBS, RMA, GRS, GST, MSK, STN, VBW, XTE, XTR|
-
-## Minimum Rust version
-
-The crate's minimum supported Rust toolchain version is 1.56.
 
 ## License
 

@@ -76,9 +76,7 @@ pub(crate) fn handle(
     Ok(ParsedMessage::Alm(AlmData {
         source: nav_system,
         prn: pick_hex_field(&split, 3)?,
-        week_number: {
-            pick_hex_field::<u16>(&split, 4)?.map(|wk| wk & 0x3ff)
-        },
+        week_number: { pick_hex_field::<u16>(&split, 4)?.map(|wk| wk & 0x3ff) },
         health_bits: pick_hex_field(&split, 5)?,
         eccentricity: pick_hex_field(&split, 6)?,
         reference_time: pick_hex_field(&split, 7)?,
