@@ -39,7 +39,7 @@ pub(crate) mod mwv;
 use super::*;
 pub use gga::{GgaData, GgaQualityIndicator};
 pub use gll::GllData;
-pub use gns::GnsData;
+pub use gns::{GnsData, GnsModeIndicator};
 pub use gsa::{GsaData, GsaFixMode};
 pub use gsv::GsvData;
 pub use rmc::RmcData;
