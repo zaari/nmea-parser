@@ -390,31 +390,44 @@ impl NmeaParser {
         // Handle sentence types
         match sentence_type.as_str() {
             // $xxGGA - Global Positioning System Fix Data
-            "$GGA" => gnss::gga::handle(sentence.as_str(), nav_system),
+            "$GGA" => gnss::gga::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_gga")),
             // $xxRMC - Recommended minimum specific GPS/Transit data
-            "$RMC" => gnss::rmc::handle(sentence.as_str(), nav_system),
+            "$RMC" => gnss::rmc::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_rmc")),
             // $xxGNS - GNSS fix data
-            "$GNS" => gnss::gns::handle(sentence.as_str(), nav_system),
+            "$GNS" => gnss::gns::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_gns")),
             // $xxGSA - GPS DOP and active satellites
-            "$GSA" => gnss::gsa::handle(sentence.as_str(), nav_system),
+            "$GSA" => gnss::gsa::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_gss")),
             // $xxGSV - GPS Satellites in view
-            "$GSV" => gnss::gsv::handle(sentence.as_str(), nav_system, self),
+            "$GSV" => gnss::gsv::handle(sentence.as_str(), nav_system, self)
+                .map_err(|err| append_type_to_error(err, "gnss_gsv")),
             // $xxVTG - Track made good and ground speed
-            "$VTG" => gnss::vtg::handle(sentence.as_str(), nav_system),
+            "$VTG" => gnss::vtg::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_vtg")),
             // $xxGLL - Geographic position, latitude / longitude
-            "$GLL" => gnss::gll::handle(sentence.as_str(), nav_system),
+            "$GLL" => gnss::gll::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_gll")),
             // $xxALM - Almanac Data
-            "$ALM" => gnss::alm::handle(sentence.as_str(), nav_system),
+            "$ALM" => gnss::alm::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_alm")),
             // $xxDTM - Datum reference
-            "$DTM" => gnss::dtm::handle(sentence.as_str(), nav_system),
+            "$DTM" => gnss::dtm::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_dtm")),
             // $xxMSS - MSK receiver signal
-            "$MSS" => gnss::mss::handle(sentence.as_str(), nav_system),
+            "$MSS" => gnss::mss::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_mss")),
             // $xxSTN - Multiple Data ID
-            "$STN" => gnss::stn::handle(sentence.as_str(), nav_system),
+            "$STN" => gnss::stn::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_stn")),
             // $xxVBW - MSK Receiver Signal
-            "$VBW" => gnss::vbw::handle(sentence.as_str(), nav_system),
+            "$VBW" => gnss::vbw::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_vbw")),
             // $xxZDA - Date and time
-            "$ZDA" => gnss::zda::handle(sentence.as_str(), nav_system),
+            "$ZDA" => gnss::zda::handle(sentence.as_str(), nav_system)
+                .map_err(|err| append_type_to_error(err, "gnss_zda")),
 
             // Received AIS data from other or own vessel
             "!VDM" | "!VDO" => {
@@ -534,13 +547,17 @@ impl NmeaParser {
                     let message_type = pick_u64(&bv, 0, 6);
                     match message_type {
                         // Position report with SOTDMA/ITDMA
-                        1..=3 => ais::vdm_t1t2t3::handle(&bv, station, own_vessel),
+                        1..=3 => ais::vdm_t1t2t3::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t1t2t3")),
                         // Base station report
-                        4 => ais::vdm_t4::handle(&bv, station, own_vessel),
+                        4 => ais::vdm_t4::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t4")),
                         // Ship static voyage related data
-                        5 => ais::vdm_t5::handle(&bv, station, own_vessel),
+                        5 => ais::vdm_t5::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t5")),
                         // Addressed binary message
-                        6 => ais::vdm_t6::handle(&bv, station, own_vessel),
+                        6 => ais::vdm_t6::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t6")),
                         // Binary acknowledge
                         7 => {
                             // TODO: implementation
@@ -558,43 +575,62 @@ impl NmeaParser {
                             )))
                         }
                         // Standard SAR aircraft position report
-                        9 => ais::vdm_t9::handle(&bv, station, own_vessel),
+                        9 => ais::vdm_t9::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t9")),
                         // UTC and Date inquiry
-                        10 => ais::vdm_t10::handle(&bv, station, own_vessel),
+                        10 => ais::vdm_t10::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t10")),
                         // UTC and date response
-                        11 => ais::vdm_t11::handle(&bv, station, own_vessel),
+                        11 => ais::vdm_t11::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t11")),
                         // Addressed safety related message
-                        12 => ais::vdm_t12::handle(&bv, station, own_vessel),
+                        12 => ais::vdm_t12::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t12")),
                         // Safety related acknowledge
-                        13 => ais::vdm_t13::handle(&bv, station, own_vessel),
+                        13 => ais::vdm_t13::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t13")),
                         // Safety related broadcast message
-                        14 => ais::vdm_t14::handle(&bv, station, own_vessel),
+                        14 => ais::vdm_t14::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t14")),
                         // Interrogation
-                        15 => ais::vdm_t15::handle(&bv, station, own_vessel),
+                        15 => ais::vdm_t15::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t15")),
                         // Assigned mode command
-                        16 => ais::vdm_t16::handle(&bv, station, own_vessel),
+                        16 => ais::vdm_t16::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t16")),
                         // GNSS binary broadcast message
-                        17 => ais::vdm_t17::handle(&bv, station, own_vessel),
+                        17 => ais::vdm_t17::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t17")),
                         // Standard class B CS position report
-                        18 => ais::vdm_t18::handle(&bv, station, own_vessel),
+                        18 => ais::vdm_t18::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t18")),
                         // Extended class B equipment position report
-                        19 => ais::vdm_t19::handle(&bv, station, own_vessel),
+                        19 => ais::vdm_t19::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t19")),
                         // Data link management
-                        20 => ais::vdm_t20::handle(&bv, station, own_vessel),
+                        20 => ais::vdm_t20::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t20")),
                         // Aids-to-navigation report
-                        21 => ais::vdm_t21::handle(&bv, station, own_vessel),
+                        21 => ais::vdm_t21::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t21")),
                         // Channel management
-                        22 => ais::vdm_t22::handle(&bv, station, own_vessel),
+                        22 => ais::vdm_t22::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t22")),
                         // Group assignment command
-                        23 => ais::vdm_t23::handle(&bv, station, own_vessel),
+                        23 => ais::vdm_t23::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t23")),
                         // Class B CS static data report
-                        24 => ais::vdm_t24::handle(&bv, station, self, own_vessel),
+                        24 => ais::vdm_t24::handle(&bv, station, self, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t24")),
                         // Single slot binary message
-                        25 => ais::vdm_t25::handle(&bv, station, own_vessel),
+                        25 => ais::vdm_t25::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t25")),
                         // Multiple slot binary message
-                        26 => ais::vdm_t26::handle(&bv, station, own_vessel),
+                        26 => ais::vdm_t26::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t26")),
                         // Long range AIS broadcast message
-                        27 => ais::vdm_t27::handle(&bv, station, own_vessel),
+                        27 => ais::vdm_t27::handle(&bv, station, own_vessel)
+                            .map_err(|err| append_type_to_error(err, "vdm_t27")),
                         _ => Err(ParseError::UnsupportedSentenceType(format!(
                             "Unsupported {} message type: {}",
                             sentence_type, message_type
@@ -604,17 +640,31 @@ impl NmeaParser {
                     Ok(ParsedMessage::Incomplete)
                 }
             }
-            "$DPT" => gnss::dpt::handle(sentence.as_str()),
-            "$DBS" => gnss::dbs::handle(sentence.as_str()),
-            "$MTW" => gnss::mtw::handle(sentence.as_str()),
-            "$VHW" => gnss::vhw::handle(sentence.as_str()),
-            "$HDT" => gnss::hdt::handle(sentence.as_str()),
-            "$MWV" => gnss::mwv::handle(sentence.as_str()),
+            "$DPT" => gnss::dpt::handle(sentence.as_str())
+                .map_err(|err| append_type_to_error(err, "gnss_dpt")),
+            "$DBS" => gnss::dbs::handle(sentence.as_str())
+                .map_err(|err| append_type_to_error(err, "gnss_dbs")),
+            "$MTW" => gnss::mtw::handle(sentence.as_str())
+                .map_err(|err| append_type_to_error(err, "gnss_mtw")),
+            "$VHW" => gnss::vhw::handle(sentence.as_str())
+                .map_err(|err| append_type_to_error(err, "gnss_vhw")),
+            "$HDT" => gnss::hdt::handle(sentence.as_str())
+                .map_err(|err| append_type_to_error(err, "gnss_hdt")),
+            "$MWV" => gnss::mwv::handle(sentence.as_str())
+                .map_err(|err| append_type_to_error(err, "gnss_mwv")),
             _ => Err(ParseError::UnsupportedSentenceType(format!(
                 "Unsupported sentence type: {}",
                 sentence_type
             ))),
         }
+    }
+}
+fn append_type_to_error(err: ParseError, message_type: &str) -> ParseError {
+    match err {
+        ParseError::InvalidSentence(invalid_error) => {
+            ParseError::InvalidSentence(format!("{} for type {}", invalid_error, message_type))
+        }
+        _ => err,
     }
 }
 

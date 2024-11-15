@@ -5,7 +5,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Implementation for AIS VDM/VDO sentence type 19 parsing
+- Implementation of type spesification to errors happening in parse method for easier debugging
 ### Changed
+- Added fallback to none value where instead of failing when try to parse optional field in t4 and t5 ais
+
 
 ## [0.11.0] - 2024-06-13
 ### Added

@@ -79,14 +79,17 @@ pub(crate) fn handle(
         station: { station },
         mmsi: { pick_u64(bv, 8, 30) as u32 },
         timestamp: {
-            Some(parse_ymdhs(
+            match parse_ymdhs(
                 pick_u64(bv, 38, 14) as i32,
                 pick_u64(bv, 52, 4) as u32,
                 pick_u64(bv, 56, 5) as u32,
                 pick_u64(bv, 61, 5) as u32,
                 pick_u64(bv, 66, 6) as u32,
                 pick_u64(bv, 72, 6) as u32,
-            )?)
+            ) {
+                Ok(val) => Some(val),
+                Err(_) => None,
+            }
         },
         high_position_accuracy: { pick_u64(bv, 78, 1) != 0 },
         latitude: {
