@@ -376,26 +376,17 @@ pub(crate) fn parse_latitude_ddmm_mmm(
         return Ok(None);
     }
 
-    // Validate: 4 digits, a decimal point, then 1 or more digits
-    let byte_string = lat_string.as_bytes();
-    if !(byte_string.iter().take(4).all(|c| c.is_ascii_digit())
-        && byte_string.get(4) == Some(&b'.')
-        && byte_string
-            .get(5)
-            .map(|c| c.is_ascii_digit())
-            .unwrap_or(false))
-    {
-        return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string).into());
-    }
-    let end = 5 + byte_string
-        .iter()
-        .skip(5)
-        .take_while(|c| c.is_ascii_digit())
-        .count();
+    // Be lenient: accept numbers that have no decimal point, or fewer than
+    // four leading digits.
+
+    let n = match lat_string.parse::<f64>() {
+        Ok(n) => n,
+        Err(_) => { return Err(format!("Failed to parse latitude (DDMM.MMM) from {}", lat_string).into()); }
+    };
+    let d = (n / 100.).floor();
+    let m = n - d * 100.;
 
     // Extract
-    let d = lat_string[0..2].parse::<f64>().unwrap_or(0.0);
-    let m = lat_string[2..end].parse::<f64>().unwrap_or(0.0);
     let val = d + m / 60.0;
     Ok(Some(match hemisphere {
         "N" => val,
@@ -417,29 +408,14 @@ pub(crate) fn parse_longitude_dddmm_mmm(
         return Ok(None);
     }
 
-    // Validate: 5 digits, a decimal point, then 1 or more digits
-    let byte_string = lon_string.as_bytes();
-    if !(byte_string.iter().take(5).all(|c| c.is_ascii_digit())
-        && byte_string.get(5) == Some(&b'.')
-        && byte_string
-            .get(6)
-            .map(|c| c.is_ascii_digit())
-            .unwrap_or(false))
-    {
-        return Err(format!(
-            "Failed to parse longitude (DDDMM.MMM) from {}",
-            lon_string
-        ));
-    }
-    let end = 6 + byte_string
-        .iter()
-        .skip(6)
-        .take_while(|c| c.is_ascii_digit())
-        .count();
+    let n = match lon_string.parse::<f64>() {
+        Ok(n) => n,
+        Err(_) => { return Err(format!("Failed to parse longitude (DDDMM.MMM) from {}", lon_string).into()); }
+    };
 
     // Extract
-    let d = lon_string[0..3].parse::<f64>().unwrap_or(0.0);
-    let m = lon_string[3..end].parse::<f64>().unwrap_or(0.0);
+    let d = (n / 100.).floor();
+    let m = n - d * 100.;
     let val = d + m / 60.0;
     Ok(Some(match hemisphere {
         "E" => val,
@@ -746,6 +722,28 @@ mod test {
         assert!(!parse_longitude_m_m("ABCD", "E").is_ok());
         assert!(parse_longitude_m_m("", "E").is_ok());
         assert_eq!(parse_longitude_m_m("", "E").ok().unwrap(), None);
+    }
+
+    #[test]
+    fn test_parse_latitude_ddmm_mmm() {
+        assert::close(parse_latitude_ddmm_mmm("1033.333", "N").unwrap().unwrap(), 10.55555, 1e-9);
+        assert::close(parse_latitude_ddmm_mmm("1033.3333", "N").unwrap().unwrap(), 10.555555, 1e-9);
+        assert::close(parse_latitude_ddmm_mmm("533.333", "N").unwrap().unwrap(), 5.55555, 1e-9);
+        assert::close(parse_latitude_ddmm_mmm("033.333", "N").unwrap().unwrap(), 0.55555, 1e-9);
+        assert::close(parse_latitude_ddmm_mmm("0.333", "N").unwrap().unwrap(), 0.00555, 1e-9);
+        assert::close(parse_latitude_ddmm_mmm("0.", "N").unwrap().unwrap(), 0.0, 1e-9);
+        assert!(parse_latitude_ddmm_mmm(".", "N").is_err());
+    }
+
+    #[test]
+    fn test_parse_longitude_dddmm_mmm() {
+        assert::close(parse_longitude_dddmm_mmm("10033.333", "N").unwrap().unwrap(), 100.55555, 1e-9);
+        assert::close(parse_longitude_dddmm_mmm("1033.3333", "N").unwrap().unwrap(), 10.555555, 1e-9);
+        assert::close(parse_longitude_dddmm_mmm("533.333", "N").unwrap().unwrap(), 5.55555, 1e-9);
+        assert::close(parse_longitude_dddmm_mmm("033.333", "N").unwrap().unwrap(), 0.55555, 1e-9);
+        assert::close(parse_longitude_dddmm_mmm("0.333", "N").unwrap().unwrap(), 0.00555, 1e-9);
+        assert::close(parse_longitude_dddmm_mmm("0.", "N").unwrap().unwrap(), 0., 1e-9);
+        assert!(parse_longitude_dddmm_mmm(".", "N").is_err());
     }
 
     #[test]
