@@ -16,7 +16,8 @@ limitations under the License.
 use super::*;
 
 /// GLL - geographic Position - Latitude/Longitude
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct GllData {
     /// Navigation system
     pub source: NavigationSystem,
@@ -28,7 +29,7 @@ pub struct GllData {
     pub longitude: Option<f64>,
 
     /// UTC of position fix
-    #[serde(with = "json_date_time_utc")]
+    #[cfg_attr(feature = "serde", serde(with = "json_date_time_utc"))]
     pub timestamp: Option<DateTime<Utc>>,
 
     /// True = data valid, false = data invalid.

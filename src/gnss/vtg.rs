@@ -16,7 +16,8 @@ limitations under the License.
 use super::*;
 
 /// VTG - track made good and speed over ground
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct VtgData {
     /// Navigation system
     pub source: NavigationSystem,

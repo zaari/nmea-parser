@@ -17,7 +17,8 @@ limitations under the License.
 use super::*;
 
 /// STN - MSK Receiver Signal
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct StnData {
     /// Navigation system
     pub source: NavigationSystem,

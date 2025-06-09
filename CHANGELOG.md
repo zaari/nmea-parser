@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+- Moved serde behind "serde" feature
 
 ## [0.11.0] - 2024-06-13
 ### Added

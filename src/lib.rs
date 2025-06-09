@@ -51,7 +51,9 @@ pub mod ais;
 mod error;
 pub mod gnss;
 mod util;
+#[cfg(feature = "serde")]
 mod json_date_time_utc;
+#[cfg(feature = "serde")]
 mod json_fixed_offset;
 
 pub use error::ParseError;

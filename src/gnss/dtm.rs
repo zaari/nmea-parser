@@ -17,7 +17,8 @@ limitations under the License.
 use super::*;
 
 /// DTM - Datum being used
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct DtmData {
     /// Navigation system
     pub source: NavigationSystem,
