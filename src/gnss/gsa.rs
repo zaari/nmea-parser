@@ -15,7 +15,8 @@ limitations under the License.
 */
 use super::*;
 /// GSA - GNSS dilution of position (DOP) and active satellites
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct GsaData {
     /// Navigation system
     pub source: NavigationSystem,
@@ -40,7 +41,8 @@ pub struct GsaData {
 }
 
 /// GSA position fix type
-#[derive(Clone, Copy, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum GsaFixMode {
     /// No fix.
     NotAvailable,

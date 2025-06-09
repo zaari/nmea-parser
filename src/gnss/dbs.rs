@@ -17,7 +17,8 @@ limitations under the License.
 use super::*;
 
 /// DBS - Depth Below Surface
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct DbsData {
     /// Water depth below surface, meters
     pub depth_meters: Option<f64>,

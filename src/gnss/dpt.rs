@@ -17,7 +17,8 @@ limitations under the License.
 use super::*;
 
 /// DPT - Depth of Water
-#[derive(Clone, Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "serde", derive(Serialize))]
+#[derive(Clone, Debug, PartialEq)]
 pub struct DptData {
     /// Water depth relative to transducer, meters
     pub depth_relative_to_transducer: Option<f64>,
