@@ -286,6 +286,12 @@ impl NmeaParser {
             }
         };
 
+        if !sentence.is_ascii() {
+            return Err(ParseError::InvalidSentence(String::from(
+                "Invalid characters in sentence",
+            )));
+        }
+
         // Calculate NMEA checksum and compare it to the given one. Also, remove the checksum part
         // from the sentence to simplify next processing steps.
         let mut checksum = 0;
@@ -625,9 +631,9 @@ mod test {
     fn test_parse_invalid_sentence() {
         let mut p = NmeaParser::new();
         assert_eq!(
-            p.parse_sentence("$޴GAGSV,,"),
+            p.parse_sentence("$GAGSV^,,"),
             Err(ParseError::InvalidSentence(
-                "Invalid characters in sentence type: $\u{7b4}GAGSV".to_string()
+                "Invalid characters in sentence type: $GAGSV^".to_string()
             ))
         );
         assert_eq!(
@@ -646,6 +652,12 @@ mod test {
             p.parse_sentence("!"),
             Err(ParseError::InvalidSentence(
                 "Invalid NMEA sentence: !".to_string()
+            ))
+        );
+        assert_eq!(
+            p.parse_sentence("$GAGSV,,*💖"),
+            Err(ParseError::InvalidSentence(
+                "Invalid characters in sentence".to_string()
             ))
         );
     }

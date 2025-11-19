@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+- Fixed panic on messages with multi-byte characters in the checksum
 
 ## [0.11.0] - 2024-06-13
 ### Added
