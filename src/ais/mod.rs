@@ -532,10 +532,7 @@ impl ShipType {
             70..=79 => ShipType::Cargo,
             80..=89 => ShipType::Tanker,
             90..=99 => ShipType::Other,
-            _ => {
-                warn!("Unexpected ship and cargo type: {}", raw);
-                ShipType::NotAvailable
-            }
+            _ => ShipType::NotAvailable,
         }
     }
 
@@ -616,10 +613,7 @@ impl CargoType {
             17 | 27 | 47 | 67 | 77 | 87 | 97 => CargoType::Reserved7,
             18 | 28 | 48 | 68 | 78 | 88 | 98 => CargoType::Reserved8,
             19 | 29 | 49 | 69 | 79 | 89 | 99 => CargoType::Reserved9,
-            _ => {
-                warn!("Unexpected ship and cargo type: {}", raw);
-                CargoType::Undefined
-            }
+            _ => CargoType::Undefined,
         }
     }
 
@@ -679,10 +673,7 @@ impl PositionFixType {
             6 => PositionFixType::IntegratedNavigationSystem,
             7 => PositionFixType::Surveyed,
             8 => PositionFixType::Galileo,
-            _ => {
-                warn!("Unrecognized position fix type: {}", raw);
-                PositionFixType::Undefined
-            }
+            _ => PositionFixType::Undefined,
         }
     }
 

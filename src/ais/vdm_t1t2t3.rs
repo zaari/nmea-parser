@@ -112,10 +112,7 @@ pub(crate) fn handle(
                 0 => None,
                 1 => Some(true),
                 2 => Some(true),
-                _ => {
-                    warn!("Unrecognized Maneuver Indicator value: {}", raw);
-                    None
-                }
+                _ => None,
             }
         },
         raim_flag: pick_u64(bv, 148, 1) != 0,

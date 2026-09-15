@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 ### Changed
+- Removed log warnings for unexpected ship type, cargo type, position fix type and special manoeuvre values in AIS messages; they are mapped to the existing undefined/unavailable values silently
 
 ## [0.11.0] - 2024-06-13
 ### Added
